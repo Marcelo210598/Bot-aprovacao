@@ -73,7 +73,26 @@ Ordens de vender stop não podem ser aplicadas ACIMA do mercado. Ordem afetada: 
 **Correção (13/06):** `SetStopLoss`/`SetProfitTarget` agora são chamados em **`CalculationMode.Ticks` ANTES do Enter** → o NT8 cria as ordens **atreladas ao fill**, no preço correto, protegendo intrabar desde o 1º tick. Nunca mais nasce inválido. Trailing sintético mantido.
 
 ## ✅ Versão corrigida compilada (13/06 ~18h)
-`BotAprovacao.cs` (trailing sintético + nomes únicos + IgnoreAllErrors) baixada do GitHub e compilada no NT8 (Compile succeeded). **Próximo:** rodar um dia limpo no replay com a versão nova e confirmar: TP/SL sempre visíveis, trailing fechando, zero erros no Output. Esse será o teste que valida o bot de verdade.
+`BotAprovacao.cs` (trailing sintético + nomes únicos + IgnoreAllErrors + stop/alvo na entrada por ticks) baixada do GitHub e compilada no NT8 (Compile succeeded).
+
+### 🔢 Trade 4 — LONG (11:44) → -$1.918 (bug) | ajustado p/ -$125 (stop correto)
+- `LONG @ 29631,00 | tocou Min 29627,00 (L=29626,75) e FECHOU ACIMA (C=29631,00)`. Furou a mínima e despencou. Stop não foi criado (bug 3) → perda real -$1.918. Com o stop funcionando (12,5pt) teria sido **-$125**.
+
+## 💰 PLACAR CONSOLIDADO DIA 09 (ajustado, considerando stop correto no T4): **+$906,50**
+| # | Trade | Real | Ajustado (stop ok) |
+|---|---|---:|---:|
+| 1 | SHORT (trailing) | +$79,00 | +$79,00 |
+| 2 | SHORT | +$398,50 | +$398,50 |
+| 3 | SHORT (mão) | +$554,00 | +$554,00 |
+| 4 | LONG (bug) | -$1.918,00 | **-$125,00** |
+| | **TOTAL** | -$886,50 | **+$906,50** |
+
+⚠️ Todos os 4 trades rodaram em versões com bug (dia de debugging). O número ajustado (+$906,50) é uma estimativa do que seria com o stop funcionando — NÃO um resultado validado. A validação real virá ao rodar um **dia limpo** com a versão final.
+
+## 📌 Status no fim da sessão 13/06
+- 4 bugs achados e corrigidos no forward test: (1) tolerância 6→20 [melhoria], (2) trailing desabilitava estratégia, (3) OCO → posição sem proteção, (4) stop inicial inválido → perda gigante.
+- Versão final `BotAprovacao.cs` compilada, no GitHub e na pasta do NT8.
+- **Próximo (dia 10/06):** rodar o replay limpo com a versão final e confirmar: SL/TP sempre na tela, stop cortando em ~$125, trailing fechando, zero erros. Esse é o teste que valida o bot.
 
 ---
 

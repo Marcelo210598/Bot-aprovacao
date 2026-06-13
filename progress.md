@@ -87,7 +87,17 @@ Filtro VWAP:    OFF
 - Acima de 24 ticks a taxa cai (91%) + overfit. Adotado **20 ticks** como novo padrão no bot.
 - Doc completo: `docs/estrategia-mnq-5contratos.md` (seção "Otimização da tolerância").
 
-## 🤖 Strategy de produção (`src/ApexBot94.cs`) — criado 13/06
+## 🔬 Forward test (dia 09/06 no replay) — 4 bugs achados e corrigidos
+Rodando no Market Replay, o forward test pegou 4 problemas que só apareceriam ao vivo:
+1. Tolerância 6→20 ticks (melhoria por backtest) ✅
+2. Trailing com ordem no servidor desabilitava a estratégia → trailing **sintético** (no código) ✅
+3. OCO reutilizado → **posição sem stop/alvo** → nome de sinal **único por trade** ✅
+4. Stop inicial inválido (LONG -$1.918) → stop/alvo criados **NA ENTRADA** (ticks, atrelados ao fill) ✅
+
+Arquivo final: **`src/BotAprovacao.cs`** (renomeado de ApexBot94.cs). Placar dia 09 ajustado (stop correto): **+$906,50**. Log: `docs/forward-test-log.md`.
+**Próximo (dia 10):** rodar replay limpo com a versão final e validar.
+
+## 🤖 Strategy de produção (`src/BotAprovacao.cs`) — criado 13/06
 - Classe `ApexBot94` (Strategy NT8), **separada** do `ApexApprovalSim.cs` (que é só backtest comparativo).
 - Lógica idêntica ao backtest validado `backtest/run_mnq_5contr.py`:
   reversão na máx/mín do dia anterior · tol 6 ticks · TP 60 · SL 12,5 · BE +3,75→trava +2,5 · trail 1,75.
