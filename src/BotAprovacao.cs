@@ -209,6 +209,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{
 					tradeSeq++;
 					sinalAtivo = "NIV_S" + tradeSeq;   // nome unico por trade (evita colisao de OCO)
+					// stop e alvo definidos ANTES da entrada (em ticks): o NT8 cria as ordens
+					// atreladas ao fill, no preco correto, protegendo intrabar desde o 1o tick
+					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
+					SetProfitTarget(sinalAtivo, CalculationMode.Ticks, AlvoPontos / TickSize);
 					EnterShort(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}) e FECHOU ABAIXO (C={4:F2})",
 						Time[0], c, pdHigh, h, c));
@@ -228,6 +232,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{
 					tradeSeq++;
 					sinalAtivo = "NIV_L" + tradeSeq;
+					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
+					SetProfitTarget(sinalAtivo, CalculationMode.Ticks, AlvoPontos / TickSize);
 					EnterLong(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}) e FECHOU ACIMA (C={4:F2})",
 						Time[0], c, pdLow, l, c));
@@ -247,7 +253,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			bool isLong = Position.MarketPosition == MarketPosition.Long;
 
-			// 1a barra na posicao: define entrada, stop inicial (servidor) e alvo (servidor)
+			// 1a barra na posicao: registra entrada e inicializa o trailing
+			// (stop inicial e alvo ja foram criados NA ENTRADA, em ticks atrelados ao fill)
 			if (!gerenciando)
 			{
 				entryPrice = Position.AveragePrice;
@@ -255,10 +262,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				beFeito    = false;
 				stopPrice  = isLong ? entryPrice - StopPontos : entryPrice + StopPontos;
 				gerenciando = true;
-
-				SetProfitTarget(sinalAtivo, CalculationMode.Price,
-					isLong ? entryPrice + AlvoPontos : entryPrice - AlvoPontos);
-				SetStopLoss(sinalAtivo, CalculationMode.Price, stopPrice, false);
+				// stop inicial e alvo ja foram criados NA ENTRADA (em ticks, atrelados ao fill)
 				return;
 			}
 
