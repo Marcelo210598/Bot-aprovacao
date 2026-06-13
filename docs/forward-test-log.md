@@ -62,6 +62,16 @@ Após o 1º fix, apareceram mais erros ao mover o stop em reentradas/movimento r
 
 ---
 
+## 🐞 BUG 3 (13/06) — stop inicial nascia inválido (LONG perdeu -$1.918)
+Ao testar a versão "corrigida", um LONG (entrou na mín 29627, furou e despencou) **perdeu -$1.918** porque o stop de 12,5pt **nunca foi criado**:
+```
+Ordens de vender stop não podem ser aplicadas ACIMA do mercado. Ordem afetada: Sell 2 StopMarket @ 29623
+```
+**Causa:** o `SetStopLoss(Price)` era chamado no **fechamento da barra** (OnBarClose). Quando o candle de entrada despencava rápido, no fechamento o mercado já estava abaixo do stop → ordem inválida → não criada → posição sem proteção. Só fechou quando o stop diário ($750) acionou — mas em queda livre, saiu em -$1.918.
+> Esclarecimento: o stop é 12,5pt ($125) pra a posição inteira (não há "stop dividido"; só os fills vêm em lotes). A perda gigante foi o bug, não o design.
+
+**Correção (13/06):** `SetStopLoss`/`SetProfitTarget` agora são chamados em **`CalculationMode.Ticks` ANTES do Enter** → o NT8 cria as ordens **atreladas ao fill**, no preço correto, protegendo intrabar desde o 1º tick. Nunca mais nasce inválido. Trailing sintético mantido.
+
 ## ✅ Versão corrigida compilada (13/06 ~18h)
 `BotAprovacao.cs` (trailing sintético + nomes únicos + IgnoreAllErrors) baixada do GitHub e compilada no NT8 (Compile succeeded). **Próximo:** rodar um dia limpo no replay com a versão nova e confirmar: TP/SL sempre visíveis, trailing fechando, zero erros no Output. Esse será o teste que valida o bot de verdade.
 
