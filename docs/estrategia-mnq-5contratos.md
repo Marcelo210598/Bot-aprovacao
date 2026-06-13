@@ -25,8 +25,9 @@ Alvo (TP):        60 pontos      ← antes 25pt; ESSE é o segredo da velocidade
 Stop (SL):        12,5 pontos    (risco $125/trade)
 Breakeven:        +3,75pt → trava stop em +2,5pt
 Trailing:         1,75pt (curto — protege o lucro quando perde força)
+Tolerância toque: 20 ticks (5pt) ← otimizado 13/06 (era 1,5pt); ver seção abaixo
 Stop diário:      $750
-Trades/dia:       sem limite rígido (~5/dia na prática)
+Trades/dia:       sem limite rígido (~7/dia na prática)
 Horário:          pregão regular EUA, entradas 9h30–15h00 ET (fecha tudo 15h55)
 ```
 
@@ -52,6 +53,20 @@ O alvo antigo de 25pt **cortava os ganhos cedo demais**. Com alvo largo (60pt) +
 3. **Risco por trade continua $125** — o mais seguro de todas as opções testadas.
 
 ---
+
+## 🔬 Otimização da tolerância de toque (13/06/2026)
+
+Durante o forward test, vimos rejeições boas escaparem porque o candle parava poucos pontos antes da linha (tolerância original = 6 ticks / 1,5pt). Rodamos a varredura (`backtest/run_tolerancia.py`) mantendo todo o resto fixo:
+
+| Tol (ticks) | Tol (pts) | Taxa | Aprov/ano | Mediana | PF | PnL/ano | Robustez (1ª/2ª) |
+|---|---|---|---|---|---|---|---|
+| 6 (original) | 1,5pt | 94% | 17 | 15d | 1.53 | $30.900 | 100% / 90% |
+| 16 | 4,0pt | 95% | 18 | 14d | 1.50 | $33.872 | 100% / 91% |
+| **20** ⭐ | **5,0pt** | **95%** | **19** | **14d** | **1.53** | **$37.521** | **100% / 91%** |
+| 24 | 6,0pt | 91% | 20 | 14d | 1.53 | $39.439 | — |
+| 30 | 7,5pt | 91% | 20 | 12d | 1.55 | $43.872 | 100% / 85% |
+
+**Adotado: 20 ticks (5pt).** Melhora tudo sem perder robustez: +2 contas aprovadas/ano, mediana 1 dia mais rápida, mesmo PF (1.53), +21% PnL. **Acima de 24 ticks a taxa cai (91%) e a robustez piora** (overfit — passa a pegar toques que não são rejeição real). Ressalva: otimização no mesmo 1 ano, mas o out-of-sample (2 metades) se manteve até 20 ticks.
 
 ## 🥈 Alternativa mais conservadora (trava de trades)
 

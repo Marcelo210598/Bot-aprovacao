@@ -81,6 +81,12 @@ Filtro VWAP:    OFF
 - [ ] Confirmar com Andersson: regra dos 7 dias mínimos + custo real do MNQ na corretora
 - [ ] (Futuro) Variante stop diário $1.000 (100% no backtest) + portfólio Níveis+ORB
 
+## 🔬 Otimização tolerância de toque (13/06) — 6→20 ticks
+- Forward test mostrou rejeições boas escapando (candle parava ~4-5pt antes da linha; tol era 1,5pt).
+- Backtest `run_tolerancia.py` (1 ano): **20 ticks (5pt) = sweet spot** → 95% (19 aprov), mediana 14d, PF 1.53, +21% PnL ($37.521), robusto (100%/91%).
+- Acima de 24 ticks a taxa cai (91%) + overfit. Adotado **20 ticks** como novo padrão no bot.
+- Doc completo: `docs/estrategia-mnq-5contratos.md` (seção "Otimização da tolerância").
+
 ## 🤖 Strategy de produção (`src/ApexBot94.cs`) — criado 13/06
 - Classe `ApexBot94` (Strategy NT8), **separada** do `ApexApprovalSim.cs` (que é só backtest comparativo).
 - Lógica idêntica ao backtest validado `backtest/run_mnq_5contr.py`:

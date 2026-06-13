@@ -104,7 +104,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				BreakevenTrigPontos	= 3.75;   // ao ganhar +3,75pt...
 				BreakevenLockPontos	= 2.5;    // ...trava o stop em +2,5pt
 				TrailingPontos		= 1.75;   // trailing curto a partir do breakeven
-				TolToqueTicks		= 6;      // tolerancia de toque na zona (6 ticks = 1,5pt)
+				TolToqueTicks		= 20;     // tolerancia de toque na zona (20 ticks = 5pt) — otimizado 13/06: 95%, 19 aprov/ano, +21% PnL vs 6 ticks
 
 				// Risco diario
 				StopDiarioDolar		= 750.0;  // kill switch: para o dia ao perder $750
@@ -399,7 +399,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[NinjaScriptProperty]
 		[Range(0, 50)]
-		[Display(Name="Tolerancia toque (ticks)", Description="Tolerancia de toque na zona do nivel", Order=15, GroupName="2. Saida")]
+		[Display(Name="Tolerancia toque (ticks)", Description="Distancia max da linha p/ contar como toque (20 ticks=5pt, otimizado)", Order=15, GroupName="2. Saida")]
 		public int TolToqueTicks { get; set; }
 
 		[NinjaScriptProperty]
