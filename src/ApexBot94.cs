@@ -12,6 +12,8 @@ using NinjaTrader.Data;
 using NinjaTrader.NinjaScript;
 using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
+using NinjaTrader.NinjaScript.DrawingTools;
+using System.Windows.Media;
 #endregion
 
 // =============================================================================
@@ -51,6 +53,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private double pdHigh = 0, pdLow = 0;     // high/low do dia ANTERIOR
 		private double curHigh = 0, curLow = 0;   // acumula high/low do dia atual
 		private string diaNiveis = "";
+		private int    barInicioDia = 0;          // barra em que o dia atual comecou (p/ desenhar as linhas)
 
 		// ---------- Gestao da posicao aberta ----------
 		private double entryPrice = 0;   // preco de entrada (Position.AveragePrice)
@@ -116,6 +119,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				PararAoAprovar		= true;
 				MetaLucroDolar		= 1500.0;
 				MinDiasOperados		= 7;
+
+				// Visual
+				DesenharNiveis		= true;
 			}
 			else if (State == State.Configure)
 			{
@@ -147,12 +153,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 				diaNiveis = hoje;
 				curHigh = emSessao ? High[0] : 0;
 				curLow  = emSessao ? Low[0]  : 0;
+				barInicioDia = CurrentBar;
 			}
 			else if (emSessao)
 			{
 				curHigh = curHigh == 0 ? High[0] : Math.Max(curHigh, High[0]);
 				curLow  = curLow  == 0 ? Low[0]  : Math.Min(curLow,  Low[0]);
 			}
+
+			// ---------------- Desenha as linhas dos niveis no grafico ----------------
+			DesenhaNiveis(hoje);
 
 			// ---------------- Gestao da posicao aberta ----------------
 			if (Position.MarketPosition != MarketPosition.Flat)
@@ -276,6 +286,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 			SetStopLoss(sinalAtivo, CalculationMode.Price, stopPrice, false);
 		}
 
+		// ---------------- Desenho das linhas de max/min do dia anterior ----------------
+		private void DesenhaNiveis(string hoje)
+		{
+			if (!DesenharNiveis || pdHigh <= 0 || pdLow <= 0) return;
+
+			int startBars = CurrentBar - barInicioDia;
+			if (startBars < 0) startBars = 0;
+
+			// linha da MAXIMA do dia anterior (zona de short) — vermelha
+			Draw.Line(this, "PDH_" + hoje, false, startBars, pdHigh, 0, pdHigh,
+				Brushes.Red, DashStyleHelper.Dash, 2);
+			Draw.Text(this, "PDHt_" + hoje, "Max ant " + pdHigh.ToString("F2"),
+				startBars, pdHigh + 4 * TickSize, Brushes.Red);
+
+			// linha da MINIMA do dia anterior (zona de long) — verde
+			Draw.Line(this, "PDL_" + hoje, false, startBars, pdLow, 0, pdLow,
+				Brushes.LimeGreen, DashStyleHelper.Dash, 2);
+			Draw.Text(this, "PDLt_" + hoje, "Min ant " + pdLow.ToString("F2"),
+				startBars, pdLow - 4 * TickSize, Brushes.LimeGreen);
+		}
+
 		private void FechaPosicao(string motivo)
 		{
 			if (Position.MarketPosition == MarketPosition.Long)  ExitLong("X_" + motivo, sinalAtivo);
@@ -389,6 +420,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(0, 60)]
 		[Display(Name="Min dias operados", Description="Minimo de dias p/ aprovar (Apex = 7)", Order=42, GroupName="5. Meta")]
 		public int MinDiasOperados { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name="Desenhar niveis", Description="Mostra as linhas de max/min do dia anterior no grafico", Order=50, GroupName="6. Visual")]
+		public bool DesenharNiveis { get; set; }
 		#endregion
 	}
 }
