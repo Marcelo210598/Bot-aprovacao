@@ -16,11 +16,24 @@ Registro dos trades e observações do bot rodando no NinjaTrader 8 (Market Repl
 - Candle vermelho forte de rejeição, mas o **topo ficou abaixo de 30033,75** (zona de short). Nem gerou log = não tocou a zona.
 - Lição: a estratégia só opera rejeição **na máx/mín do dia anterior** (dentro da tolerância). Rejeição fora da linha, por mais bonita, não é o setup. Não vale afrouxar mais a tolerância (backtest: acima de 24 ticks a taxa cai p/ 91% + overfit).
 
-### ✅/⏳ Trade 2 — SHORT (10:31) → em andamento (+$455 no print das 17:03)
+### ✅ Trade 2 — SHORT (10:31) → +$398,50 (fechado por erro de ordem, ver bug)
 - Sinal: `SHORT @ 30022,00 | tocou Max 30038,75 (H=30035,00) e FECHOU ABAIXO (C=30022,00)`
 - Por que pegou (e o de 10:29 não): o topo **H=30035 alcançou a zona** (≥ 30033,75); o de 10:29 ficou abaixo. ~2pt no topo decidiram.
 - Fill real ~30010 (preço caiu na abertura da barra seguinte → entrou ~12pt melhor que o sinal; a defasagem do OnBarClose jogou a favor desta vez).
-- Stop inicial 30022,50 (entry+12,5); alvo 29950 (60pt). Preço despencou ~46pt a favor (+$455).
+- Preço despencou ~46pt a favor (chegou a +$455). **Mas fechou em ~29970 com +$398,50 por causa de um BUG** (ver abaixo), não pelo trailing/alvo planejado.
+
+### 💰 Placar do dia (replay 09/06): **+$477,50** (Trade 1 +$79,00 · Trade 2 +$398,50) — 2 trades, 2 ganhos
+
+---
+
+## 🐞 BUG ENCONTRADO (13/06) — trailing desabilitava a estratégia
+- No Trade 2, o preço caiu muito rápido; ao tentar **mover o trailing**, o NT8 retornou `'Não é possível alterar ordem'` e, por `RealtimeErrorHandling=StopCancelClose`, **desabilitou a estratégia inteira** e fechou a posição (StopCancelClose ~29970).
+- **Causa:** trailing apertado (1,75pt) + fills parciais (2 ordens stop: 1 e 4) + OnBarClose em movimento veloz → o stop calculado ficou do lado errado do mercado no instante do envio → ordem inválida.
+- **Gravidade:** o trade até lucrou ($398,5), mas ao vivo o bot **pararia de operar sozinho** sem o usuário perceber. Crítico.
+- **Correção aplicada (13/06):**
+  1. `RealtimeErrorHandling = IgnoreAllErrors` — um erro de alteração de ordem não desabilita mais a estratégia.
+  2. **Validação do trailing:** só reposiciona o stop se ele for válido vs. mercado (short: stop > Close; long: stop < Close). Evita gerar a ordem inválida.
+- Pendente: re-rodar o replay com a correção e confirmar que o trailing move sem derrubar a estratégia.
 
 ---
 

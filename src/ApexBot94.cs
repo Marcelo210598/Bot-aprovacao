@@ -90,7 +90,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				StartBehavior				= StartBehavior.WaitUntilFlat;
 				TimeInForce					= TimeInForce.Gtc;
 				TraceOrders					= false;
-				RealtimeErrorHandling		= RealtimeErrorHandling.StopCancelClose;
+				RealtimeErrorHandling		= RealtimeErrorHandling.IgnoreAllErrors;  // nao desabilita a estrategia se uma alteracao de ordem (trailing) falhar
 				StopTargetHandling			= StopTargetHandling.PerEntryExecution;
 				BarsRequiredToTrade			= 20;
 				IsInstantiatedOnEachOptimizationIteration = true;
@@ -304,8 +304,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 					stopPrice = Math.Min(stopPrice, favPrice + TrailingPontos);
 			}
 
-			// reposiciona a ordem de stop no novo preco
-			SetStopLoss(sinalAtivo, CalculationMode.Price, stopPrice, false);
+			// So reposiciona o stop se ele for VALIDO em relacao ao mercado:
+			//  - short: o stop (buy stop) tem que ficar ACIMA do preco atual
+			//  - long:  o stop (sell stop) tem que ficar ABAIXO do preco atual
+			// Evita o erro "nao e possivel alterar ordem" em movimentos rapidos.
+			bool stopValido = isLong ? (stopPrice < Close[0]) : (stopPrice > Close[0]);
+			if (stopValido)
+				SetStopLoss(sinalAtivo, CalculationMode.Price, stopPrice, false);
 		}
 
 		// ---------------- Desenho das linhas de max/min do dia anterior ----------------
