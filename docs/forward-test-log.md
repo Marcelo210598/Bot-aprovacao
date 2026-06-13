@@ -51,6 +51,20 @@ Após o 1º fix, apareceram mais erros ao mover o stop em reentradas/movimento r
 - **Trade-off honesto:** o trailing sintético fecha **a mercado** (próximo tick), não no preço exato como no backtest → pode haver leve slippage na saída do trailing. É o custo de robustez (sem os erros de ordem).
 - Pendente: re-rodar o replay e confirmar que opera limpo (sem erros) e o trailing fecha os trades.
 
+### ✅ Trade 3 — SHORT (10:55) → +$554,00 (FECHADO NA MÃO)
+- Sinal: `SHORT @ 30025,00 | tocou Max 30038,75 (H=30074,25) e FECHOU ABAIXO (C=30025,00)`
+- ⚠️ Entrou **sem TP nem SL** (bug do OCO da versão antiga impediu a criação das ordens de proteção → posição desprotegida). O Marcelo **fechou manualmente** (botão Flat) num bom momento, garantindo +$554.
+- Foi o achado mais grave: posição sem stop ao vivo = risco de estourar a conta. **Corrigido na versão nova** (nomes únicos → stop+alvo sempre criados).
+
+### 💰 PLACAR FINAL DIA 09 (replay, versão ANTIGA com bugs): **+$1.031,50**
+- Trade 1 +$79,00 · Trade 2 +$398,50 · Trade 3 +$554,00 — 3 trades, 3 ganhos.
+- ⚠️ Resultado obtido na versão ANTIGA (com os bugs de ordem). O dia 09 serviu para **descobrir e corrigir** os bugs (tolerância, trailing/erro de ordem, OCO/posição desprotegida). O placar não valida a estratégia ao vivo — valida que os achados foram reais.
+
+---
+
+## ✅ Versão corrigida compilada (13/06 ~18h)
+`BotAprovacao.cs` (trailing sintético + nomes únicos + IgnoreAllErrors) baixada do GitHub e compilada no NT8 (Compile succeeded). **Próximo:** rodar um dia limpo no replay com a versão nova e confirmar: TP/SL sempre visíveis, trailing fechando, zero erros no Output. Esse será o teste que valida o bot de verdade.
+
 ---
 
 ## 🔎 Observações técnicas confirmadas no forward test
