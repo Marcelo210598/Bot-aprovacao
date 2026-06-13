@@ -17,67 +17,57 @@ using System.Windows.Media;
 #endregion
 
 // =============================================================================
-//  ApexBot94  —  Bot de APROVACAO de conta Apex (config "94 em 15 dias")
+//  BotAprovacao  —  Bot de APROVACAO de conta Apex (config "94 em 15 dias")
 // -----------------------------------------------------------------------------
 //  Estrategia: reversao na maxima/minima do dia anterior ("Niveis 94").
-//  Config validada em 1 ano de dados reais (MNQ 5 contratos):
-//    94% de aprovacao | mediana 15 dias | PF 1.53 | risco $125/trade.
+//  Config 5 MNQ: TP 60 | SL 12,5 | BE +3,75->+2,5 | trail 1,75 | tol 20 ticks.
 //
-//  Esta e a Strategy de PRODUCAO (opera ao vivo). O backtest comparativo
-//  fica em ApexApprovalSim.cs. A logica de entrada/saida aqui e identica a
-//  do script validado backtest/run_mnq_5contr.py.
+//  GESTAO DE SAIDA (importante):
+//    - Stop inicial (12,5pt) e Alvo (60pt) = ordens FIXAS no servidor (validas,
+//      protegem intrabar).
+//    - Breakeven + trailing = gerenciados NO CODIGO (igual ao backtest): quando
+//      a barra atinge o nivel do trailing, fecha a posicao a mercado. NAO move
+//      ordens no servidor -> evita os erros "alterar ordem"/"stop abaixo do
+//      mercado"/"OCO reutilizado" que o trailing apertado (1,75pt) causava.
+//    - Cada trade usa um nome de sinal UNICO (evita colisao de OCO em reentradas).
 //
-//  COMO USAR NO NT8:
-//    1) Copie p/ Documents\NinjaTrader 8\bin\Custom\Strategies\
-//    2) Editor NinjaScript > F5 (compilar)
-//    3) Rode num grafico MNQ de 1 minuto, sessao US (horario do PC em ET
-//       OU use o trading hours "CME US Index Futures RTH").
-//    4) FORWARD TEST PRIMEIRO: Sim101 / Market Replay antes de ir pra conta real.
-//
-//  PARAMETROS PADRAO = config vencedora (5 MNQ):
-//    TP 60pt | SL 12,5pt | BE +3,75 trava +2,5 | trail 1,75 | stop diario $750
-//
-//  IMPORTANTE:
-//    - Calculate = OnBarClose: decisoes no FECHAMENTO de cada barra de 1min
-//      (igual ao backtest). Os stops/alvos ficam como ordens no servidor e
-//      disparam ao toque intrabar.
-//    - O ponto do MNQ vale $2; 5 contratos = $10/ponto. Ajuste Contratos se
-//      for usar NQ (cheio) em vez de MNQ.
+//  Calculate = OnBarClose (igual ao backtest). FORWARD TEST no Sim101/Replay
+//  antes da conta real. MNQ: $2/ponto; 5 contratos = $10/ponto.
 // =============================================================================
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public class ApexBot94 : Strategy
+	public class BotAprovacao : Strategy
 	{
 		// ---------- Niveis do dia anterior (gatilho de entrada) ----------
-		private double pdHigh = 0, pdLow = 0;     // high/low do dia ANTERIOR
-		private double curHigh = 0, curLow = 0;   // acumula high/low do dia atual
+		private double pdHigh = 0, pdLow = 0;
+		private double curHigh = 0, curLow = 0;
 		private string diaNiveis = "";
-		private int    barInicioDia = 0;          // barra em que o dia atual comecou (p/ desenhar as linhas)
 
 		// ---------- Gestao da posicao aberta ----------
-		private double entryPrice = 0;   // preco de entrada (Position.AveragePrice)
-		private double stopPrice  = 0;   // preco atual do stop (sobe com trailing)
-		private double favPrice   = 0;   // melhor preco a favor desde a entrada
-		private bool   beFeito    = false; // breakeven ja acionado
-		private bool   gerenciando = false; // ja inicializei stop/alvo desta posicao
-		private string sinalAtivo = "";   // nome do sinal da entrada vigente
+		private double entryPrice = 0;
+		private double stopPrice  = 0;    // nivel do trailing (sintetico; sobe/desce no codigo)
+		private double favPrice   = 0;
+		private bool   beFeito    = false;
+		private bool   gerenciando = false;
+		private string sinalAtivo = "";
+		private int    tradeSeq   = 0;    // contador p/ nome de sinal unico por trade
 
 		// ---------- Kill switch / controle diario ----------
 		private string diaCorrente = "";
-		private double pnlInicioDia = 0;  // realizado acumulado no inicio do dia
+		private double pnlInicioDia = 0;
 		private bool   bloqueadoHoje = false;
 
-		// ---------- Controle de meta (opcional: para ao aprovar) ----------
+		// ---------- Controle de meta (opcional) ----------
 		private HashSet<string> diasOperados = new HashSet<string>();
-		private bool aprovado = false;    // bateu meta + min dias -> para de operar
+		private bool aprovado = false;
 
 		protected override void OnStateChange()
 		{
 			if (State == State.SetDefaults)
 			{
-				Description					= @"Bot de aprovacao Apex (Niveis 94): reversao na max/min do dia anterior. Config 5 MNQ: 94% / mediana 15 dias.";
-				Name						= "ApexBot94";
+				Description					= @"Bot de aprovacao Apex (Niveis 94): reversao na max/min do dia anterior. 5 MNQ, tol 20 ticks. Trailing gerenciado no codigo.";
+				Name						= "BotAprovacao";
 				Calculate					= Calculate.OnBarClose;
 				EntriesPerDirection			= 1;
 				EntryHandling				= EntryHandling.AllEntries;
@@ -90,42 +80,35 @@ namespace NinjaTrader.NinjaScript.Strategies
 				StartBehavior				= StartBehavior.WaitUntilFlat;
 				TimeInForce					= TimeInForce.Gtc;
 				TraceOrders					= false;
-				RealtimeErrorHandling		= RealtimeErrorHandling.IgnoreAllErrors;  // nao desabilita a estrategia se uma alteracao de ordem (trailing) falhar
+				RealtimeErrorHandling		= RealtimeErrorHandling.IgnoreAllErrors;  // rede de seguranca: erro de ordem nao desabilita a estrategia
 				StopTargetHandling			= StopTargetHandling.PerEntryExecution;
 				BarsRequiredToTrade			= 20;
 				IsInstantiatedOnEachOptimizationIteration = true;
 
-				// ----- Config vencedora (5 MNQ) -----
 				Contratos			= 5;
 
-				// Pontos (config "94 em 15 dias")
-				AlvoPontos			= 60.0;   // TP — deixar o ganho correr e o segredo da velocidade
-				StopPontos			= 12.5;   // SL — risco $125/trade com 5 MNQ
-				BreakevenTrigPontos	= 3.75;   // ao ganhar +3,75pt...
-				BreakevenLockPontos	= 2.5;    // ...trava o stop em +2,5pt
-				TrailingPontos		= 1.75;   // trailing curto a partir do breakeven
-				TolToqueTicks		= 20;     // tolerancia de toque na zona (20 ticks = 5pt) — otimizado 13/06: 95%, 19 aprov/ano, +21% PnL vs 6 ticks
+				AlvoPontos			= 60.0;
+				StopPontos			= 12.5;
+				BreakevenTrigPontos	= 3.75;
+				BreakevenLockPontos	= 2.5;
+				TrailingPontos		= 1.75;
+				TolToqueTicks		= 20;     // 20 ticks = 5pt (otimizado 13/06)
 
-				// Risco diario
-				StopDiarioDolar		= 750.0;  // kill switch: para o dia ao perder $750
-				MaxTradesDia		= 0;       // 0 = sem limite (config principal); use 12 p/ variante amarrada
+				StopDiarioDolar		= 750.0;
+				MaxTradesDia		= 0;
 
-				// Horarios (HHmm em ET — rode o grafico/PC em US Eastern)
 				SessaoInicio		= 930;
 				EntradaFim			= 1500;
 				FlattenHora			= 1555;
 
-				// Meta de aprovacao (para de operar quando atingida)
 				PararAoAprovar		= true;
 				MetaLucroDolar		= 1500.0;
 				MinDiasOperados		= 7;
 
-				// Visual
 				DesenharNiveis		= true;
 			}
 			else if (State == State.Configure)
 			{
-				// nada a configurar aqui — stop/alvo sao definidos por posicao
 			}
 		}
 
@@ -134,10 +117,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (CurrentBars[0] < BarsRequiredToTrade)
 				return;
 
-			int agora = ToTime(Time[0]) / 100;            // HHmm
+			int agora = ToTime(Time[0]) / 100;
 			string hoje = Time[0].ToString("yyyy-MM-dd");
 
-			// ---------------- Virada de dia ----------------
 			if (hoje != diaCorrente)
 			{
 				diaCorrente   = hoje;
@@ -145,7 +127,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				pnlInicioDia  = RealizadoAcumulado();
 			}
 
-			// ---------------- Niveis do dia anterior ----------------
 			bool emSessao = agora >= SessaoInicio && agora < 1600;
 			if (hoje != diaNiveis)
 			{
@@ -153,7 +134,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				diaNiveis = hoje;
 				curHigh = emSessao ? High[0] : 0;
 				curLow  = emSessao ? Low[0]  : 0;
-				barInicioDia = CurrentBar;
 			}
 			else if (emSessao)
 			{
@@ -161,7 +141,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				curLow  = curLow  == 0 ? Low[0]  : Math.Min(curLow,  Low[0]);
 			}
 
-			// ---------------- Desenha as linhas dos niveis no grafico ----------------
 			DesenhaNiveis(hoje);
 
 			// ---------------- Gestao da posicao aberta ----------------
@@ -169,10 +148,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				diasOperados.Add(hoje);
 				GerenciaPosicao();
+				if (Position.MarketPosition == MarketPosition.Flat) return;   // saiu pelo trailing nesta barra
 			}
 			else if (gerenciando)
 			{
-				// saiu da posicao (stop/alvo bateu) -> reseta estado de gestao
 				gerenciando = false;
 				sinalAtivo  = "";
 			}
@@ -186,7 +165,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					FechaPosicao("StopDiario");
 			}
 
-			// ---------------- Meta de aprovacao (para de operar) ----------------
+			// ---------------- Meta de aprovacao ----------------
 			if (PararAoAprovar && !aprovado)
 			{
 				if (RealizadoAcumulado() >= MetaLucroDolar && diasOperados.Count >= MinDiasOperados)
@@ -194,7 +173,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					aprovado = true;
 					if (Position.MarketPosition != MarketPosition.Flat)
 						FechaPosicao("MetaAtingida");
-					Print(string.Format("[ApexBot94] META ATINGIDA em {0} | realizado ${1:N2} | {2} dias operados — PARANDO de operar.",
+					Print(string.Format("[BotAprovacao] META ATINGIDA em {0} | realizado ${1:N2} | {2} dias operados — PARANDO de operar.",
 						hoje, RealizadoAcumulado(), diasOperados.Count));
 				}
 			}
@@ -215,7 +194,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			EntradaNiveis(agora);
 		}
 
-		// ---------------- Logica de entrada (Niveis: max/min dia anterior) ----------------
 		private void EntradaNiveis(int agora)
 		{
 			if (agora < SessaoInicio || agora >= EntradaFim) return;
@@ -229,7 +207,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				if (c < pdHigh)
 				{
-					sinalAtivo = "NIV_S";
+					tradeSeq++;
+					sinalAtivo = "NIV_S" + tradeSeq;   // nome unico por trade (evita colisao de OCO)
 					EnterShort(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}) e FECHOU ABAIXO (C={4:F2})",
 						Time[0], c, pdHigh, h, c));
@@ -247,7 +226,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				if (c > pdLow)
 				{
-					sinalAtivo = "NIV_L";
+					tradeSeq++;
+					sinalAtivo = "NIV_L" + tradeSeq;
 					EnterLong(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}) e FECHOU ACIMA (C={4:F2})",
 						Time[0], c, pdLow, l, c));
@@ -261,11 +241,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 
 		// ---------------- Gestao de stop/alvo/breakeven/trailing ----------------
+		// Stop inicial + alvo = ordens fixas no servidor. Breakeven/trailing = sintetico
+		// (fecha a mercado quando a barra atinge o nivel), igual a logica do backtest.
 		private void GerenciaPosicao()
 		{
 			bool isLong = Position.MarketPosition == MarketPosition.Long;
 
-			// 1a barra na posicao: define entrada, stop inicial e alvo
+			// 1a barra na posicao: define entrada, stop inicial (servidor) e alvo (servidor)
 			if (!gerenciando)
 			{
 				entryPrice = Position.AveragePrice;
@@ -280,37 +262,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return;
 			}
 
-			// barras seguintes: atualiza favoravel + breakeven + trailing
+			// 2. Trailing SINTETICO: checa se a barra ATUAL atingiu o nivel de trailing
+			//    definido na barra anterior (so apos o breakeven). Fecha a mercado.
+			if (beFeito)
+			{
+				if (isLong  && Low[0]  <= stopPrice) { FechaPosicao("Trailing"); return; }
+				if (!isLong && High[0] >= stopPrice) { FechaPosicao("Trailing"); return; }
+			}
+
+			// 3. Atualiza o favoravel e recalcula o nivel de trailing (vale a partir da proxima barra)
 			if (isLong)
 			{
 				favPrice = Math.Max(favPrice, High[0]);
 				if (!beFeito && (favPrice - entryPrice) >= BreakevenTrigPontos)
-				{
-					stopPrice = Math.Max(stopPrice, entryPrice + BreakevenLockPontos);
 					beFeito = true;
-				}
 				if (beFeito)
-					stopPrice = Math.Max(stopPrice, favPrice - TrailingPontos);
+					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + BreakevenLockPontos, favPrice - TrailingPontos));
 			}
 			else
 			{
 				favPrice = Math.Min(favPrice, Low[0]);
 				if (!beFeito && (entryPrice - favPrice) >= BreakevenTrigPontos)
-				{
-					stopPrice = Math.Min(stopPrice, entryPrice - BreakevenLockPontos);
 					beFeito = true;
-				}
 				if (beFeito)
-					stopPrice = Math.Min(stopPrice, favPrice + TrailingPontos);
+					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - BreakevenLockPontos, favPrice + TrailingPontos));
 			}
-
-			// So reposiciona o stop se ele for VALIDO em relacao ao mercado:
-			//  - short: o stop (buy stop) tem que ficar ACIMA do preco atual
-			//  - long:  o stop (sell stop) tem que ficar ABAIXO do preco atual
-			// Evita o erro "nao e possivel alterar ordem" em movimentos rapidos.
-			bool stopValido = isLong ? (stopPrice < Close[0]) : (stopPrice > Close[0]);
-			if (stopValido)
-				SetStopLoss(sinalAtivo, CalculationMode.Price, stopPrice, false);
 		}
 
 		// ---------------- Desenho das linhas de max/min do dia anterior ----------------
@@ -318,7 +294,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (!DesenharNiveis) return;
 
-			// texto de status no canto (confirma que os niveis estao sendo calculados)
 			Draw.TextFixed(this, "statusNiveis",
 				"Niveis dia anterior:\n" +
 				"  Max (short): " + (pdHigh > 0 ? pdHigh.ToString("F2") : "(aguardando 1o dia)") + "\n" +
@@ -327,7 +302,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			if (pdHigh <= 0 || pdLow <= 0) return;
 
-			// linhas horizontais (atravessam o grafico inteiro — sempre visiveis)
 			Draw.HorizontalLine(this, "PDH", pdHigh, Brushes.Red,       DashStyleHelper.Dash, 2);
 			Draw.HorizontalLine(this, "PDL", pdLow,  Brushes.LimeGreen, DashStyleHelper.Dash, 2);
 		}
@@ -338,7 +312,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (Position.MarketPosition == MarketPosition.Short) ExitShort("X_" + motivo, sinalAtivo);
 		}
 
-		// ---------------- Helpers de PnL ----------------
 		private double RealizadoAcumulado()
 		{
 			return SystemPerformance != null
@@ -346,7 +319,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				: 0;
 		}
 
-		// Pior caso intraday da barra (nao subestima a perda do kill switch)
 		private double UnrealizadoPiorCaso()
 		{
 			if (Position.MarketPosition == MarketPosition.Long)
@@ -366,7 +338,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (trades[i].Exit.Time.ToString("yyyy-MM-dd") == hoje) n++;
 				else break;
 			}
-			// soma a posicao aberta de hoje, se houver
 			if (Position.MarketPosition != MarketPosition.Flat) n++;
 			return n;
 		}

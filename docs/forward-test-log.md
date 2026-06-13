@@ -35,6 +35,22 @@ Registro dos trades e observações do bot rodando no NinjaTrader 8 (Market Repl
   2. **Validação do trailing:** só reposiciona o stop se ele for válido vs. mercado (short: stop > Close; long: stop < Close). Evita gerar a ordem inválida.
 - Pendente: re-rodar o replay com a correção e confirmar que o trailing move sem derrubar a estratégia.
 
+## 🐞 BUG 2 (13/06) — trailing com ordem no servidor é incompatível com 1,75pt
+Após o 1º fix, apareceram mais erros ao mover o stop em reentradas/movimento rápido:
+- `'Não é possível alterar ordem'`
+- `'OCO ID não pode ser reutilizado'`
+- `'Ordens de comprar stop não podem ser aplicadas abaixo do mercado'` (BuyToCover StopMarket)
+
+**Causa raiz (a mesma dos 3):** manter uma **ordem de stop real no servidor** colada ao preço com trailing de **1,75pt** é incompatível — a ordem fica sempre dentro do range da barra (→ "stop abaixo do mercado"), e reentradas colidem OCO IDs. No backtest não dá problema porque lá o stop é só comparação, não ordem real.
+
+**Correção definitiva (13/06) — reescrita da gestão de saída (`src/BotAprovacao.cs`, arquivo renomeado de ApexBot94.cs):**
+- **Stop inicial (12,5) + Alvo (60)** = ordens FIXAS no servidor (válidas, protegem intrabar). Nunca movidas.
+- **Breakeven + trailing** = SINTÉTICOS no código (igual ao backtest): a cada barra, se atingiu o nível do trailing (após o breakeven), fecha **a mercado**. Não move ordens.
+- **Nome de sinal único por trade** (`NIV_S{n}`/`NIV_L{n}`) → mata a colisão de OCO.
+- `RealtimeErrorHandling = IgnoreAllErrors` como rede.
+- **Trade-off honesto:** o trailing sintético fecha **a mercado** (próximo tick), não no preço exato como no backtest → pode haver leve slippage na saída do trailing. É o custo de robustez (sem os erros de ordem).
+- Pendente: re-rodar o replay e confirmar que opera limpo (sem erros) e o trailing fecha os trades.
+
 ---
 
 ## 🔎 Observações técnicas confirmadas no forward test
