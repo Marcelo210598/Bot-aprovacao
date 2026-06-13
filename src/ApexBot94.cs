@@ -224,17 +224,39 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double tol = TolToqueTicks * TickSize;
 			double h = High[0], l = Low[0], c = Close[0];
 
-			// rejeicao no HIGH do dia anterior -> SHORT
-			if (h >= pdHigh - tol && c < pdHigh)
+			// ----- tocou a zona da MAXIMA do dia anterior? (setup de SHORT) -----
+			if (h >= pdHigh - tol)
 			{
-				sinalAtivo = "NIV_S";
-				EnterShort(Contratos, sinalAtivo);
+				if (c < pdHigh)
+				{
+					sinalAtivo = "NIV_S";
+					EnterShort(Contratos, sinalAtivo);
+					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}) e FECHOU ABAIXO (C={4:F2})",
+						Time[0], c, pdHigh, h, c));
+				}
+				else
+				{
+					Print(string.Format("{0}  toque no Max {1:F2} SEM rejeicao (H={2:F2}, C={3:F2} >= linha) -> nao entrou",
+						Time[0], pdHigh, h, c));
+				}
+				return;
 			}
-			// rejeicao no LOW do dia anterior -> LONG
-			else if (l <= pdLow + tol && c > pdLow)
+
+			// ----- tocou a zona da MINIMA do dia anterior? (setup de LONG) -----
+			if (l <= pdLow + tol)
 			{
-				sinalAtivo = "NIV_L";
-				EnterLong(Contratos, sinalAtivo);
+				if (c > pdLow)
+				{
+					sinalAtivo = "NIV_L";
+					EnterLong(Contratos, sinalAtivo);
+					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}) e FECHOU ACIMA (C={4:F2})",
+						Time[0], c, pdLow, l, c));
+				}
+				else
+				{
+					Print(string.Format("{0}  toque no Min {1:F2} SEM reacao (L={2:F2}, C={3:F2} <= linha) -> nao entrou",
+						Time[0], pdLow, l, c));
+				}
 			}
 		}
 
