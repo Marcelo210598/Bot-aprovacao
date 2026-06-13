@@ -289,22 +289,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 		// ---------------- Desenho das linhas de max/min do dia anterior ----------------
 		private void DesenhaNiveis(string hoje)
 		{
-			if (!DesenharNiveis || pdHigh <= 0 || pdLow <= 0) return;
+			if (!DesenharNiveis) return;
 
-			int startBars = CurrentBar - barInicioDia;
-			if (startBars < 0) startBars = 0;
+			// texto de status no canto (confirma que os niveis estao sendo calculados)
+			Draw.TextFixed(this, "statusNiveis",
+				"Niveis dia anterior:\n" +
+				"  Max (short): " + (pdHigh > 0 ? pdHigh.ToString("F2") : "(aguardando 1o dia)") + "\n" +
+				"  Min (long):  " + (pdLow  > 0 ? pdLow.ToString("F2")  : "(aguardando 1o dia)"),
+				TextPosition.TopRight);
 
-			// linha da MAXIMA do dia anterior (zona de short) — vermelha
-			Draw.Line(this, "PDH_" + hoje, false, startBars, pdHigh, 0, pdHigh,
-				Brushes.Red, DashStyleHelper.Dash, 2);
-			Draw.Text(this, "PDHt_" + hoje, "Max ant " + pdHigh.ToString("F2"),
-				startBars, pdHigh + 4 * TickSize, Brushes.Red);
+			if (pdHigh <= 0 || pdLow <= 0) return;
 
-			// linha da MINIMA do dia anterior (zona de long) — verde
-			Draw.Line(this, "PDL_" + hoje, false, startBars, pdLow, 0, pdLow,
-				Brushes.LimeGreen, DashStyleHelper.Dash, 2);
-			Draw.Text(this, "PDLt_" + hoje, "Min ant " + pdLow.ToString("F2"),
-				startBars, pdLow - 4 * TickSize, Brushes.LimeGreen);
+			// linhas horizontais (atravessam o grafico inteiro — sempre visiveis)
+			Draw.HorizontalLine(this, "PDH", pdHigh, Brushes.Red,       DashStyleHelper.Dash, 2);
+			Draw.HorizontalLine(this, "PDL", pdLow,  Brushes.LimeGreen, DashStyleHelper.Dash, 2);
 		}
 
 		private void FechaPosicao(string motivo)
