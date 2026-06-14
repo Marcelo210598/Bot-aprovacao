@@ -20,7 +20,7 @@ using System.Windows.Media;
 //  BotAprovacao  —  Bot de APROVACAO de conta Apex (config "94 em 15 dias")
 // -----------------------------------------------------------------------------
 //  Estrategia: reversao na maxima/minima do dia anterior ("Niveis 94").
-//  Config 5 MNQ: TP 60 | SL 12,5 | BE +3,75->+2,5 | trail 1,75 | tol 20 ticks.
+//  Config 5 MNQ: TP 60 | SL 12,5 | BE +3,75->+2,5 | trail 1,75 | tol 20 ticks | maxDist 15pt.
 //
 //  GESTAO DE SAIDA — MODELO HIBRIDO:
 //    - Stop inicial (12,5pt) = ordem no SERVIDOR (protege intrabar, sem OCO
@@ -96,6 +96,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				BreakevenLockPontos	= 2.5;
 				TrailingPontos		= 1.75;
 				TolToqueTicks		= 20;     // 20 ticks = 5pt (otimizado 13/06)
+				MaxDistPontos		= 15.0;   // 15pt = sweet spot (otimizado 14/06): 100% taxa, PF 1.60, OOS 100%/100%
 
 				StopDiarioDolar		= 750.0;
 				MaxTradesDia		= 0;
@@ -210,13 +211,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				if (c < pdHigh)
 				{
+					double distPontos = pdHigh - c;
+					if (MaxDistPontos > 0 && distPontos > MaxDistPontos)
+					{
+						Print(string.Format("{0}  toque no Max {1:F2} CHASE ignorado (close {2:F2}pt abaixo da linha, max permitido {3:F2}pt)",
+							Time[0], pdHigh, distPontos, MaxDistPontos));
+						return;
+					}
 					tradeSeq++;
 					sinalAtivo = "NIV_S" + tradeSeq;
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
 					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 					EnterShort(Contratos, sinalAtivo);
-					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}) e FECHOU ABAIXO (C={4:F2})",
-						Time[0], c, pdHigh, h, c));
+					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}, dist {4:F2}pt) e FECHOU ABAIXO (C={5:F2})",
+						Time[0], c, pdHigh, h, distPontos, c));
 				}
 				else if (h <= pdHigh + tol * 2)  // silencia spam quando mercado opera longe acima da linha
 				{
@@ -231,13 +239,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				if (c > pdLow)
 				{
+					double distPontos = c - pdLow;
+					if (MaxDistPontos > 0 && distPontos > MaxDistPontos)
+					{
+						Print(string.Format("{0}  toque no Min {1:F2} CHASE ignorado (close {2:F2}pt acima da linha, max permitido {3:F2}pt)",
+							Time[0], pdLow, distPontos, MaxDistPontos));
+						return;
+					}
 					tradeSeq++;
 					sinalAtivo = "NIV_L" + tradeSeq;
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
 					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 					EnterLong(Contratos, sinalAtivo);
-					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}) e FECHOU ACIMA (C={4:F2})",
-						Time[0], c, pdLow, l, c));
+					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}, dist {4:F2}pt) e FECHOU ACIMA (C={5:F2})",
+						Time[0], c, pdLow, l, distPontos, c));
 				}
 				else if (l >= pdLow - tol * 2)  // silencia spam quando mercado opera longe abaixo da linha
 				{
@@ -389,6 +404,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(0, 50)]
 		[Display(Name="Tolerancia toque (ticks)", Description="Distancia max da linha p/ contar como toque (20 ticks=5pt, otimizado)", Order=15, GroupName="2. Saida")]
 		public int TolToqueTicks { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0, 200)]
+		[Display(Name="Max dist. entrada (pontos)", Description="Close deve estar a no max X pontos da linha (0=sem filtro, 15=recomendado). Filtra entradas chase.", Order=16, GroupName="2. Saida")]
+		public double MaxDistPontos { get; set; }
 
 		[NinjaScriptProperty]
 		[Range(0, 100000)]
