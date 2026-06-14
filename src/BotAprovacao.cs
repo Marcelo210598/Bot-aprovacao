@@ -22,17 +22,17 @@ using System.Windows.Media;
 //  Estrategia: reversao na maxima/minima do dia anterior ("Niveis 94").
 //  Config 5 MNQ: TP 60 | SL 12,5 | BE +3,75->+2,5 | trail 1,75 | tol 20 ticks.
 //
-//  GESTAO DE SAIDA (importante):
-//    - Stop inicial (12,5pt) e Alvo (60pt) = ordens FIXAS no servidor (validas,
-//      protegem intrabar).
-//    - Breakeven + trailing = gerenciados NO CODIGO (igual ao backtest): quando
-//      a barra atinge o nivel do trailing, fecha a posicao a mercado. NAO move
-//      ordens no servidor -> evita os erros "alterar ordem"/"stop abaixo do
-//      mercado"/"OCO reutilizado" que o trailing apertado (1,75pt) causava.
-//    - Cada trade usa um nome de sinal UNICO (evita colisao de OCO em reentradas).
+//  GESTAO DE SAIDA — 100% SINTETICA (igual ao backtest Python):
+//    - Stop inicial, alvo, breakeven e trailing = todos gerenciados NO CODIGO.
+//    - NAO usa SetStopLoss nem SetProfitTarget (ordens server-side).
+//    - Motivo: com reentradas rapidas, o OCO do trade anterior ainda estava sendo
+//      cancelado quando o novo trade tentava criar um novo OCO -> erro
+//      "OCO ID nao pode ser reutilizado" + "BuyToCover abaixo do mercado".
+//    - Saida: ExitLong/ExitShort a mercado quando a barra fecha alem do nivel.
+//    - Igual ao backtest (OnBarClose): mesmos resultados esperados.
 //
-//  Calculate = OnBarClose (igual ao backtest). FORWARD TEST no Sim101/Replay
-//  antes da conta real. MNQ: $2/ponto; 5 contratos = $10/ponto.
+//  Calculate = OnBarClose. FORWARD TEST no Sim101/Replay antes da conta real.
+//  MNQ: $2/ponto; 5 contratos = $10/ponto.
 // =============================================================================
 
 namespace NinjaTrader.NinjaScript.Strategies
@@ -46,7 +46,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		// ---------- Gestao da posicao aberta ----------
 		private double entryPrice = 0;
-		private double stopPrice  = 0;    // nivel do trailing (sintetico; sobe/desce no codigo)
+		private double stopPrice  = 0;    // stop sintetico: inicial -> trailing apos breakeven
+		private double alvoPrice  = 0;    // alvo sintetico (substitui SetProfitTarget)
 		private double favPrice   = 0;
 		private bool   beFeito    = false;
 		private bool   gerenciando = false;
@@ -208,11 +209,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (c < pdHigh)
 				{
 					tradeSeq++;
-					sinalAtivo = "NIV_S" + tradeSeq;   // nome unico por trade (evita colisao de OCO)
-					// stop e alvo definidos ANTES da entrada (em ticks): o NT8 cria as ordens
-					// atreladas ao fill, no preco correto, protegendo intrabar desde o 1o tick
-					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
-					SetProfitTarget(sinalAtivo, CalculationMode.Ticks, AlvoPontos / TickSize);
+					sinalAtivo = "NIV_S" + tradeSeq;
 					EnterShort(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}) e FECHOU ABAIXO (C={4:F2})",
 						Time[0], c, pdHigh, h, c));
@@ -232,8 +229,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{
 					tradeSeq++;
 					sinalAtivo = "NIV_L" + tradeSeq;
-					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
-					SetProfitTarget(sinalAtivo, CalculationMode.Ticks, AlvoPontos / TickSize);
 					EnterLong(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}) e FECHOU ACIMA (C={4:F2})",
 						Time[0], c, pdLow, l, c));
@@ -246,35 +241,34 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 
-		// ---------------- Gestao de stop/alvo/breakeven/trailing ----------------
-		// Stop inicial + alvo = ordens fixas no servidor. Breakeven/trailing = sintetico
-		// (fecha a mercado quando a barra atinge o nivel), igual a logica do backtest.
+		// ---------------- Gestao de stop/alvo/breakeven/trailing — 100% SINTETICO ----------------
+		// Tudo gerenciado no codigo (igual ao backtest Python): fecha a mercado quando a barra
+		// fecha alem do nivel. Sem SetStopLoss/SetProfitTarget -> sem OCO -> sem conflito em reentradas.
 		private void GerenciaPosicao()
 		{
 			bool isLong = Position.MarketPosition == MarketPosition.Long;
 
-			// 1a barra na posicao: registra entrada e inicializa o trailing
-			// (stop inicial e alvo ja foram criados NA ENTRADA, em ticks atrelados ao fill)
+			// 1a barra na posicao: registra entrada, inicializa stop e alvo sinteticos
 			if (!gerenciando)
 			{
 				entryPrice = Position.AveragePrice;
 				favPrice   = entryPrice;
 				beFeito    = false;
 				stopPrice  = isLong ? entryPrice - StopPontos : entryPrice + StopPontos;
+				alvoPrice  = isLong ? entryPrice + AlvoPontos : entryPrice - AlvoPontos;
 				gerenciando = true;
-				// stop inicial e alvo ja foram criados NA ENTRADA (em ticks, atrelados ao fill)
 				return;
 			}
 
-			// 2. Trailing SINTETICO: checa se a barra ATUAL atingiu o nivel de trailing
-			//    definido na barra anterior (so apos o breakeven). Fecha a mercado.
-			if (beFeito)
-			{
-				if (isLong  && Low[0]  <= stopPrice) { FechaPosicao("Trailing"); return; }
-				if (!isLong && High[0] >= stopPrice) { FechaPosicao("Trailing"); return; }
-			}
+			// Alvo sintetico
+			if (isLong  && High[0] >= alvoPrice) { FechaPosicao("Alvo"); return; }
+			if (!isLong && Low[0]  <= alvoPrice) { FechaPosicao("Alvo"); return; }
 
-			// 3. Atualiza o favoravel e recalcula o nivel de trailing (vale a partir da proxima barra)
+			// Stop sintetico (inicial antes do breakeven, trailing depois)
+			if (isLong  && Low[0]  <= stopPrice) { FechaPosicao(beFeito ? "Trailing" : "StopInicial"); return; }
+			if (!isLong && High[0] >= stopPrice) { FechaPosicao(beFeito ? "Trailing" : "StopInicial"); return; }
+
+			// Atualiza o nivel de trailing (vale a partir da proxima barra)
 			if (isLong)
 			{
 				favPrice = Math.Max(favPrice, High[0]);
