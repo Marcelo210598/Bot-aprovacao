@@ -34,6 +34,7 @@ using System.Windows.Media;
 //
 //  Resultado: protecao real intrabar + sem erros de OCO em reentradas.
 //  Calculate = OnBarClose. MNQ: $2/ponto; 5 contratos = $10/ponto.
+//  Horarios (ET): entradas 9h30-16h00, flatten 16h55. Niveis = RTH do dia anterior.
 // =============================================================================
 
 namespace NinjaTrader.NinjaScript.Strategies
@@ -100,8 +101,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				MaxTradesDia		= 0;
 
 				SessaoInicio		= 930;
-				EntradaFim			= 1500;
-				FlattenHora			= 1555;
+				EntradaFim			= 1600;
+				FlattenHora			= 1655;
 
 				PararAoAprovar		= true;
 				MetaLucroDolar		= 1500.0;
@@ -217,7 +218,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}) e FECHOU ABAIXO (C={4:F2})",
 						Time[0], c, pdHigh, h, c));
 				}
-				else
+				else if (h <= pdHigh + tol * 2)  // silencia spam quando mercado opera longe acima da linha
 				{
 					Print(string.Format("{0}  toque no Max {1:F2} SEM rejeicao (H={2:F2}, C={3:F2} >= linha) -> nao entrou",
 						Time[0], pdHigh, h, c));
@@ -238,7 +239,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}) e FECHOU ACIMA (C={4:F2})",
 						Time[0], c, pdLow, l, c));
 				}
-				else
+				else if (l >= pdLow - tol * 2)  // silencia spam quando mercado opera longe abaixo da linha
 				{
 					Print(string.Format("{0}  toque no Min {1:F2} SEM reacao (L={2:F2}, C={3:F2} <= linha) -> nao entrou",
 						Time[0], pdLow, l, c));
