@@ -22,17 +22,18 @@ using System.Windows.Media;
 //  Estrategia: reversao na maxima/minima do dia anterior ("Niveis 94").
 //  Config 5 MNQ: TP 60 | SL 12,5 | BE +3,75->+2,5 | trail 1,75 | tol 20 ticks.
 //
-//  GESTAO DE SAIDA — 100% SINTETICA (igual ao backtest Python):
-//    - Stop inicial, alvo, breakeven e trailing = todos gerenciados NO CODIGO.
-//    - NAO usa SetStopLoss nem SetProfitTarget (ordens server-side).
-//    - Motivo: com reentradas rapidas, o OCO do trade anterior ainda estava sendo
-//      cancelado quando o novo trade tentava criar um novo OCO -> erro
-//      "OCO ID nao pode ser reutilizado" + "BuyToCover abaixo do mercado".
-//    - Saida: ExitLong/ExitShort a mercado quando a barra fecha alem do nivel.
-//    - Igual ao backtest (OnBarClose): mesmos resultados esperados.
+//  GESTAO DE SAIDA — MODELO HIBRIDO:
+//    - Stop inicial (12,5pt) = ordem no SERVIDOR (protege intrabar, sem OCO
+//      pois nao usamos SetProfitTarget -> nao ha par OCO para conflitar).
+//    - Quando breakeven aciona: atualiza stop servidor para nivel de lock (+2,5pt).
+//      A partir dai, intrabar o servidor garante no minimo o lucro travado.
+//    - Alvo (60pt), trailing (1,75pt) = SINTETICOS (fecha a mercado no bar close).
+//    - Trailing nao atualiza o servidor (1,75pt e muito apertado; risco de
+//      "stop abaixo do mercado" em barras rapidas). Servidor fica no breakeven.
+//    - Stop sintetico existe como BACKUP do servidor (se ordem falhar).
 //
-//  Calculate = OnBarClose. FORWARD TEST no Sim101/Replay antes da conta real.
-//  MNQ: $2/ponto; 5 contratos = $10/ponto.
+//  Resultado: protecao real intrabar + sem erros de OCO em reentradas.
+//  Calculate = OnBarClose. MNQ: $2/ponto; 5 contratos = $10/ponto.
 // =============================================================================
 
 namespace NinjaTrader.NinjaScript.Strategies
@@ -210,6 +211,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{
 					tradeSeq++;
 					sinalAtivo = "NIV_S" + tradeSeq;
+					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
+					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 					EnterShort(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}) e FECHOU ABAIXO (C={4:F2})",
 						Time[0], c, pdHigh, h, c));
@@ -229,6 +232,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{
 					tradeSeq++;
 					sinalAtivo = "NIV_L" + tradeSeq;
+					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
+					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 					EnterLong(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}) e FECHOU ACIMA (C={4:F2})",
 						Time[0], c, pdLow, l, c));
@@ -273,7 +278,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				favPrice = Math.Max(favPrice, High[0]);
 				if (!beFeito && (favPrice - entryPrice) >= BreakevenTrigPontos)
+				{
 					beFeito = true;
+					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar
+					SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice + BreakevenLockPontos, false);
+				}
 				if (beFeito)
 					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + BreakevenLockPontos, favPrice - TrailingPontos));
 			}
@@ -281,7 +290,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				favPrice = Math.Min(favPrice, Low[0]);
 				if (!beFeito && (entryPrice - favPrice) >= BreakevenTrigPontos)
+				{
 					beFeito = true;
+					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar
+					SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice - BreakevenLockPontos, false);
+				}
 				if (beFeito)
 					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - BreakevenLockPontos, favPrice + TrailingPontos));
 			}
