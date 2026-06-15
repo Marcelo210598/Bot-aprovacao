@@ -1,6 +1,6 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-14
+## Última atualização: 2026-06-15
 
 ## 📌 Visão Geral
 - **Objetivo:** Bot de APROVAÇÃO de conta Apex (produto de entrada) → upsell do bot de operação
@@ -14,6 +14,7 @@
 Mercado:     MNQ (Micro Nasdaq) — 5 contratos
 Conta:       Apex 25K Intraday (meta $1.500 | DD $1.500 | mín. 7 dias)
 Entrada:     reversão na máxima/mínima do dia anterior
+             (SEGUNDA: range do domingo à noite / Globex 18h→9h30)
 Tolerância:  20 ticks = 5pt
 Filtro:      MaxDistPontos = 15pt (close a no max 15pt da linha)
 Alvo (TP):   60 pontos
@@ -50,6 +51,7 @@ Parar:       ao bater meta $1.500 + 7 dias operados
 1. **Tolerância de toque: 6 → 20 ticks** (13/06) — +21% PnL, +2 aprovações
 2. **Janela de entrada: 15h → 16h** (14/06) — +2 aprovações/ano, zero noturnas
 3. **Filtro de proximidade: MaxDistPontos = 15pt** (14/06) — 100% taxa, PF 1.60, OOS perfeito
+4. **Segunda usa range do domingo à noite (Globex)** (15/06) — 19→**22 aprov/ano**, mediana 15→**13d**, PF 1.60→1.64, OOS 100%/100%. Antes a segunda usava a linha de sexta (ou linha degenerada de 1 barra de domingo, efeito colateral). Toggle `SegUsaDomingo` (default ON). Backtest: `backtest/run_segunda_domingo.py`. ⚠️ No gráfico exige sessão ETH/Globex (não RTH-only) senão cai no fallback da linha de sexta.
 
 ### Implementação
 - Strategy de produção **`src/BotAprovacao.cs`** — compilada e funcionando no NT8

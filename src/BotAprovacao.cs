@@ -35,6 +35,9 @@ using System.Windows.Media;
 //  Resultado: protecao real intrabar + sem erros de OCO em reentradas.
 //  Calculate = OnBarClose. MNQ: $2/ponto; 5 contratos = $10/ponto.
 //  Horarios (ET): entradas 9h30-16h00, flatten 16h55. Niveis = RTH do dia anterior.
+//  SEGUNDA (15/06): usa o range do DOMINGO A NOITE (Globex 18h -> seg 9h30) como
+//  nivel de rejeicao, em vez da linha de sexta. Toggle: SegUsaDomingo (default ON).
+//  Backtest: +3 aprovacoes/ano (19->22), aprova mais rapido (15->13d), OOS 100%/100%.
 // =============================================================================
 
 namespace NinjaTrader.NinjaScript.Strategies
@@ -45,6 +48,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private double pdHigh = 0, pdLow = 0;
 		private double curHigh = 0, curLow = 0;
 		private string diaNiveis = "";
+
+		// ---------- Range do domingo a noite (Globex) p/ usar na SEGUNDA ----------
+		private double onHigh = 0, onLow = 0;   // high/low do overnight (dom 18h -> seg 9h30)
+		private string onKey   = "";            // data da segunda a que esse range pertence
 
 		// ---------- Gestao da posicao aberta ----------
 		private double entryPrice = 0;
@@ -105,6 +112,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				EntradaFim			= 1600;
 				FlattenHora			= 1655;
 
+				SegUsaDomingo		= true;   // segunda usa range do Globex (otimizado 15/06: +3 aprov/ano, aprova +rapido, OOS 100%)
+				DomNoiteInicio		= 1800;   // abertura do Globex (ET)
+
 				PararAoAprovar		= true;
 				MetaLucroDolar		= 1500.0;
 				MinDiasOperados		= 7;
@@ -143,6 +153,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				curHigh = curHigh == 0 ? High[0] : Math.Max(curHigh, High[0]);
 				curLow  = curLow  == 0 ? Low[0]  : Math.Min(curLow,  Low[0]);
+			}
+
+			// ----- Range do domingo a noite (Globex): dom >= DomNoiteInicio  ate  seg < SessaoInicio -----
+			// Acumula o high/low do overnight p/ servir de nivel de rejeicao na SEGUNDA.
+			if (SegUsaDomingo)
+			{
+				DayOfWeek dow = Time[0].DayOfWeek;
+				string chaveSeg = null;
+				if (dow == DayOfWeek.Sunday && agora >= DomNoiteInicio)
+					chaveSeg = Time[0].AddDays(1).ToString("yyyy-MM-dd");   // segunda seguinte
+				else if (dow == DayOfWeek.Monday && agora < SessaoInicio)
+					chaveSeg = hoje;
+				if (chaveSeg != null)
+				{
+					if (chaveSeg != onKey) { onKey = chaveSeg; onHigh = High[0]; onLow = Low[0]; }
+					else { onHigh = Math.Max(onHigh, High[0]); onLow = Math.Min(onLow, Low[0]); }
+				}
 			}
 
 			DesenhaNiveis(hoje);
@@ -198,24 +225,42 @@ namespace NinjaTrader.NinjaScript.Strategies
 			EntradaNiveis(agora);
 		}
 
+		// Nivel de rejeicao ativo: na SEGUNDA usa o range do domingo a noite (Globex);
+		// nos demais dias usa o RTH do dia anterior. Retorna false se nao ha nivel valido.
+		private bool NivelAtivo(out double nHi, out double nLo, out bool usouDomingo)
+		{
+			usouDomingo = false;
+			if (SegUsaDomingo && Time[0].DayOfWeek == DayOfWeek.Monday
+				&& onKey == Time[0].ToString("yyyy-MM-dd") && onHigh > 0)
+			{
+				nHi = onHigh; nLo = onLow; usouDomingo = true;
+				return true;
+			}
+			nHi = pdHigh; nLo = pdLow;
+			return (nHi > 0 && nLo > 0);
+		}
+
 		private void EntradaNiveis(int agora)
 		{
 			if (agora < SessaoInicio || agora >= EntradaFim) return;
-			if (pdHigh <= 0 || pdLow <= 0) return;
+
+			double nHi, nLo; bool dom;
+			if (!NivelAtivo(out nHi, out nLo, out dom)) return;
+			string src = dom ? "(domingo)" : "";
 
 			double tol = TolToqueTicks * TickSize;
 			double h = High[0], l = Low[0], c = Close[0];
 
-			// ----- tocou a zona da MAXIMA do dia anterior? (setup de SHORT) -----
-			if (h >= pdHigh - tol)
+			// ----- tocou a zona da MAXIMA de referencia? (setup de SHORT) -----
+			if (h >= nHi - tol)
 			{
-				if (c < pdHigh)
+				if (c < nHi)
 				{
-					double distPontos = pdHigh - c;
+					double distPontos = nHi - c;
 					if (MaxDistPontos > 0 && distPontos > MaxDistPontos)
 					{
-						Print(string.Format("{0}  toque no Max {1:F2} CHASE ignorado (close {2:F2}pt abaixo da linha, max permitido {3:F2}pt)",
-							Time[0], pdHigh, distPontos, MaxDistPontos));
+						Print(string.Format("{0}  toque no Max {1:F2} {6} CHASE ignorado (close {2:F2}pt abaixo da linha, max permitido {3:F2}pt)",
+							Time[0], nHi, distPontos, MaxDistPontos, h, c, src));
 						return;
 					}
 					tradeSeq++;
@@ -223,27 +268,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
 					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 					EnterShort(Contratos, sinalAtivo);
-					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} (H={3:F2}, dist {4:F2}pt) e FECHOU ABAIXO (C={5:F2})",
-						Time[0], c, pdHigh, h, distPontos, c));
+					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} {6} (H={3:F2}, dist {4:F2}pt) e FECHOU ABAIXO (C={5:F2})",
+						Time[0], c, nHi, h, distPontos, c, src));
 				}
-				else if (h <= pdHigh + tol * 2)  // silencia spam quando mercado opera longe acima da linha
+				else if (h <= nHi + tol * 2)  // silencia spam quando mercado opera longe acima da linha
 				{
-					Print(string.Format("{0}  toque no Max {1:F2} SEM rejeicao (H={2:F2}, C={3:F2} >= linha) -> nao entrou",
-						Time[0], pdHigh, h, c));
+					Print(string.Format("{0}  toque no Max {1:F2} {4} SEM rejeicao (H={2:F2}, C={3:F2} >= linha) -> nao entrou",
+						Time[0], nHi, h, c, src));
 				}
 				return;
 			}
 
-			// ----- tocou a zona da MINIMA do dia anterior? (setup de LONG) -----
-			if (l <= pdLow + tol)
+			// ----- tocou a zona da MINIMA de referencia? (setup de LONG) -----
+			if (l <= nLo + tol)
 			{
-				if (c > pdLow)
+				if (c > nLo)
 				{
-					double distPontos = c - pdLow;
+					double distPontos = c - nLo;
 					if (MaxDistPontos > 0 && distPontos > MaxDistPontos)
 					{
-						Print(string.Format("{0}  toque no Min {1:F2} CHASE ignorado (close {2:F2}pt acima da linha, max permitido {3:F2}pt)",
-							Time[0], pdLow, distPontos, MaxDistPontos));
+						Print(string.Format("{0}  toque no Min {1:F2} {4} CHASE ignorado (close {2:F2}pt acima da linha, max permitido {3:F2}pt)",
+							Time[0], nLo, distPontos, MaxDistPontos, src));
 						return;
 					}
 					tradeSeq++;
@@ -251,13 +296,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
 					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 					EnterLong(Contratos, sinalAtivo);
-					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} (L={3:F2}, dist {4:F2}pt) e FECHOU ACIMA (C={5:F2})",
-						Time[0], c, pdLow, l, distPontos, c));
+					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} {6} (L={3:F2}, dist {4:F2}pt) e FECHOU ACIMA (C={5:F2})",
+						Time[0], c, nLo, l, distPontos, c, src));
 				}
-				else if (l >= pdLow - tol * 2)  // silencia spam quando mercado opera longe abaixo da linha
+				else if (l >= nLo - tol * 2)  // silencia spam quando mercado opera longe abaixo da linha
 				{
-					Print(string.Format("{0}  toque no Min {1:F2} SEM reacao (L={2:F2}, C={3:F2} <= linha) -> nao entrou",
-						Time[0], pdLow, l, c));
+					Print(string.Format("{0}  toque no Min {1:F2} {4} SEM reacao (L={2:F2}, C={3:F2} <= linha) -> nao entrou",
+						Time[0], nLo, l, c, src));
 				}
 			}
 		}
@@ -321,16 +366,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (!DesenharNiveis) return;
 
+			double nHi, nLo; bool dom;
+			NivelAtivo(out nHi, out nLo, out dom);
+			string titulo = dom ? "Niveis DOMINGO a noite (Globex):" : "Niveis dia anterior:";
+
 			Draw.TextFixed(this, "statusNiveis",
-				"Niveis dia anterior:\n" +
-				"  Max (short): " + (pdHigh > 0 ? pdHigh.ToString("F2") : "(aguardando 1o dia)") + "\n" +
-				"  Min (long):  " + (pdLow  > 0 ? pdLow.ToString("F2")  : "(aguardando 1o dia)"),
+				titulo + "\n" +
+				"  Max (short): " + (nHi > 0 ? nHi.ToString("F2") : "(aguardando 1o dia)") + "\n" +
+				"  Min (long):  " + (nLo > 0 ? nLo.ToString("F2") : "(aguardando 1o dia)"),
 				TextPosition.TopRight);
 
-			if (pdHigh <= 0 || pdLow <= 0) return;
+			if (nHi <= 0 || nLo <= 0) return;
 
-			Draw.HorizontalLine(this, "PDH", pdHigh, Brushes.Red,       DashStyleHelper.Dash, 2);
-			Draw.HorizontalLine(this, "PDL", pdLow,  Brushes.LimeGreen, DashStyleHelper.Dash, 2);
+			Draw.HorizontalLine(this, "PDH", nHi, Brushes.Red,       DashStyleHelper.Dash, 2);
+			Draw.HorizontalLine(this, "PDL", nLo, Brushes.LimeGreen, DashStyleHelper.Dash, 2);
 		}
 
 		private void FechaPosicao(string motivo)
@@ -434,6 +483,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(0, 2359)]
 		[Display(Name="Flatten Hora (HHmm ET)", Order=32, GroupName="4. Horarios")]
 		public int FlattenHora { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name="Segunda usa range domingo-noite", Description="Na SEGUNDA usa o high/low do Globex (dom 18h -> seg 9h30) em vez da linha de sexta. Otimizado 15/06: +3 aprov/ano, aprova +rapido, OOS 100%.", Order=33, GroupName="4. Horarios")]
+		public bool SegUsaDomingo { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0, 2359)]
+		[Display(Name="Domingo noite inicio (HHmm ET)", Description="Inicio do range do domingo a noite (1800 = abertura do Globex)", Order=34, GroupName="4. Horarios")]
+		public int DomNoiteInicio { get; set; }
 
 		[NinjaScriptProperty]
 		[Display(Name="Parar ao aprovar", Description="Para de operar ao bater a meta + min dias", Order=40, GroupName="5. Meta")]
