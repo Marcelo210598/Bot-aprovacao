@@ -1,129 +1,115 @@
-# Bot Trade NT8 ("Ping Pong" / Aprova Conta) - Progresso
+# Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-13
+## Última atualização: 2026-06-14
 
 ## 📌 Visão Geral
-- **Objetivo:** Bot de trading automatizado para NQ/MNQ no NinjaTrader 8 (NinjaScript C#)
-- **Foco atual:** **Bot de APROVAÇÃO de conta Apex** (produto de entrada) → depois upsell do bot de operação
+- **Objetivo:** Bot de APROVAÇÃO de conta Apex (produto de entrada) → upsell do bot de operação
 - **Público:** Comunidade Nômade Trader (traders BR, Apex)
 - **Stack:** NinjaScript (C#) + backtest em Python (validação)
-- **Status:** 🟢 Estratégia ESCOLHIDA e aprovada — partindo p/ implementação no NinjaScript
+- **Status:** 🟢 Bot implementado e em forward test — **100% de aprovação no backtest**
 
-## 🎯 ESTRATÉGIA ESCOLHIDA (12/06) — 1ª a ser trabalhada
-> **Decisão tomada:** rodar o bot de aprovação no **MNQ com 5 micro contratos**, config "94 em 15 dias".
-> Escolhida por unir **alta taxa (94%)**, **prazo curto (mediana 15 dias)** e **risco baixo** ($125/trade, buffer DD 12x).
+## 🎯 Config vencedora atual (5 MNQ, conta 25K Intraday)
 
 ```
-Mercado:      MNQ (Micro Nasdaq) — 5 contratos     | risco $125/trade (buffer DD 12x)
-Conta:        Apex 25K (meta $1.500 | DD $1.500 | mín. 7 dias)
-Entrada:      reversão na máxima/mínima do dia anterior (estratégia "Níveis 94")
-Alvo (TP):    60 pontos   ← deixar o ganho correr é o que dá os 15 dias
-Stop (SL):    12,5 pontos
-Breakeven:    +3,75pt → trava +2,5pt
-Trailing:     1,75pt
-Stop diário:  $750   (variante $1.000 → 100% aprovação, mais agressiva)
-Trades/dia:   sem limite rígido (~5/dia)
-```
-**Resultado (1 ano real):** 94% aprovação (17/1) · mediana 15 dias · PF 1.53 · PnL +$30.900.
-**Robustez:** 1ª metade 100% (7/7) · 2ª metade 90% (9/10).
-**Doc completo:** `docs/estrategia-mnq-5contratos.md` · **Script:** `backtest/run_mnq_5contr.py`
-
-### Por que não foi mais rápido (5 dias)?
-- **Apex exige mín. 7 dias** de operação → aprovar em 5 dias é impossível pela regra (piso real ~8 dias).
-- 5 MNQ é pequeno demais p/ fazer $1.500 em 5 pregões (mediana trava em ~14d mesmo ignorando a regra).
-- Forçar 5 dias exigiria 8-10 MNQ → taxa despenca p/ 69-77% e dobra o risco. Péssima troca.
-- ⚠️ **Confirmar com Andersson** se a regra dos 7 dias mínimos ainda vale no plano usado.
-
-## ✅ Concluído (11/06)
-- Análise competitiva do concorrente (NinjaBot IA / NinjaPass) — sem mágica, vende "IA" vaporware
-- Decisão: bot de aprovação como produto principal; diferencial = gestão de DD
-- **Backtest com 1 ano de dados reais do NQ** (1min, ~10,5 meses, 300k barras, exportado do NT8)
-- Testadas 4 estratégias: ORB+VWAP, MeanReversion, Níveis, Matheus(manhã)
-- **VENCEDORA: Níveis + trailing stop** (rejeição high/low do dia anterior)
-- Refinamento: breakeven $75 + trailing $50 → win rate 34% → 64%
-- Validação out-of-sample (2 metades) → robusto, não overfit
-- **Documento pro Andersson:** `docs/estrategias-para-andersson.md`
-
-## 🏆 Config vencedora (Níveis 25K — FOCO)
-```
-Entrada:        rejeição na máxima/mínima do dia anterior
-TP / SL:        $500 / $250 (R:R 2:1)
-Breakeven:      +$75 → trava stop em +$50
-Trailing:       $35 (garante lucro ao perder força)
-Máx trades/dia: 3   ← a chave dos 94% (corta overtrading)
-Stop diário:    $750
-Filtro VWAP:    OFF
+Mercado:     MNQ (Micro Nasdaq) — 5 contratos
+Conta:       Apex 25K Intraday (meta $1.500 | DD $1.500 | mín. 7 dias)
+Entrada:     reversão na máxima/mínima do dia anterior
+Tolerância:  20 ticks = 5pt
+Filtro:      MaxDistPontos = 15pt (close a no max 15pt da linha)
+Alvo (TP):   60 pontos
+Stop (SL):   12,5 pontos  →  $125/trade (5 MNQ)
+Breakeven:   +3,75pt → trava +2,5pt
+Trailing:    1,75pt
+Stop diário: $750
+Janela:      9h30–16h00 ET (flatten 16h55)
+Parar:       ao bater meta $1.500 + 7 dias operados
 ```
 
-## 📊 Resultados (1 ano real)
-| Conta | Config | Taxa | Aprov/ano | PnL/ano |
-|-------|--------|:---:|:---:|---------|
-| **25K** ⭐ | máx 3 trades/dia + trail $35 | **94%** | 15 | +$25.615 |
-| 25K | sem limite (trail $50) | 52% | 16 | +$36.785 |
-| 50K | sem limite (trail $50) | 88% | 14 | +$42.295 |
-| 100K | sem limite (trail $50) | 88% | 7 | +$45.740 |
+## 📊 Resultado do backtest (1 ano real, 300k barras NQ 1min)
 
-→ **25K com limite de 3 trades/dia = 94%, robusto** (1ª metade 100%/PF 1.81, 2ª metade 89%/PF 1.50).
-→ Descoberta-chave: **limitar trades/dia corta o overtrading que estourava o DD apertado da 25K**.
+| Métrica | Valor |
+|---|---|
+| **Taxa de aprovação** | **100%** (19 aprovadas / 0 reprovadas) |
+| **Mediana por aprovação** | **15 dias** |
+| **Profit Factor** | **1.60** |
+| **PnL estimado/ano** | **+$36.978** |
+| **Robustez OOS** | **100%/100%** (1ª e 2ª metade) |
+| Win Rate | 68% |
+| Trades/dia | ~6.7 |
 
-## ⚠️ Aprendizados-chave
-1. **Trailing stop é o segredo** — converte perdas em ganhos protegidos (WR 34%→64%)
-2. **Gestão de saída tem que casar com a entrada** — reversão (Níveis) quer alvo curto; rompimento (ORB) quer alvo amplo
-3. **Conta maior = mais folga de DD = taxa maior** (caminho legítimo pros 70%+, virou 88%)
-4. **NÃO perseguir "taxa" cegamente** — travar o bot dá 100% falso (4 avaliações, não robusto). Métrica certa = aprovações absolutas + robustez
-5. **Sizing é o gargalo na 25K** — DD $1.500 com 1 NQ é apertado
+## ✅ Concluído
 
-## 🚧 Em progresso / Próximos passos
-- [x] ~~Debater config + conta-alvo com Andersson~~ → **escolhida: 5 MNQ, 94% em 15 dias**
-- [x] ~~Implementar a config 5 MNQ no NinjaScript~~ → **`src/ApexBot94.cs` criado** (Strategy de produção, fiel ao `run_mnq_5contr.py`)
-- [ ] **PRÓXIMO (segunda 15/06):** Levar `ApexBot94.cs` pro NT8, compilar (F5) e configurar no gráfico MNQ 1min → iniciar forward test no Sim101
-- [ ] Rodar no Sim101 / Market Replay (forward test ao vivo) p/ medir slippage real no trailing
-- [ ] Confirmar com Andersson: regra dos 7 dias mínimos + custo real do MNQ na corretora
-- [ ] (Futuro) Variante stop diário $1.000 (100% no backtest) + portfólio Níveis+ORB
+### Estratégia e backtest
+- Análise competitiva (NinjaBot IA / NinjaPass) — diferencial: gestão de DD
+- Backtest com 1 ano de dados reais NQ 1min (~300k barras)
+- Testadas 4 estratégias: ORB+VWAP, MeanReversion, Níveis, Matheus
+- **Vencedora: Níveis + trailing stop** (rejeição high/low do dia anterior)
+- Validação out-of-sample (2 metades) — robusto, não overfit
 
-## 🔬 Otimização tolerância de toque (13/06) — 6→20 ticks
-- Forward test mostrou rejeições boas escapando (candle parava ~4-5pt antes da linha; tol era 1,5pt).
-- Backtest `run_tolerancia.py` (1 ano): **20 ticks (5pt) = sweet spot** → 95% (19 aprov), mediana 14d, PF 1.53, +21% PnL ($37.521), robusto (100%/91%).
-- Acima de 24 ticks a taxa cai (91%) + overfit. Adotado **20 ticks** como novo padrão no bot.
-- Doc completo: `docs/estrategia-mnq-5contratos.md` (seção "Otimização da tolerância").
+### Otimizações (comprovadas por backtest, todas adotadas)
+1. **Tolerância de toque: 6 → 20 ticks** (13/06) — +21% PnL, +2 aprovações
+2. **Janela de entrada: 15h → 16h** (14/06) — +2 aprovações/ano, zero noturnas
+3. **Filtro de proximidade: MaxDistPontos = 15pt** (14/06) — 100% taxa, PF 1.60, OOS perfeito
 
-## 🔬 Forward test (dia 09/06 no replay) — 4 bugs achados e corrigidos
-Rodando no Market Replay, o forward test pegou 4 problemas que só apareceriam ao vivo:
-1. Tolerância 6→20 ticks (melhoria por backtest) ✅
-2. Trailing com ordem no servidor desabilitava a estratégia → trailing **sintético** (no código) ✅
-3. OCO reutilizado → **posição sem stop/alvo** → nome de sinal **único por trade** ✅
-4. Stop inicial inválido (LONG -$1.918) → stop/alvo criados **NA ENTRADA** (ticks, atrelados ao fill) ✅
+### Implementação
+- Strategy de produção **`src/BotAprovacao.cs`** — compilada e funcionando no NT8
+- Modelo híbrido de saída: stop servidor (intrabar) + trailing/alvo sintéticos (bar close)
+- Integração TraderOS (HTTP 201, dedup por externalId) — funcionando
+- Repo GitHub: `Marcelo210598/Bot-aprovacao` (privado)
 
-Arquivo final: **`src/BotAprovacao.cs`** (renomeado de ApexBot94.cs). Placar dia 09 ajustado (stop correto): **+$906,50**. Log: `docs/forward-test-log.md`.
-**Próximo (dia 10):** rodar replay limpo com a versão final e validar.
+### Forward test (Market Replay)
+- Dias **09/06 a 12/06/2026** concluídos
+- Bugs encontrados e corrigidos na sessão 13/06 (4 bugs críticos)
+- Comportamentos validados: stop intrabar, filtro chase, TraderOS sync, spam de log
 
-## 🤖 Strategy de produção (`src/BotAprovacao.cs`) — criado 13/06
-- Classe `ApexBot94` (Strategy NT8), **separada** do `ApexApprovalSim.cs` (que é só backtest comparativo).
-- Lógica idêntica ao backtest validado `backtest/run_mnq_5contr.py`:
-  reversão na máx/mín do dia anterior · tol 6 ticks · TP 60 · SL 12,5 · BE +3,75→trava +2,5 · trail 1,75.
-- Risco: stop diário $750 (kill switch), sem limite de trades/dia.
-- Extra de segurança: "Parar ao aprovar" (meta $1.500 + 7 dias → flatten e para de operar).
-- Tudo parametrizável na tela do NT8. Horários em **ET** (RTH 9h30–15h00, flatten 15h55).
-- ⚠️ Calculate=OnBarClose: entra na abertura da barra seguinte (backtest entra no close) → diferença ~1min.
+## 🚧 Em progresso
+- Forward test — semana **02–06/06/2026** pendente (baixar dados: 30/05 a 06/06)
+- Confirmar com Andersson: regra 7 dias mínimos + custo real MNQ
+
+## ⚠️ Problemas mapeados
+
+### Resolvidos
+- OCO ID reutilizado → stop/alvo não criados → **resolvido** (sinal único por trade)
+- Trailing c/ ordem no servidor desabilitava bot → **resolvido** (trailing sintético)
+- Stop inicial inválido → perdas enormes → **resolvido** (ticks na entrada)
+- Entradas "chase" (3 stops em 3 min no mesmo nível) → **resolvido** (filtro 15pt)
+- Spam de log em dias acima do PDH → **resolvido** (guard tol*2)
+
+### Monitorar (baixa prioridade)
+- Overtrading: ~14 trades/dia no backtest — decisão: manter (fiel ao backtest). Soluções mapeadas se der problema ao vivo (cooldown / max 12 trades-dia).
+- Dias de mercado lateral (range extremo dia anterior): zero entradas. Comportamento esperado, já no backtest dos 100%.
+
+## 📋 Próximos passos (roadmap)
+1. **Forward test semana 02–06/06** — baixar dados e rodar
+2. **Forward test completo** — validar slippage real ao vivo no Sim101
+3. **Confirmar Andersson** — regra 7 dias + custo MNQ
+4. **Bot Funded 25K** — estratégia pós-aprovação (foco consistência, não velocidade)
+5. **Bot Funded 50K** — variante com mais folga de DD
+
+## 🎯 Visão de produto (3 produtos)
+1. **Bot Aprovação** ← atual (BotAprovacao, 100%/15d, 5 MNQ, 25K) ✅ forward test
+2. **Bot Funded 25K** — estratégia pós-aprovação para operar a conta funded
+3. **Bot Funded 50K** — idem para conta 50K (mais agressivo)
 
 ## 📁 Arquivos importantes
-- `docs/estrategia-mnq-5contratos.md` — **estratégia ESCOLHIDA (5 MNQ, 94%/15d)**
-- `docs/estrategias-para-andersson.md` — documento de decisão (debate, NQ)
-- `src/ApexApprovalSim.cs` — Strategy NinjaScript (base, recebe a config 5 MNQ)
-- `backtest/run_mnq_5contr.py` — **varredura 5 MNQ → config vencedora (15d)**
-- `backtest/run_mnq_5dias.py` — busca por 5 dias (mostra por que não rola)
-- `backtest/run_mnq.py` / `run_mnq_speed.py` — sweeps de sizing MNQ
-- `backtest/stats_94.py` / `refine_25k_final.py` — estratégia 94 original (NQ)
-- `NQ_dados/` — 13 arquivos de NQ 1min (jun/2025–jun/2026)
+- `src/BotAprovacao.cs` — **estratégia de produção** (compilar e usar no NT8)
+- `docs/estrategia-mnq-5contratos.md` — documentação da estratégia escolhida
+- `backtest/run_mnq_5contr.py` — backtest baseline
+- `backtest/run_tolerancia.py` — otimização tolerância (tol 20t)
+- `backtest/run_horario_18h.py` — otimização janela (16h)
+- `backtest/run_proximity_filter.py` — otimização MaxDist (15pt)
+- `backtest/run_stop_diario.py` — otimização stop diário ($750)
+- `NQ_dados/` — dados NQ 1min (jun/2025–jun/2026)
+- `historico/` — snapshots diários das sessões
 
-## 🔧 Como rodar o backtest
-```bash
-cd "Desktop/Projetos AI/Bot-trade-nt8"
-python3 backtest/test_contas.py        # resultado por conta (principal)
-python3 backtest/refine_full.py        # refinamento + robustez
-```
+## 🔧 Como usar o bot no NT8
+1. Baixar `src/BotAprovacao.cs` do GitHub (repo privado — não colar texto, corrompe)
+2. Colocar na pasta Strategies do NT8
+3. Compilar (F5 no Editor NinjaScript)
+4. Adicionar ao gráfico MNQ 1min (fuso ET)
+5. Config padrão já está correta — conferir parâmetros antes de ligar
 
 ## ⚖️ Ressalvas
-- ~10,5 meses (buracos em set/dez/mar = vencimento), 1 contrato NQ, candle de minuto (não tick)
-- Custos estimados ($5/RT) — confirmar com corretora real
-- Backtest ≠ ao vivo — validar com forward test antes de vender
+- Backtest em NQ 1min (~10,5 meses úteis) — custos estimados ($1,20 RT/contrato MNQ)
+- Backtest ≠ ao vivo — forward test em Sim101 obrigatório antes de conta real
+- Apex trailing DD só estimado de dentro do NinjaScript
