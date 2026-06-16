@@ -62,6 +62,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private bool   gerenciando = false;
 		private string sinalAtivo = "";
 		private int    tradeSeq   = 0;    // contador p/ nome de sinal unico por trade
+		private bool   stopIntrabarEnviado = false;  // trava: evita reenviar a saida intrabar antes do fill
 
 		// ---------- Kill switch / controle diario ----------
 		private string diaCorrente = "";
@@ -185,6 +186,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				gerenciando = false;
 				sinalAtivo  = "";
+				stopIntrabarEnviado = false;
 			}
 
 			// ---------------- Kill switch diario ----------------
@@ -223,6 +225,38 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (MaxTradesDia > 0 && TradesHoje() >= MaxTradesDia) return;
 
 			EntradaNiveis(agora);
+		}
+
+		// ---------------- Protecao INTRABAR (tick a tick) — rede contra "stop abaixo do mercado" ----------------
+		// O stop no servidor (SetStopLoss) pode ser REJEITADO num rally/gap vertical ("stop abaixo do mercado"):
+		// a ordem enche na abertura ja ALEM do stop e o NT recusa o buy/sell-stop -> posicao fica desprotegida e
+		// a perda passa dos 12,5pt planejados (foi o B.O. do replay 15/06: cortaria -$125, sangrou ate -$250).
+		// Aqui fechamos A MERCADO no 1o tick que cruza o stop, SEM depender da ordem do servidor.
+		// Roda so ao vivo/replay: OnMarketData NAO dispara no backtest historico -> backtest 100% inalterado.
+		protected override void OnMarketData(MarketDataEventArgs e)
+		{
+			if (State != State.Realtime) return;
+			if (e.MarketDataType != MarketDataType.Last) return;
+			if (CurrentBar < 0) return;
+
+			MarketPosition mp = Position.MarketPosition;
+			if (mp == MarketPosition.Flat) { stopIntrabarEnviado = false; return; }
+			if (stopIntrabarEnviado) return;
+
+			// Stop efetivo: usa o sintetico (ja com breakeven/trailing) se inicializado;
+			// senao calcula do preco medio — cobre a 1a barra da posicao (antes do 1o OnBarClose).
+			bool isLong   = mp == MarketPosition.Long;
+			double stopEf = gerenciando ? stopPrice
+			              : (isLong ? Position.AveragePrice - StopPontos : Position.AveragePrice + StopPontos);
+
+			double preco = e.Price;
+			if ((!isLong && preco >= stopEf) || (isLong && preco <= stopEf))
+			{
+				stopIntrabarEnviado = true;
+				Print(string.Format("{0}  [STOP INTRABAR] {1} fechado a mercado @ {2:F2} (stop {3:F2}) — rede contra rejeicao do servidor",
+					Time[0], isLong ? "LONG" : "SHORT", preco, stopEf));
+				FechaPosicao(beFeito ? "TrailingTick" : "StopTick");
+			}
 		}
 
 		// Nivel de rejeicao ativo: na SEGUNDA usa o range do domingo a noite (Globex);

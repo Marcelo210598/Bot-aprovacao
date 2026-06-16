@@ -96,6 +96,29 @@ Ordens de vender stop não podem ser aplicadas ACIMA do mercado. Ordem afetada: 
 
 ---
 
+---
+
+## 🐞 BUG 5 (16/06) — stop do servidor REJEITADO em rally vertical → perda dobrou (replay 15/06)
+Rodando o replay do dia 15/06 (segunda, nível do domingo a noite), o bot tomou SHORTs de reentrada (`NIV_S11` ~30625, `NIV_S12` ~30634) numa subida vertical. O `SetStopLoss` (ticks, +12,5pt) gerou os buy-stops em 30637,xx e **30646,75/30647**, mas o NT8 **rejeitou**:
+```
+Playback101, O preço de stop não pode ser alterado abaixo do mercado.
+Ordem afetada: BuyToCover 3 StopMarket @ 30647  (e BuyToCover 2 @ 30646,75)
+```
+**Causa raiz:** com `Calculate=OnBarClose`, a ordem enche na **abertura da barra seguinte** já lá em cima (fill ~30634). Quando o NT manda o buy-stop em 30646,75, o mercado, no rally, **já passou** desse preço → buy-stop "abaixo do mercado" → **ordem nunca aceita**. As DUAS camadas falharam:
+1. **Servidor:** stop rejeitado (acima).
+2. **Sintético (backup):** só checa no **fechamento da barra** e **pula a 1ª barra** da posição → a barra violenta de entrada correu ~25pt sem ninguém checando. Só fechou na barra seguinte.
+
+**Resultado:** em vez de cortar em **-$125** (12,5pt), a posição sangrou até **~-$250**. (É o "B.O. que voltou" — mesma família dos bugs 2 e 3, agora na camada intrabar da 1ª barra.)
+
+**Correção (16/06) — proteção INTRABAR via `OnMarketData`:**
+- Novo override `OnMarketData` fecha **a mercado no 1º tick** que cruza o stop, **sem depender da ordem do servidor**. Usa o stop sintético (com breakeven/trailing) se já inicializado, senão calcula do preço médio (cobre a 1ª barra).
+- Flag `stopIntrabarEnviado` evita reenvio antes do fill.
+- Roda só ao vivo/replay (`State==Realtime`): **`OnMarketData` não dispara no backtest histórico → backtest 100% inalterado** (sem re-validar a estratégia).
+- `SetStopLoss` no servidor **mantido** como 1ª camada (quando aceito, é o mais rápido). Agora são 3 camadas: servidor → tick (OnMarketData) → bar close.
+- Pendente: baixar o arquivo na VM, compilar e **re-rodar o replay 15/06** confirmando que corta em ~$125 mesmo no rally (log `[STOP INTRABAR]`).
+
+---
+
 ## 🔎 Observações técnicas confirmadas no forward test
 1. **Trailing em degraus (OnBarClose):** o stop só atualiza no FECHAMENTO de cada barra de 1 min. A 1ª barra em posição apenas seta o stop inicial; o trailing só move a partir da 2ª barra. Entre fechamentos o stop fica parado — fiel ao backtest, mas ao vivo numa reversão intrabar rápida pode devolver um pouco mais que um trailing tick-a-tick.
 2. **Tolerância 20 capturando trades reais** que a de 6 deixaria passar (Trade 1) — otimização validada na prática.
