@@ -85,12 +85,16 @@ Parar:       ao bater meta $1.500 + 7 dias operados
 1. **Forward test semana 02–06/06** — baixar dados e rodar
 2. **Forward test completo** — validar slippage real ao vivo no Sim101
 3. **Confirmar Andersson** — regra 7 dias + custo MNQ
-4. **Bot Funded 25K** — estratégia pós-aprovação (foco consistência, não velocidade)
+4. **Bot Funded 25K** — 🟡 backtest iniciado e refinado (15/06, pasta `Estrategia 25/`). Falta `.cs` + forward test.
 5. **Bot Funded 50K** — variante com mais folga de DD
 
 ## 🎯 Visão de produto (3 produtos)
 1. **Bot Aprovação** ← atual (BotAprovacao, 100%/15d, 5 MNQ, 25K) ✅ forward test
-2. **Bot Funded 25K** — estratégia pós-aprovação para operar a conta funded
+2. **Bot Funded 25K** — 🟡 estratégia pós-aprovação em backtest. Config v3 refinada (15/06): Intraday,
+   **2→3 MNQ** (escalona após travar a gordura $26.600), alvo **$400/dia**, **breakeven 1.5/1.0**.
+   Resultado: **19 saques/ano (~$19k ≈ R$104k)**, **WR 75,9% / 78,8% dias verdes / PF 1.91 / 0 violação**,
+   OOS 0/0. Proteção 4 camadas (SL 12.5pt/trade + BE + stop diário $300 + DD $1.500). Pasta `Estrategia 25/`.
+   Descartados: filtro horário, escalonamento 2 degraus, filtro SMA (ver README). Falta `.cs` + forward test.
 3. **Bot Funded 50K** — idem para conta 50K (mais agressivo)
 
 ## 📁 Arquivos importantes
