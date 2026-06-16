@@ -119,6 +119,23 @@ Ordem afetada: BuyToCover 3 StopMarket @ 30647  (e BuyToCover 2 @ 30646,75)
 
 ---
 
+## 🐞 BUG 6 (16/06) — trailing 1 barra atrasado vs backtest + saídas mudas (replay 15/06)
+No replay 15/06, um SHORT @ 30625,50 chegou a **+$80** a favor (preço caiu ~8pt intrabar) mas o **breakeven nunca travou** — o stop ficou no inicial (30637,5), o preço reverteu e stopou em ~-$125. O Marcelo questionou: "bateu +80 e o SL não subiu".
+
+**Causa (descompasso live × backtest Python):**
+- `GerenciaPosicao()` tinha um `return` na **1ª barra** da posição (só inicializava). Com `Calculate=OnBarClose`, a 1ª barra É a barra do **fill** → o movimento a favor nela era **ignorado** (fav/breakeven não rastreados).
+- No backtest (`run_segunda_domingo.py`), o 1º bar gerenciado (o seguinte ao sinal) **já rastreia fav e trava breakeven**. Ou seja, o live gerenciava **1 barra atrasado** → travava menos lucro que o validado em 94%.
+- Agravante separado: live entra no **abre da barra seguinte** (gap), backtest no **close do sinal** → entradas piores ao vivo em barras rápidas (inerente ao OnBarClose).
+- Além disso, `FechaPosicao` **não imprimia nada** → todas as saídas eram **mudas** no log (impossível auditar como/onde saiu).
+
+**Correção (16/06):**
+1. Removido o `return` da 1ª barra → gerencia stop/alvo/breakeven/trailing **desde o fill**, igual ao backtest (faz o live convergir pro que foi validado; não altera o backtest).
+2. `FechaPosicao` agora **loga toda saída**: `<<< SAIDA [motivo] | ... | entrada X ~saida Y | fav Z | BE=sim/nao`.
+- Pendente: re-rodar o replay e auditar pelos novos logs de saída se o breakeven/trailing trava lucro nas reversões.
+- ⚠️ Ressalva: se o pico a favor e a reversão ao stop forem na **mesma barra**, nem o backtest trava (stop é checado antes do trailing) — esperado, não é bug.
+
+---
+
 ## 🔎 Observações técnicas confirmadas no forward test
 1. **Trailing em degraus (OnBarClose):** o stop só atualiza no FECHAMENTO de cada barra de 1 min. A 1ª barra em posição apenas seta o stop inicial; o trailing só move a partir da 2ª barra. Entre fechamentos o stop fica parado — fiel ao backtest, mas ao vivo numa reversão intrabar rápida pode devolver um pouco mais que um trailing tick-a-tick.
 2. **Tolerância 20 capturando trades reais** que a de 6 deixaria passar (Trade 1) — otimização validada na prática.

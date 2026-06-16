@@ -348,7 +348,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			bool isLong = Position.MarketPosition == MarketPosition.Long;
 
-			// 1a barra na posicao: registra entrada, inicializa stop e alvo sinteticos
+			// 1a barra na posicao (barra do fill): inicializa stop/alvo sinteticos.
+			// NAO retorna -> ja gerencia stop/alvo/breakeven/trailing NESTA barra, igual ao backtest
+			// (la o 1o bar gerenciado e o seguinte ao sinal e ja rastreia fav/breakeven). Antes o
+			// 'return' pulava o fill -> movimento a favor na 1a barra nao travava o breakeven (B.O. 15/06).
 			if (!gerenciando)
 			{
 				entryPrice = Position.AveragePrice;
@@ -357,7 +360,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 				stopPrice  = isLong ? entryPrice - StopPontos : entryPrice + StopPontos;
 				alvoPrice  = isLong ? entryPrice + AlvoPontos : entryPrice - AlvoPontos;
 				gerenciando = true;
-				return;
 			}
 
 			// Alvo sintetico
@@ -418,6 +420,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		private void FechaPosicao(string motivo)
 		{
+			if (Position.MarketPosition == MarketPosition.Flat) return;
+			Print(string.Format("{0}  <<< SAIDA [{1}] | {2} {3} | entrada {4:F2} ~saida {5:F2} | fav {6:F2} | BE={7}",
+				Time[0], motivo, Position.MarketPosition, sinalAtivo, entryPrice, Close[0], favPrice, beFeito ? "sim" : "nao"));
 			if (Position.MarketPosition == MarketPosition.Long)  ExitLong("X_" + motivo, sinalAtivo);
 			else if (Position.MarketPosition == MarketPosition.Short) ExitShort("X_" + motivo, sinalAtivo);
 		}
