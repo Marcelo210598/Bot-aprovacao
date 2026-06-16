@@ -227,12 +227,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			EntradaNiveis(agora);
 		}
 
-		// ---------------- Protecao INTRABAR (tick a tick) — rede contra "stop abaixo do mercado" ----------------
-		// O stop no servidor (SetStopLoss) pode ser REJEITADO num rally/gap vertical ("stop abaixo do mercado"):
-		// a ordem enche na abertura ja ALEM do stop e o NT recusa o buy/sell-stop -> posicao fica desprotegida e
-		// a perda passa dos 12,5pt planejados (foi o B.O. do replay 15/06: cortaria -$125, sangrou ate -$250).
-		// Aqui fechamos A MERCADO no 1o tick que cruza o stop, SEM depender da ordem do servidor.
+		// ---------------- Gestao INTRABAR (TICK A TICK) — trailing real desde a entrada ----------------
+		// Pedido do Marcelo (16/06): o SL tem que SUBIR junto com o lucro a cada tick, pra qualquer
+		// reversao apos lucro travar o ganho — nao so no fechamento da barra. Aqui replicamos a logica
+		// sintetica (fav -> breakeven -> trailing -> stop/alvo) a CADA TICK, desde o 1o tick apos o fill,
+		// fechando A MERCADO sem depender de ordem no servidor (imune ao "stop abaixo do mercado").
 		// Roda so ao vivo/replay: OnMarketData NAO dispara no backtest historico -> backtest 100% inalterado.
+		// (GerenciaPosicao no OnBarClose continua valendo p/ o backtest e como rede no fechamento da barra.)
 		protected override void OnMarketData(MarketDataEventArgs e)
 		{
 			if (State != State.Realtime) return;
@@ -243,19 +244,64 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (mp == MarketPosition.Flat) { stopIntrabarEnviado = false; return; }
 			if (stopIntrabarEnviado) return;
 
-			// Stop efetivo: usa o sintetico (ja com breakeven/trailing) se inicializado;
-			// senao calcula do preco medio — cobre a 1a barra da posicao (antes do 1o OnBarClose).
-			bool isLong   = mp == MarketPosition.Long;
-			double stopEf = gerenciando ? stopPrice
-			              : (isLong ? Position.AveragePrice - StopPontos : Position.AveragePrice + StopPontos);
+			bool isLong = mp == MarketPosition.Long;
+
+			// Inicializa o gerenciamento ja no 1o tick apos o fill (antes mesmo da barra fechar)
+			if (!gerenciando)
+			{
+				entryPrice = Position.AveragePrice;
+				favPrice   = entryPrice;
+				beFeito    = false;
+				stopPrice  = isLong ? entryPrice - StopPontos : entryPrice + StopPontos;
+				alvoPrice  = isLong ? entryPrice + AlvoPontos : entryPrice - AlvoPontos;
+				gerenciando = true;
+			}
 
 			double preco = e.Price;
-			if ((!isLong && preco >= stopEf) || (isLong && preco <= stopEf))
+
+			// 1) Pico a favor + SOBE o stop (breakeven -> trailing) a cada tick. Sempre monotonico
+			//    (so aperta, nunca afrouxa) — garante lucro travado numa reversao.
+			if (isLong)
+			{
+				favPrice = Math.Max(favPrice, preco);
+				if (!beFeito && (favPrice - entryPrice) >= BreakevenTrigPontos)
+				{
+					beFeito = true;
+					stopPrice = Math.Max(stopPrice, entryPrice + BreakevenLockPontos);
+				}
+				if (beFeito)
+					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + BreakevenLockPontos, favPrice - TrailingPontos));
+			}
+			else
+			{
+				favPrice = Math.Min(favPrice, preco);
+				if (!beFeito && (entryPrice - favPrice) >= BreakevenTrigPontos)
+				{
+					beFeito = true;
+					stopPrice = Math.Min(stopPrice, entryPrice - BreakevenLockPontos);
+				}
+				if (beFeito)
+					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - BreakevenLockPontos, favPrice + TrailingPontos));
+			}
+
+			// 2) Alvo: fecha a mercado se cruzou o alvo neste tick
+			if ((isLong && preco >= alvoPrice) || (!isLong && preco <= alvoPrice))
 			{
 				stopIntrabarEnviado = true;
-				Print(string.Format("{0}  [STOP INTRABAR] {1} fechado a mercado @ {2:F2} (stop {3:F2}) — rede contra rejeicao do servidor",
-					Time[0], isLong ? "LONG" : "SHORT", preco, stopEf));
+				Print(string.Format("{0}  [ALVO INTRABAR] {1} @ {2:F2} (alvo {3:F2})",
+					Time[0], isLong ? "LONG" : "SHORT", preco, alvoPrice));
+				FechaPosicao("AlvoTick");
+				return;
+			}
+
+			// 3) Stop/trailing: fecha a mercado no 1o tick que cruza o stop ATUAL (ja trilhado)
+			if ((!isLong && preco >= stopPrice) || (isLong && preco <= stopPrice))
+			{
+				stopIntrabarEnviado = true;
+				Print(string.Format("{0}  [STOP INTRABAR] {1} @ {2:F2} (stop {3:F2}, fav {4:F2}, BE={5}) — trava tick a tick",
+					Time[0], isLong ? "LONG" : "SHORT", preco, stopPrice, favPrice, beFeito ? "sim" : "nao"));
 				FechaPosicao(beFeito ? "TrailingTick" : "StopTick");
+				return;
 			}
 		}
 
