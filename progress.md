@@ -1,6 +1,6 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-15
+## Última atualização: 2026-06-16
 
 ## 📌 Visão Geral
 - **Objetivo:** Bot de APROVAÇÃO de conta Apex (produto de entrada) → upsell do bot de operação
@@ -55,16 +55,21 @@ Parar:       ao bater meta $1.500 + 7 dias operados
 
 ### Implementação
 - Strategy de produção **`src/BotAprovacao.cs`** — compilada e funcionando no NT8
-- Modelo híbrido de saída: stop servidor (intrabar) + trailing/alvo sintéticos (bar close)
+- **Gestão de saída ao vivo TICK A TICK** (16/06): `OnMarketData` faz fav→breakeven→trailing→alvo/stop a cada tick, desde o 1º tick pós-fill. SL sobe junto com o lucro DENTRO da vela (não espera a vela fechar). `GerenciaPosicao` (OnBarClose) mantido p/ backtest + rede no fechamento.
+- ⚠️ `OnMarketData` só roda ao vivo/replay (`State==Realtime`) → **backtest 100% inalterado**; live diverge do backtest bar-based no tick-level (validação empírica via replay).
 - Integração TraderOS (HTTP 201, dedup por externalId) — funcionando
 - Repo GitHub: `Marcelo210598/Bot-aprovacao` (privado)
 
 ### Forward test (Market Replay)
 - Dias **09/06 a 12/06/2026** concluídos
 - Bugs encontrados e corrigidos na sessão 13/06 (4 bugs críticos)
-- Comportamentos validados: stop intrabar, filtro chase, TraderOS sync, spam de log
+- **Sessão 16/06** — replay do **15/06** (segunda, nível domingo à noite): achados/corrigidos Bug 5 (stop servidor rejeitado em rally → `OnMarketData` intrabar) e Bug 6 (trailing 1 barra atrasado + saídas mudas). Implementado trailing tick a tick a pedido do Marcelo. Trades 15/06: NIV_S11 +$29, NIV_S12 -$124 (faltou 1 tick p/ breakeven), NIV_S13 -$10,5 (proteção cortou de -$125). Dia de rally forte + gap de entrada pesaram.
+- Comportamentos validados: stop intrabar, trailing tick a tick, filtro chase, TraderOS sync, spam de log
 
 ## 🚧 Em progresso
+- Forward test — rodar **mais dias de replay** (dias calmos, sem reversão em V) p/ ver o trailing tick a tick travando lucro de verdade
+- Avaliar (SÓ se necessário, por backtest) antecipar gatilho de breakeven **3,75 → 3,0/2,5** p/ proteger trades que ficam a ~3,5pt a favor (ex.: NIV_S12 -$124 do 15/06)
+- Observar o **gap de entrada** (fill no abre da vela seguinte) — maior dano em dia de rally; pensar mitigação só com backtest
 - Forward test — semana **02–06/06/2026** pendente (baixar dados: 30/05 a 06/06)
 - Confirmar com Andersson: regra 7 dias mínimos + custo real MNQ
 
