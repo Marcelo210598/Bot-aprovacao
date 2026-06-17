@@ -625,8 +625,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					// Em recovery (sem signal original), atualiza todos os stops da estrategia.
 					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
 						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice + BreakevenLockPontos, false);
-					else
-						SetStopLoss(CalculationMode.Price, entryPrice + BreakevenLockPontos, false);
+					// em recovery: server stop anterior ainda protege; trailing sintetico gerencia a saida
 				}
 				if (beFeito)
 					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + BreakevenLockPontos, favPrice - TrailingPontos));
@@ -640,8 +639,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar.
 					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
 						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice - BreakevenLockPontos, false);
-					else
-						SetStopLoss(CalculationMode.Price, entryPrice - BreakevenLockPontos, false);
+					// em recovery: server stop anterior ainda protege; trailing sintetico gerencia a saida
 				}
 				if (beFeito)
 					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - BreakevenLockPontos, favPrice + TrailingPontos));
