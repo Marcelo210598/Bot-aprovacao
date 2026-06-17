@@ -1,6 +1,6 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-16 (sessão noturna)
+## Última atualização: 2026-06-17 (1º forward test ao vivo — 3 bugs críticos corrigidos)
 
 ## 🌙 ESTRATÉGIA NOTURNA (16/06 — branch `feat/estrategia-noturna`, NÃO mergeada)
 Reversão "ping-pong" nas bordas do canal Fibonacci **19h-21h BR**, integrada ao `BotAprovacao.cs`
@@ -96,6 +96,9 @@ Parar:       ao bater meta $1.500 + 7 dias operados
 - Stop inicial inválido → perdas enormes → **resolvido** (ticks na entrada)
 - Entradas "chase" (3 stops em 3 min no mesmo nível) → **resolvido** (filtro 15pt)
 - Spam de log em dias acima do PDH → **resolvido** (guard tol*2)
+- **[17/06] Trailing sumia no restart** → resolvido (`AdoptAccountPosition` + recovery em `State.Realtime`)
+- **[17/06] Bot se auto-desabilitava** → resolvido (null-safety em `TradesHoje` e `RealizadoAcumulado`)
+- **[17/06] SHORT fantasma pós-exit** → resolvido (neutraliza server stop 5000 ticks antes de fechar)
 
 ### Monitorar (baixa prioridade)
 - Overtrading: ~14 trades/dia no backtest — decisão: manter (fiel ao backtest). Soluções mapeadas se der problema ao vivo (cooldown / max 12 trades-dia).
