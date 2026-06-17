@@ -41,9 +41,9 @@ using System.Windows.Media;
 //
 //  ESTRATEGIA NOTURNA — "Nomads Trade da Noite" (16/06, toggle OperarNoite):
 //    Reversao nas extremidades do canal formado entre 19h-21h BR (Fibonacci):
-//      - VENDA na zona 76,4%-100% (topo) apos vela de rejeicao de alta (pavio/doji);
-//      - COMPRA na zona 0%-23,6% (fundo) apos vela de rejeicao de baixa;
-//      - gatilho = rompimento do pavio da vela de rejeicao nas ~4 barras seguintes;
+//      - VENDA na zona 76,4%-100% (topo): vela TOCA a zona (sem exigir rejeicao);
+//      - COMPRA na zona 0%-23,6% (fundo): idem na base;
+//      - gatilho = a PROXIMA vela rompe o CORPO da que tocou (j2: ate 2 barras);
 //      - filtro CANAL >= 40pt (evita canal raso/ruido — cravou 100% no combinado);
 //      - MESMA gestao da diurna (SL 12,5 + BE 3,75/2,5 + trailing tick a tick).
 //    Backtest combinado (diurna + noturna, mesma conta 25K): 100% aprovacao,
@@ -89,17 +89,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private string origemAtual = "";
 
 		// ---------- ESTRATEGIA NOTURNA (canal Fibonacci 19h-21h BR) ----------
-		private TimeZoneInfo etTz = null;     // fuso Eastern (so p/ saber se os EUA estao em horario de verao)
+		private TimeZoneInfo etTz = null;       // fuso Eastern (diurna opera em ET)
+		private TimeZoneInfo brTz = null;       // fuso Brasilia (noturna opera em BR)
+		private TimeZoneInfo graficoTz = null;  // fuso que o NinjaTrader usa p/ exibir Time[0] (auto-detectado)
 		private double noiteHigh = 0, noiteLow = 0;   // canal acumulado na sessao noturna
 		private string noiteDia  = "";                // data BR da sessao noturna corrente
 		private int    notTradesDia = 0;              // trades noturnos na sessao (reservado p/ limite futuro)
 		private int    pendLado = 0;                  // setup pendente: -1 short, +1 long, 0 nenhum
-		private double pendNivel = 0;                 // nivel do pavio a romper
+		private double pendNivel = 0;                 // nivel do corpo a romper (min/max de open,close)
 		private int    pendRestantes = 0;             // barras restantes p/ o rompimento acontecer
 
-		// Constantes da deteccao de rejeicao (objetivadas no backtest)
-		private const double REJ_PAVIO = 0.5;   // pavio >= 50% do range = rejeicao
-		private const double REJ_DOJI  = 0.3;   // corpo <= 30% do range = doji
 		private const double FIB_VENDA  = 0.764; // zona de venda: 76,4%-100%
 		private const double FIB_COMPRA = 0.236; // zona de compra: 0%-23,6%
 
@@ -159,7 +158,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				NoiteWarmupBR		= 1915;    // so opera apos 19h15 (canal precisa formar)
 				NoiteFlattenBR		= 2200;    // flatten de seguranca 22h BR (nao carrega overnight)
 				CanalMinPontos		= 40.0;    // canal minimo: cravou 100% + OOS 100%/100% no combinado
-				GatilhoBarras		= 4;       // janela (min) p/ romper o pavio da vela de rejeicao
+				GatilhoBarras		= 2;       // janela (barras) p/ a proxima romper o CORPO da vela que tocou (j2)
 				PularDomingoNoite	= true;    // domingo a noite = abertura do Globex (spikes), nao opera
 			}
 			else if (State == State.Configure)
@@ -167,12 +166,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				// O grafico roda em ET (igual a diurna). BR nao tem horario de verao; os EUA tem.
-				// Resolvemos o offset BR pelo flag de DST do fuso Eastern (nao dependemos do fuso do grafico).
+				// FUSO-PROOF: o bot NAO depende do fuso configurado no grafico. Ele detecta sozinho
+				// qual fuso o NinjaTrader usa p/ exibir Time[0] e converte: diurna -> ET, noturna -> BR.
+				// Se nao conseguir detectar, cai no comportamento antigo (assume grafico em ET).
 				try { etTz = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"); }
 				catch { etTz = null; }
-				if (OperarNoite && etTz == null)
-					Print("[BotAprovacao] AVISO: fuso Eastern nao resolvido — janela noturna usando offset fixo +1h (verao US). Confira no inverno americano.");
+				try { brTz = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time"); }
+				catch { brTz = null; }
+				graficoTz = ResolveFusoGrafico();
+
+				if (graficoTz != null)
+					Print(string.Format("[BotAprovacao] Fuso do grafico detectado: {0} (UTC{1:+0;-0}h padrao) — convertendo diurna->ET e noturna->BR automaticamente.",
+						graficoTz.Id, graficoTz.BaseUtcOffset.TotalHours));
+				else
+					Print("[BotAprovacao] AVISO: nao consegui detectar o fuso do grafico — assumindo ET (config classica). Tudo segue funcionando.");
 			}
 			else if (State == State.Realtime)
 			{
@@ -195,8 +202,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (CurrentBars[0] < BarsRequiredToTrade)
 				return;
 
-			int agora = ToTime(Time[0]) / 100;
-			string hoje = Time[0].ToString("yyyy-MM-dd");
+			// FUSO-PROOF: converte a hora da barra p/ ET (a diurna opera em horario Eastern),
+			// independente do fuso configurado no grafico.
+			DateTime tEt = EmET(Time[0]);
+			int agora = ToTime(tEt) / 100;
+			string hoje = tEt.ToString("yyyy-MM-dd");
 
 			if (hoje != diaCorrente)
 			{
@@ -223,10 +233,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// Acumula o high/low do overnight p/ servir de nivel de rejeicao na SEGUNDA.
 			if (SegUsaDomingo)
 			{
-				DayOfWeek dow = Time[0].DayOfWeek;
+				DayOfWeek dow = tEt.DayOfWeek;
 				string chaveSeg = null;
 				if (dow == DayOfWeek.Sunday && agora >= DomNoiteInicio)
-					chaveSeg = Time[0].AddDays(1).ToString("yyyy-MM-dd");   // segunda seguinte
+					chaveSeg = tEt.AddDays(1).ToString("yyyy-MM-dd");   // segunda seguinte
 				else if (dow == DayOfWeek.Monday && agora < SessaoInicio)
 					chaveSeg = hoje;
 				if (chaveSeg != null)
@@ -392,8 +402,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private bool NivelAtivo(out double nHi, out double nLo, out bool usouDomingo)
 		{
 			usouDomingo = false;
-			if (SegUsaDomingo && Time[0].DayOfWeek == DayOfWeek.Monday
-				&& onKey == Time[0].ToString("yyyy-MM-dd") && onHigh > 0)
+			DateTime tEt = EmET(Time[0]);   // ET: 'segunda' e a chave onKey sao em horario Eastern
+			if (SegUsaDomingo && tEt.DayOfWeek == DayOfWeek.Monday
+				&& onKey == tEt.ToString("yyyy-MM-dd") && onHigh > 0)
 			{
 				nHi = onHigh; nLo = onLow; usouDomingo = true;
 				return true;
@@ -471,13 +482,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 
-		// ===================== ESTRATEGIA NOTURNA (Nomads Trade da Noite) =====================
-		// Converte a hora da barra (grafico em ET, igual a diurna) p/ horario de Brasilia.
-		// BR e fixo (UTC-3); os EUA tem horario de verao. Logo o offset ET->BR e +1h no verao
-		// americano (EDT) e +2h no inverno (EST). Descobrimos qual pelo flag de DST do Eastern.
+		// ===================== CONVERSAO DE FUSO (FUSO-PROOF) =====================
+		// O bot nao depende do fuso do grafico: detecta o fuso de exibicao (graficoTz) e converte
+		// a hora da barra p/ o fuso alvo (ET na diurna, BR na noturna). Se nao detectou o fuso do
+		// grafico, cai no fallback (assume grafico em ET).
+		private DateTime EmFuso(DateTime t, TimeZoneInfo destino)
+		{
+			if (graficoTz != null && destino != null)
+			{
+				try
+				{
+					DateTime utc = TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(t, DateTimeKind.Unspecified), graficoTz);
+					return TimeZoneInfo.ConvertTimeFromUtc(utc, destino);
+				}
+				catch { }
+			}
+			return DateTime.MinValue;   // sinaliza "usar fallback"
+		}
+
+		// Hora da barra em horario de Brasilia (noturna).
 		private DateTime EmBR(DateTime t)
 		{
-			int off = 1;  // fallback: verao US
+			DateTime br = EmFuso(t, brTz);
+			if (br != DateTime.MinValue) return br;
+			// fallback: assume grafico em ET. BR e fixo (UTC-3); EUA tem DST -> offset +1h (verao) / +2h (inverno).
+			int off = 1;
 			if (etTz != null)
 			{
 				try { off = etTz.IsDaylightSavingTime(DateTime.SpecifyKind(t, DateTimeKind.Unspecified)) ? 1 : 2; }
@@ -486,10 +515,51 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return t.AddHours(off);
 		}
 
+		// Hora da barra em horario Eastern (diurna). Fallback: assume que o grafico ja esta em ET.
+		private DateTime EmET(DateTime t)
+		{
+			DateTime et = EmFuso(t, etTz);
+			return et != DateTime.MinValue ? et : t;
+		}
+
 		private int HoraBR(DateTime t) { DateTime b = EmBR(t); return b.Hour * 100 + b.Minute; }
 
-		// Forma o canal 19h-21h BR, detecta vela de rejeicao nas zonas Fib e dispara a entrada
-		// no rompimento do pavio. Usa a MESMA gestao de saida da diurna (SL/BE/trailing).
+		// Le, por reflection, o fuso que o NinjaTrader usa p/ exibir as barras (Tools > Options >
+		// General > Time zone). Reflection p/ ser robusto entre versoes e NUNCA quebrar a compilacao:
+		// se o membro nao existir, retorna null e o bot usa o fallback (assume ET).
+		private TimeZoneInfo ResolveFusoGrafico()
+		{
+			const System.Reflection.BindingFlags PS =
+				System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static;
+			try
+			{
+				foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+				{
+					if (asm.FullName == null || asm.FullName.IndexOf("NinjaTrader", StringComparison.OrdinalIgnoreCase) < 0)
+						continue;
+					Type[] tipos;
+					try { tipos = asm.GetTypes(); }
+					catch { continue; }   // assembly com tipos nao carregaveis -> pula
+					foreach (var t in tipos)
+					{
+						if (t.Name != "Globals") continue;
+						// GeneralOptions pode ser propriedade ou campo estatico
+						object go = t.GetProperty("GeneralOptions", PS)?.GetValue(null)
+								 ?? t.GetField("GeneralOptions", PS)?.GetValue(null);
+						if (go == null) continue;
+						var ty = go.GetType();
+						var tz = (ty.GetProperty("TimeZoneInfo")?.GetValue(go)
+							   ?? ty.GetField("TimeZoneInfo")?.GetValue(go)) as TimeZoneInfo;
+						if (tz != null) return tz;
+					}
+				}
+			}
+			catch { }
+			return null;
+		}
+
+		// Forma o canal 19h-21h BR, detecta toque nas zonas Fib e dispara a entrada no
+		// rompimento do CORPO da vela que tocou. Usa a MESMA gestao de saida da diurna (SL/BE/trailing).
 		private void ProcessaNoturna()
 		{
 			int brAgora    = HoraBR(Time[0]);
@@ -542,7 +612,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			double zCompra = noiteLow + FIB_COMPRA * canal;   // 23,6% (topo da zona de compra)
 			double h = High[0], l = Low[0], c = Close[0], o = Open[0];
 
-			// 4) Aciona setup pendente: rompeu o pavio da vela de rejeicao nas ~4 barras?
+			// 4) Aciona setup pendente: a proxima vela rompeu o CORPO da que tocou (ate GatilhoBarras)?
 			if (pendLado != 0)
 			{
 				if (pendLado == -1 && l <= pendNivel) { EntraNoturna(-1, canal); return; }
@@ -552,24 +622,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return;   // enquanto ha setup pendente, nao arma outro
 			}
 
-			// 5) Detecta nova vela de rejeicao na zona -> arma o setup
-			double rng = h - l;
-			if (rng <= 0) return;
-			double corpo  = Math.Abs(c - o);
-			double pavSup = h - Math.Max(o, c);
-			double pavInf = Math.Min(o, c) - l;
-
-			if (h >= zVenda && (pavSup >= REJ_PAVIO * rng || corpo <= REJ_DOJI * rng))
+			// 5) Vela TOCA a zona (SEM exigir rejeicao) -> arma o setup; gatilho = rompimento do CORPO.
+			//    O corpo (min/max de open,close) fica ACIMA do pavio -> a venda entra mais cedo/mais
+			//    alto, sem o "la embaixo sem forca". Validado por backtest 17/06 (run_noturna_corpo.py,
+			//    j2): COMBINADO 100% (27/27), PF 1.63, $60,9k/ano, OOS 100%/100% — vs 96%/PF1.57/OOS93%
+			//    do gatilho antigo (pavio+rejeicao). A noturna isolada quase dobrou (PF 1.35->1.58).
+			if (h >= zVenda)
 			{
-				pendLado = -1; pendNivel = l; pendRestantes = GatilhoBarras;   // venda: rompe pavio inferior
+				pendLado = -1; pendNivel = Math.Min(o, c); pendRestantes = GatilhoBarras;   // venda: rompe corpo inferior
 			}
-			else if (l <= zCompra && (pavInf >= REJ_PAVIO * rng || corpo <= REJ_DOJI * rng))
+			else if (l <= zCompra)
 			{
-				pendLado = 1; pendNivel = h; pendRestantes = GatilhoBarras;    // compra: rompe pavio superior
+				pendLado = 1; pendNivel = Math.Max(o, c); pendRestantes = GatilhoBarras;    // compra: rompe corpo superior
 			}
 		}
 
-		// Entrada noturna a mercado no fechamento da barra que rompeu o pavio.
+		// Entrada noturna a mercado no fechamento da barra que rompeu o corpo.
 		// Reusa a mesma gestao da diurna: stop no servidor + trailing tick a tick (OnMarketData).
 		private void EntraNoturna(int lado, double canal)
 		{
@@ -581,7 +649,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 			if (lado == -1) EnterShort(Contratos, sinalAtivo);
 			else            EnterLong(Contratos, sinalAtivo);
-			Print(string.Format("{0}  >>> NOITE {1} @ {2:F2} | canal {3:F1}pt [{4:F2}-{5:F2}] | rompeu pavio {6:F2}",
+			Print(string.Format("{0}  >>> NOITE {1} @ {2:F2} | canal {3:F1}pt [{4:F2}-{5:F2}] | rompeu corpo {6:F2}",
 				Time[0], lado == -1 ? "SHORT" : "LONG", Close[0], canal, noiteLow, noiteHigh, pendNivel));
 		}
 
@@ -877,7 +945,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[NinjaScriptProperty]
 		[Range(1, 20)]
-		[Display(Name="Gatilho (barras)", Description="Quantas barras (min) o bot espera o rompimento do pavio da vela de rejeicao antes de cancelar o setup", Order=66, GroupName="7. Noturna")]
+		[Display(Name="Gatilho (barras)", Description="Quantas barras (min) o bot espera a proxima romper o CORPO da vela que tocou antes de cancelar o setup (2 = j2, otimizado 17/06)", Order=66, GroupName="7. Noturna")]
 		public int GatilhoBarras { get; set; }
 
 		[NinjaScriptProperty]
