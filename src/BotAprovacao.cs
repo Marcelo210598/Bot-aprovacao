@@ -480,6 +480,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 			}
 
+			// Desenha o canal + zonas Fib enquanto a sessao noturna esta em formacao
+			if (naJanela && noiteHigh > 0)
+				DesenhaCanalNoturno(noiteHigh - noiteLow);
+
 			// 2) Flatten de seguranca pos-sessao (so fecha posicao NOTURNA)
 			if (brAgora >= NoiteFlattenBR && Position.MarketPosition != MarketPosition.Flat && origemAtual == "N")
 			{
@@ -617,6 +621,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			Draw.HorizontalLine(this, "PDH", nHi, Brushes.Red,       DashStyleHelper.Dash, 2);
 			Draw.HorizontalLine(this, "PDL", nLo, Brushes.LimeGreen, DashStyleHelper.Dash, 2);
+		}
+
+		// ---------------- Desenho do canal noturno + zonas de Fibonacci (19h-21h BR) ----------------
+		private void DesenhaCanalNoturno(double canal)
+		{
+			if (!DesenharNiveis || canal <= 0) return;
+
+			double topo  = noiteHigh;                       // 100% (zona de venda)
+			double fundo = noiteLow;                        // 0%   (zona de compra)
+			double z764  = fundo + FIB_VENDA  * canal;      // 76,4%
+			double z236  = fundo + FIB_COMPRA * canal;      // 23,6%
+
+			bool valido = canal >= CanalMinPontos;          // laranja forte = opera; cinza = canal raso (so observa)
+			Brush corCanal = valido ? Brushes.DarkOrange : Brushes.Gray;
+
+			Draw.HorizontalLine(this, "NoiteTopo",  topo,  corCanal,     DashStyleHelper.Solid, 2);
+			Draw.HorizontalLine(this, "NoiteFundo", fundo, corCanal,     DashStyleHelper.Solid, 2);
+			Draw.HorizontalLine(this, "NoiteZ764",  z764,  Brushes.Gold, DashStyleHelper.Dot,   1);
+			Draw.HorizontalLine(this, "NoiteZ236",  z236,  Brushes.Gold, DashStyleHelper.Dot,   1);
+
+			Draw.TextFixed(this, "statusNoite",
+				"Canal NOITE (19h-21h BR): " + canal.ToString("F1") + "pt " + (valido ? "(operando)" : "(< minimo, so observa)") + "\n" +
+				"  Topo (venda 76,4-100%):  " + topo.ToString("F2") + " / " + z764.ToString("F2") + "\n" +
+				"  Fundo (compra 0-23,6%):  " + fundo.ToString("F2") + " / " + z236.ToString("F2"),
+				TextPosition.BottomRight);
 		}
 
 		private void FechaPosicao(string motivo)
