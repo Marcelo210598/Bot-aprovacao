@@ -105,7 +105,7 @@ def eh_rejeicao_baixa(b):
 
 
 def bt(bars, usar_diurna=True, usar_noturna=True, dom_map=None, sl_not=PTS_SL, tp_not=TP_NOITE,
-       max_not=99, rng_min=RANGE_MIN):
+       max_not=99, rng_min=RANGE_MIN, pular_dom=False, dom_warmup_br=None):
     pv = MNQ_PV * N_CONTR; rt = RT_PER * N_CONTR
     pos = 0; entry = stop = target = 0.0; fav = 0.0; be_done = False; origem = None
     realized = 0.0; trades = []
@@ -198,7 +198,8 @@ def bt(bars, usar_diurna=True, usar_noturna=True, dom_map=None, sl_not=PTS_SL, t
 
         # ============ NOTURNA ============
         if usar_noturna:
-            na_janela = NOITE_INI_BR <= mbr < NOITE_FIM_BR
+            na_janela = (NOITE_INI_BR <= mbr < NOITE_FIM_BR
+                         and not (pular_dom and b['br'].weekday() == 6))
             # reset/atualiza canal da sessao noturna
             if na_janela:
                 if dbr != noite_dia:
@@ -209,7 +210,10 @@ def bt(bars, usar_diurna=True, usar_noturna=True, dom_map=None, sl_not=PTS_SL, t
             if mbr >= NOITE_FLATTEN_BR and pos != 0 and origem == 'N':
                 fecha(b['c'])
             # so opera dentro da janela, com warmup e canal valido
-            pode = (na_janela and mbr >= NOITE_WARMUP_BR and noite_hi is not None
+            warmup_ef = NOITE_WARMUP_BR
+            if dom_warmup_br is not None and b['br'].weekday() == 6:
+                warmup_ef = dom_warmup_br   # domingo: warm-up mais tarde (deixa a abertura caotica passar)
+            pode = (na_janela and mbr >= warmup_ef and noite_hi is not None
                     and (noite_hi - noite_lo) >= rng_min)
             if pode and not block and not_trades_dia < max_not:
                 rng = noite_hi - noite_lo
@@ -355,3 +359,41 @@ if __name__ == '__main__':
     print(f"     OOS -> 1a: {r1['aprov']}/{r1['tot']} ({r1['taxa']:.0f}%) PF {r1['pf']:.2f} | "
           f"2a: {r2['aprov']}/{r2['tot']} ({r2['taxa']:.0f}%) PF {r2['pf']:.2f}")
     print("=" * 96)
+
+    # ---- FILTRO PULAR DOMINGO (canal >=40pt, config vencedora) ----
+    # Domingo a noite = abertura do Globex (baixa liquidez/spikes). Sexta a noite o mercado ja
+    # fechou. Noites operaveis: dom->qui. Pular domingo deixa seg->qui.
+    print("\n" + "=" * 84)
+    print("  IMPACTO DE PULAR DOMINGO A NOITE (canal >=40pt)")
+    print("=" * 84)
+    print(f"  {'cenario':>28s} {'taxa':>5s} {'aprov':>6s} {'d.med':>5s} {'t/dia':>5s} {'PF':>5s} {'PnL$/ano':>10s}")
+    print("-" * 84)
+    rd40 = bt(bars, True, False, dom, rng_min=40.0)
+    rc_com = bt(bars, True, True, dom, rng_min=40.0, pular_dom=False)
+    rc_sem = bt(bars, True, True, dom, rng_min=40.0, pular_dom=True)
+    rn_sem = bt(bars, False, True, dom, rng_min=40.0, pular_dom=True)
+    for nome, r in [("SO DIURNA", rd40), ("COMBINADO (com domingo)", rc_com),
+                    ("COMBINADO (SEM domingo)", rc_sem), ("SO NOTURNA (sem dom)", rn_sem)]:
+        print(f"  {nome:>28s} {r['taxa']:>4.0f}% {r['aprov']:>3}/{r['tot']:<2} {r['dmediana']:>4.0f}d "
+              f"{r['trd_dia']:>5.1f} {r['pf']:>5.2f} {r['net']:>10,.0f}")
+    print("-" * 84)
+    s1 = bt(b1, True, True, dom, rng_min=40.0, pular_dom=True)
+    s2 = bt(b2, True, True, dom, rng_min=40.0, pular_dom=True)
+    print(f"  COMBINADO sem domingo OOS -> 1a: {s1['aprov']}/{s1['tot']} ({s1['taxa']:.0f}%) PF {s1['pf']:.2f} | "
+          f"2a: {s2['aprov']}/{s2['tot']} ({s2['taxa']:.0f}%) PF {s2['pf']:.2f}")
+    print("=" * 84)
+
+    # ---- VIA DO MEIO: manter domingo mas com warm-up mais tarde (evita o spike de abertura) ----
+    print("\n" + "=" * 84)
+    print("  DOMINGO COM WARM-UP MAIS TARDE (canal >=40pt) — combinado")
+    print("=" * 84)
+    print(f"  {'domingo opera a partir de':>28s} {'taxa':>5s} {'aprov':>6s} {'d.med':>5s} {'PF':>5s} {'PnL$/ano':>10s}  OOS(1a|2a)")
+    print("-" * 84)
+    for lbl, dw in [("19:15 BR (atual, c/ spike)", None), ("19:30 BR", 1930),
+                    ("20:00 BR", 2000), ("20:30 BR", 2030)]:
+        r  = bt(bars, True, True, dom, rng_min=40.0, dom_warmup_br=dw)
+        q1 = bt(b1, True, True, dom, rng_min=40.0, dom_warmup_br=dw)
+        q2 = bt(b2, True, True, dom, rng_min=40.0, dom_warmup_br=dw)
+        print(f"  {lbl:>28s} {r['taxa']:>4.0f}% {r['aprov']:>3}/{r['tot']:<2} {r['dmediana']:>4.0f}d "
+              f"{r['pf']:>5.2f} {r['net']:>10,.0f}  {q1['taxa']:>3.0f}%|{q2['taxa']:>3.0f}%")
+    print("=" * 84)

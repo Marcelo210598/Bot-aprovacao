@@ -160,6 +160,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				NoiteFlattenBR		= 2200;    // flatten de seguranca 22h BR (nao carrega overnight)
 				CanalMinPontos		= 40.0;    // canal minimo: cravou 100% + OOS 100%/100% no combinado
 				GatilhoBarras		= 4;       // janela (min) p/ romper o pavio da vela de rejeicao
+				PularDomingoNoite	= true;    // domingo a noite = abertura do Globex (spikes), nao opera
 			}
 			else if (State == State.Configure)
 			{
@@ -463,8 +464,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private void ProcessaNoturna()
 		{
 			int brAgora    = HoraBR(Time[0]);
-			string brDia   = EmBR(Time[0]).ToString("yyyy-MM-dd");
+			DateTime emBr  = EmBR(Time[0]);
+			string brDia   = emBr.ToString("yyyy-MM-dd");
 			bool naJanela  = brAgora >= NoiteInicioBR && brAgora < NoiteFimBR;
+
+			// Domingo a noite = ABERTURA do Globex (spikes/baixa liquidez). O backtest 1min
+			// "gosta" desses trades, mas ao vivo a execucao e lixo (canal de spike, slippage).
+			// Por isso nao operamos domingo a noite. (toggle PularDomingoNoite)
+			if (PularDomingoNoite && emBr.DayOfWeek == DayOfWeek.Sunday) { pendLado = 0; return; }
 
 			// 1) Atualiza o canal da sessao noturna (high/low acumulado desde 19h BR)
 			if (naJanela)
@@ -817,6 +824,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(1, 20)]
 		[Display(Name="Gatilho (barras)", Description="Quantas barras (min) o bot espera o rompimento do pavio da vela de rejeicao antes de cancelar o setup", Order=66, GroupName="7. Noturna")]
 		public int GatilhoBarras { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name="Pular domingo a noite", Description="Nao opera domingo a noite (abertura do Globex = spikes/baixa liquidez). Recomendado ON: o backtest 1min superestima esses trades.", Order=67, GroupName="7. Noturna")]
+		public bool PularDomingoNoite { get; set; }
 		#endregion
 	}
 }
