@@ -38,6 +38,18 @@ using System.Windows.Media;
 //  SEGUNDA (15/06): usa o range do DOMINGO A NOITE (Globex 18h -> seg 9h30) como
 //  nivel de rejeicao, em vez da linha de sexta. Toggle: SegUsaDomingo (default ON).
 //  Backtest: +3 aprovacoes/ano (19->22), aprova mais rapido (15->13d), OOS 100%/100%.
+//
+//  ESTRATEGIA NOTURNA — "Nomads Trade da Noite" (16/06, toggle OperarNoite):
+//    Reversao nas extremidades do canal formado entre 19h-21h BR (Fibonacci):
+//      - VENDA na zona 76,4%-100% (topo) apos vela de rejeicao de alta (pavio/doji);
+//      - COMPRA na zona 0%-23,6% (fundo) apos vela de rejeicao de baixa;
+//      - gatilho = rompimento do pavio da vela de rejeicao nas ~4 barras seguintes;
+//      - filtro CANAL >= 40pt (evita canal raso/ruido — cravou 100% no combinado);
+//      - MESMA gestao da diurna (SL 12,5 + BE 3,75/2,5 + trailing tick a tick).
+//    Backtest combinado (diurna + noturna, mesma conta 25K): 100% aprovacao,
+//    aprova em ~8 dias (vs 14 da diurna so), +33% PnL/ano, OOS 100%/100%.
+//    Horario 19h-21h convertido de BR p/ o fuso do grafico (imune ao DST dos EUA).
+//    A NOTURNA e ACELERADOR da diurna — sozinha e fraca (~89%). Forward test antes do real.
 // =============================================================================
 
 namespace NinjaTrader.NinjaScript.Strategies
@@ -72,6 +84,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 		// ---------- Controle de meta (opcional) ----------
 		private HashSet<string> diasOperados = new HashSet<string>();
 		private bool aprovado = false;
+
+		// ---------- Origem da posicao aberta ("D"=diurna | "N"=noturna) ----------
+		private string origemAtual = "";
+
+		// ---------- ESTRATEGIA NOTURNA (canal Fibonacci 19h-21h BR) ----------
+		private TimeZoneInfo brTz = null;     // fuso Brasilia
+		private TimeZoneInfo chartTz = null;  // fuso do grafico (ET, igual a diurna)
+		private double noiteHigh = 0, noiteLow = 0;   // canal acumulado na sessao noturna
+		private string noiteDia  = "";                // data BR da sessao noturna corrente
+		private int    notTradesDia = 0;              // trades noturnos na sessao (reservado p/ limite futuro)
+		private int    pendLado = 0;                  // setup pendente: -1 short, +1 long, 0 nenhum
+		private double pendNivel = 0;                 // nivel do pavio a romper
+		private int    pendRestantes = 0;             // barras restantes p/ o rompimento acontecer
+
+		// Constantes da deteccao de rejeicao (objetivadas no backtest)
+		private const double REJ_PAVIO = 0.5;   // pavio >= 50% do range = rejeicao
+		private const double REJ_DOJI  = 0.3;   // corpo <= 30% do range = doji
+		private const double FIB_VENDA  = 0.764; // zona de venda: 76,4%-100%
+		private const double FIB_COMPRA = 0.236; // zona de compra: 0%-23,6%
 
 		protected override void OnStateChange()
 		{
@@ -121,9 +152,28 @@ namespace NinjaTrader.NinjaScript.Strategies
 				MinDiasOperados		= 7;
 
 				DesenharNiveis		= true;
+
+				// ----- Estrategia noturna (Nomads Trade da Noite) -----
+				OperarNoite			= true;    // toggle: liga a noturna junto da diurna
+				NoiteInicioBR		= 1900;    // 19h00 Brasilia
+				NoiteFimBR			= 2100;    // 21h00 Brasilia (nao abre depois)
+				NoiteWarmupBR		= 1915;    // so opera apos 19h15 (canal precisa formar)
+				NoiteFlattenBR		= 2200;    // flatten de seguranca 22h BR (nao carrega overnight)
+				CanalMinPontos		= 40.0;    // canal minimo: cravou 100% + OOS 100%/100% no combinado
+				GatilhoBarras		= 4;       // janela (min) p/ romper o pavio da vela de rejeicao
 			}
 			else if (State == State.Configure)
 			{
+			}
+			else if (State == State.DataLoaded)
+			{
+				// Resolve os fusos p/ converter a janela noturna de BR -> grafico (ET)
+				try { brTz = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time"); }
+				catch { brTz = null; }
+				try { chartTz = (Bars != null && Bars.TradingHours != null) ? Bars.TradingHours.TimeZoneInfo : null; }
+				catch { chartTz = null; }
+				if (OperarNoite && (brTz == null || chartTz == null))
+					Print("[BotAprovacao] AVISO: fuso BR/grafico nao resolvido — janela noturna usando fallback ET+1h (verao US). Confira o fuso do grafico.");
 			}
 		}
 
@@ -187,6 +237,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				gerenciando = false;
 				sinalAtivo  = "";
 				stopIntrabarEnviado = false;
+				origemAtual = "";
 			}
 
 			// ---------------- Kill switch diario ----------------
@@ -211,20 +262,23 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 			}
 
-			// ---------------- Flatten no fim do dia ----------------
-			if (agora >= FlattenHora)
+			// ---------------- Flatten do pregao diurno (16h55 ET) ----------------
+			// Fecha SO a posicao diurna e encerra entradas diurnas. NAO retorna aqui:
+			// a janela noturna (apos o pregao) e tratada por ProcessaNoturna() abaixo.
+			if (agora >= FlattenHora && Position.MarketPosition != MarketPosition.Flat && origemAtual == "D")
+				FechaPosicao("FlattenEOD");
+
+			// ---------------- Entrada DIURNA ----------------
+			// EntradaNiveis so dispara dentro de 9h30-16h (checado internamente).
+			if (!aprovado && !bloqueadoHoje && Position.MarketPosition == MarketPosition.Flat
+				&& !(MaxTradesDia > 0 && TradesHoje() >= MaxTradesDia))
 			{
-				if (Position.MarketPosition != MarketPosition.Flat)
-					FechaPosicao("FlattenEOD");
-				return;
+				EntradaNiveis(agora);
 			}
 
-			// ---------------- Entrada ----------------
-			if (aprovado || bloqueadoHoje) return;
-			if (Position.MarketPosition != MarketPosition.Flat) return;
-			if (MaxTradesDia > 0 && TradesHoje() >= MaxTradesDia) return;
-
-			EntradaNiveis(agora);
+			// ---------------- Estrategia NOTURNA (canal Fib 19h-21h BR) ----------------
+			if (OperarNoite)
+				ProcessaNoturna();
 		}
 
 		// ---------------- Gestao INTRABAR (TICK A TICK) — trailing real desde a entrada ----------------
@@ -345,6 +399,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					}
 					tradeSeq++;
 					sinalAtivo = "NIV_S" + tradeSeq;
+					origemAtual = "D";
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
 					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 					EnterShort(Contratos, sinalAtivo);
@@ -373,6 +428,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					}
 					tradeSeq++;
 					sinalAtivo = "NIV_L" + tradeSeq;
+					origemAtual = "D";
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
 					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
 					EnterLong(Contratos, sinalAtivo);
@@ -385,6 +441,105 @@ namespace NinjaTrader.NinjaScript.Strategies
 						Time[0], nLo, l, c, src));
 				}
 			}
+		}
+
+		// ===================== ESTRATEGIA NOTURNA (Nomads Trade da Noite) =====================
+		// Converte o horario da barra (fuso do grafico = ET) p/ horario de Brasilia.
+		private DateTime EmBR(DateTime t)
+		{
+			if (brTz != null && chartTz != null)
+			{
+				try { return TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t, DateTimeKind.Unspecified), chartTz, brTz); }
+				catch { }
+			}
+			return t.AddHours(1);  // fallback: ET(EDT) -> BR ~ +1h (verao US)
+		}
+
+		private int HoraBR(DateTime t) { DateTime b = EmBR(t); return b.Hour * 100 + b.Minute; }
+
+		// Forma o canal 19h-21h BR, detecta vela de rejeicao nas zonas Fib e dispara a entrada
+		// no rompimento do pavio. Usa a MESMA gestao de saida da diurna (SL/BE/trailing).
+		private void ProcessaNoturna()
+		{
+			int brAgora    = HoraBR(Time[0]);
+			string brDia   = EmBR(Time[0]).ToString("yyyy-MM-dd");
+			bool naJanela  = brAgora >= NoiteInicioBR && brAgora < NoiteFimBR;
+
+			// 1) Atualiza o canal da sessao noturna (high/low acumulado desde 19h BR)
+			if (naJanela)
+			{
+				if (brDia != noiteDia)
+				{
+					noiteDia = brDia; noiteHigh = High[0]; noiteLow = Low[0];
+					pendLado = 0; notTradesDia = 0;
+				}
+				else
+				{
+					noiteHigh = Math.Max(noiteHigh, High[0]);
+					noiteLow  = Math.Min(noiteLow,  Low[0]);
+				}
+			}
+
+			// 2) Flatten de seguranca pos-sessao (so fecha posicao NOTURNA)
+			if (brAgora >= NoiteFlattenBR && Position.MarketPosition != MarketPosition.Flat && origemAtual == "N")
+			{
+				FechaPosicao("FlattenNoite");
+				return;
+			}
+
+			// 3) So opera dentro da janela, apos warm-up e com canal valido
+			if (!naJanela) { pendLado = 0; return; }
+			if (brAgora < NoiteWarmupBR || noiteHigh <= 0) return;
+			double canal = noiteHigh - noiteLow;
+			if (canal < CanalMinPontos) return;
+			if (aprovado || bloqueadoHoje) return;
+			if (Position.MarketPosition != MarketPosition.Flat) return;
+
+			double zVenda  = noiteLow + FIB_VENDA  * canal;   // 76,4% (topo da zona de venda)
+			double zCompra = noiteLow + FIB_COMPRA * canal;   // 23,6% (topo da zona de compra)
+			double h = High[0], l = Low[0], c = Close[0], o = Open[0];
+
+			// 4) Aciona setup pendente: rompeu o pavio da vela de rejeicao nas ~4 barras?
+			if (pendLado != 0)
+			{
+				if (pendLado == -1 && l <= pendNivel) { EntraNoturna(-1, canal); return; }
+				if (pendLado ==  1 && h >= pendNivel) { EntraNoturna( 1, canal); return; }
+				pendRestantes--;
+				if (pendRestantes <= 0) pendLado = 0;
+				return;   // enquanto ha setup pendente, nao arma outro
+			}
+
+			// 5) Detecta nova vela de rejeicao na zona -> arma o setup
+			double rng = h - l;
+			if (rng <= 0) return;
+			double corpo  = Math.Abs(c - o);
+			double pavSup = h - Math.Max(o, c);
+			double pavInf = Math.Min(o, c) - l;
+
+			if (h >= zVenda && (pavSup >= REJ_PAVIO * rng || corpo <= REJ_DOJI * rng))
+			{
+				pendLado = -1; pendNivel = l; pendRestantes = GatilhoBarras;   // venda: rompe pavio inferior
+			}
+			else if (l <= zCompra && (pavInf >= REJ_PAVIO * rng || corpo <= REJ_DOJI * rng))
+			{
+				pendLado = 1; pendNivel = h; pendRestantes = GatilhoBarras;    // compra: rompe pavio superior
+			}
+		}
+
+		// Entrada noturna a mercado no fechamento da barra que rompeu o pavio.
+		// Reusa a mesma gestao da diurna: stop no servidor + trailing tick a tick (OnMarketData).
+		private void EntraNoturna(int lado, double canal)
+		{
+			tradeSeq++;
+			sinalAtivo  = (lado == -1 ? "NOT_S" : "NOT_L") + tradeSeq;
+			origemAtual = "N";
+			notTradesDia++;
+			pendLado = 0;
+			SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
+			if (lado == -1) EnterShort(Contratos, sinalAtivo);
+			else            EnterLong(Contratos, sinalAtivo);
+			Print(string.Format("{0}  >>> NOITE {1} @ {2:F2} | canal {3:F1}pt [{4:F2}-{5:F2}] | rompeu pavio {6:F2}",
+				Time[0], lado == -1 ? "SHORT" : "LONG", Close[0], canal, noiteLow, noiteHigh, pendNivel));
 		}
 
 		// ---------------- Gestao de stop/alvo/breakeven/trailing — 100% SINTETICO ----------------
@@ -595,6 +750,41 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[NinjaScriptProperty]
 		[Display(Name="Desenhar niveis", Description="Mostra as linhas de max/min do dia anterior no grafico", Order=50, GroupName="6. Visual")]
 		public bool DesenharNiveis { get; set; }
+
+		// ----- Estrategia noturna (Nomads Trade da Noite) -----
+		[NinjaScriptProperty]
+		[Display(Name="Operar noite", Description="Liga a estrategia noturna (canal Fib 19h-21h BR) junto da diurna. Acelerador: combinado 100% em ~8 dias no backtest.", Order=60, GroupName="7. Noturna")]
+		public bool OperarNoite { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0, 2359)]
+		[Display(Name="Noite inicio (HHmm BR)", Description="Inicio da janela noturna em horario de Brasilia (convertido p/ o fuso do grafico)", Order=61, GroupName="7. Noturna")]
+		public int NoiteInicioBR { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0, 2359)]
+		[Display(Name="Noite fim (HHmm BR)", Description="Nao abre novas operacoes apos esse horario de Brasilia", Order=62, GroupName="7. Noturna")]
+		public int NoiteFimBR { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0, 2359)]
+		[Display(Name="Noite warm-up (HHmm BR)", Description="So comeca a operar apos esse horario (canal precisa se formar)", Order=63, GroupName="7. Noturna")]
+		public int NoiteWarmupBR { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0, 2359)]
+		[Display(Name="Noite flatten (HHmm BR)", Description="Fecha posicao noturna remanescente nesse horario (nao carrega overnight)", Order=64, GroupName="7. Noturna")]
+		public int NoiteFlattenBR { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0, 500)]
+		[Display(Name="Canal minimo (pontos)", Description="So opera se o canal 19h-21h tiver pelo menos X pontos (40 = cravou 100% no backtest combinado). Evita canal raso/ruido.", Order=65, GroupName="7. Noturna")]
+		public double CanalMinPontos { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(1, 20)]
+		[Display(Name="Gatilho (barras)", Description="Quantas barras (min) o bot espera o rompimento do pavio da vela de rejeicao antes de cancelar o setup", Order=66, GroupName="7. Noturna")]
+		public int GatilhoBarras { get; set; }
 		#endregion
 	}
 }
