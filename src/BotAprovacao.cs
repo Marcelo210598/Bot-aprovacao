@@ -89,8 +89,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private string origemAtual = "";
 
 		// ---------- ESTRATEGIA NOTURNA (canal Fibonacci 19h-21h BR) ----------
-		private TimeZoneInfo brTz = null;     // fuso Brasilia
-		private TimeZoneInfo chartTz = null;  // fuso do grafico (ET, igual a diurna)
+		private TimeZoneInfo etTz = null;     // fuso Eastern (so p/ saber se os EUA estao em horario de verao)
 		private double noiteHigh = 0, noiteLow = 0;   // canal acumulado na sessao noturna
 		private string noiteDia  = "";                // data BR da sessao noturna corrente
 		private int    notTradesDia = 0;              // trades noturnos na sessao (reservado p/ limite futuro)
@@ -167,13 +166,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.DataLoaded)
 			{
-				// Resolve os fusos p/ converter a janela noturna de BR -> grafico (ET)
-				try { brTz = TimeZoneInfo.FindSystemTimeZoneById("E. South America Standard Time"); }
-				catch { brTz = null; }
-				try { chartTz = (Bars != null && Bars.TradingHours != null) ? Bars.TradingHours.TimeZoneInfo : null; }
-				catch { chartTz = null; }
-				if (OperarNoite && (brTz == null || chartTz == null))
-					Print("[BotAprovacao] AVISO: fuso BR/grafico nao resolvido — janela noturna usando fallback ET+1h (verao US). Confira o fuso do grafico.");
+				// O grafico roda em ET (igual a diurna). BR nao tem horario de verao; os EUA tem.
+				// Resolvemos o offset BR pelo flag de DST do fuso Eastern (nao dependemos do fuso do grafico).
+				try { etTz = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"); }
+				catch { etTz = null; }
+				if (OperarNoite && etTz == null)
+					Print("[BotAprovacao] AVISO: fuso Eastern nao resolvido — janela noturna usando offset fixo +1h (verao US). Confira no inverno americano.");
 			}
 		}
 
@@ -444,15 +442,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		}
 
 		// ===================== ESTRATEGIA NOTURNA (Nomads Trade da Noite) =====================
-		// Converte o horario da barra (fuso do grafico = ET) p/ horario de Brasilia.
+		// Converte a hora da barra (grafico em ET, igual a diurna) p/ horario de Brasilia.
+		// BR e fixo (UTC-3); os EUA tem horario de verao. Logo o offset ET->BR e +1h no verao
+		// americano (EDT) e +2h no inverno (EST). Descobrimos qual pelo flag de DST do Eastern.
 		private DateTime EmBR(DateTime t)
 		{
-			if (brTz != null && chartTz != null)
+			int off = 1;  // fallback: verao US
+			if (etTz != null)
 			{
-				try { return TimeZoneInfo.ConvertTime(DateTime.SpecifyKind(t, DateTimeKind.Unspecified), chartTz, brTz); }
-				catch { }
+				try { off = etTz.IsDaylightSavingTime(DateTime.SpecifyKind(t, DateTimeKind.Unspecified)) ? 1 : 2; }
+				catch { off = 1; }
 			}
-			return t.AddHours(1);  // fallback: ET(EDT) -> BR ~ +1h (verao US)
+			return t.AddHours(off);
 		}
 
 		private int HoraBR(DateTime t) { DateTime b = EmBR(t); return b.Hour * 100 + b.Minute; }
@@ -472,6 +473,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{
 					noiteDia = brDia; noiteHigh = High[0]; noiteLow = Low[0];
 					pendLado = 0; notTradesDia = 0;
+					Print(string.Format("{0}  [NOITE] janela {1:D4}-{2:D4} BR aberta | grafico {3:HH:mm} = BR {4:HH:mm}",
+						Time[0], NoiteInicioBR, NoiteFimBR, Time[0], EmBR(Time[0])));
 				}
 				else
 				{
