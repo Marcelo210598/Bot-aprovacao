@@ -118,7 +118,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				MaximumBarsLookBack			= MaximumBarsLookBack.TwoHundredFiftySix;
 				OrderFillResolution			= OrderFillResolution.Standard;
 				Slippage					= 0;
-				StartBehavior				= StartBehavior.WaitUntilFlat;
+				StartBehavior				= StartBehavior.AdoptAccountPosition;
 				TimeInForce					= TimeInForce.Gtc;
 				TraceOrders					= false;
 				RealtimeErrorHandling		= RealtimeErrorHandling.IgnoreAllErrors;  // rede de seguranca: erro de ordem nao desabilita a estrategia
@@ -173,6 +173,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 				catch { etTz = null; }
 				if (OperarNoite && etTz == null)
 					Print("[BotAprovacao] AVISO: fuso Eastern nao resolvido — janela noturna usando offset fixo +1h (verao US). Confira no inverno americano.");
+			}
+			else if (State == State.Realtime)
+			{
+				// RECOVERY: estrategia reiniciou (crash/rede) com posicao aberta.
+				// AdoptAccountPosition ja entrega a posicao; aqui so inicializamos o estado
+				// para o trailing assumir no proximo tick via OnMarketData.
+				if (Position.MarketPosition != MarketPosition.Flat)
+				{
+					sinalAtivo  = "RECOVERY";
+					origemAtual = "D";   // flatten EOD vai fechar se necessario
+					gerenciando = false; // OnMarketData reinicializa na entrada do 1o tick
+					Print(string.Format("[BotAprovacao] RECOVERY: reiniciou com posicao {0} @ {1:F2} — trailing assume no proximo tick",
+						Position.MarketPosition, Position.AveragePrice));
+				}
 			}
 		}
 
@@ -592,8 +606,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (!beFeito && (favPrice - entryPrice) >= BreakevenTrigPontos)
 				{
 					beFeito = true;
-					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar
-					SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice + BreakevenLockPontos, false);
+					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar.
+					// Em recovery (sem signal original), atualiza todos os stops da estrategia.
+					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
+						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice + BreakevenLockPontos, false);
+					else
+						SetStopLoss(CalculationMode.Price, entryPrice + BreakevenLockPontos, false);
 				}
 				if (beFeito)
 					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + BreakevenLockPontos, favPrice - TrailingPontos));
@@ -604,8 +622,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (!beFeito && (entryPrice - favPrice) >= BreakevenTrigPontos)
 				{
 					beFeito = true;
-					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar
-					SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice - BreakevenLockPontos, false);
+					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar.
+					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
+						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice - BreakevenLockPontos, false);
+					else
+						SetStopLoss(CalculationMode.Price, entryPrice - BreakevenLockPontos, false);
 				}
 				if (beFeito)
 					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - BreakevenLockPontos, favPrice + TrailingPontos));
@@ -663,15 +684,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (Position.MarketPosition == MarketPosition.Flat) return;
 			Print(string.Format("{0}  <<< SAIDA [{1}] | {2} {3} | entrada {4:F2} ~saida {5:F2} | fav {6:F2} | BE={7}",
 				Time[0], motivo, Position.MarketPosition, sinalAtivo, entryPrice, Close[0], favPrice, beFeito ? "sim" : "nao"));
-			if (Position.MarketPosition == MarketPosition.Long)  ExitLong("X_" + motivo, sinalAtivo);
-			else if (Position.MarketPosition == MarketPosition.Short) ExitShort("X_" + motivo, sinalAtivo);
+			// Em recovery (signal perdido no restart) fecha sem especificar o signal, para nao errar
+			bool semSignal = string.IsNullOrEmpty(sinalAtivo) || sinalAtivo == "RECOVERY";
+			if (Position.MarketPosition == MarketPosition.Long)
+			{
+				if (semSignal) ExitLong("X_" + motivo);
+				else           ExitLong("X_" + motivo, sinalAtivo);
+			}
+			else if (Position.MarketPosition == MarketPosition.Short)
+			{
+				if (semSignal) ExitShort("X_" + motivo);
+				else           ExitShort("X_" + motivo, sinalAtivo);
+			}
 		}
 
 		private double RealizadoAcumulado()
 		{
-			return SystemPerformance != null
-				? SystemPerformance.AllTrades.TradesPerformance.Currency.CumProfit
-				: 0;
+			try
+			{
+				return SystemPerformance?.AllTrades?.TradesPerformance?.Currency?.CumProfit ?? 0;
+			}
+			catch { return 0; }
 		}
 
 		private double UnrealizadoPiorCaso()
@@ -686,13 +719,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int TradesHoje()
 		{
 			int n = 0;
-			string hoje = Time[0].ToString("yyyy-MM-dd");
-			var trades = SystemPerformance.AllTrades;
-			for (int i = trades.Count - 1; i >= 0; i--)
+			try
 			{
-				if (trades[i].Exit.Time.ToString("yyyy-MM-dd") == hoje) n++;
-				else break;
+				string hoje = Time[0].ToString("yyyy-MM-dd");
+				var trades = SystemPerformance?.AllTrades;
+				if (trades != null)
+				{
+					for (int i = trades.Count - 1; i >= 0; i--)
+					{
+						var exit = trades[i]?.Exit;
+						if (exit == null) continue;  // trade aberto ainda nao tem Exit
+						if (exit.Time.ToString("yyyy-MM-dd") == hoje) n++;
+						else break;
+					}
+				}
 			}
+			catch { }
 			if (Position.MarketPosition != MarketPosition.Flat) n++;
 			return n;
 		}
