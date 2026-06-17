@@ -1,6 +1,21 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-16
+## Última atualização: 2026-06-16 (sessão noturna)
+
+## 🌙 ESTRATÉGIA NOTURNA (16/06 — branch `feat/estrategia-noturna`, NÃO mergeada)
+Reversão "ping-pong" nas bordas do canal Fibonacci **19h-21h BR**, integrada ao `BotAprovacao.cs`
+pra rodar **junto da diurna na mesma conta**. Vende zona 76,4-100% (topo), compra 0-23,6% (fundo);
+gatilho = rompimento do pavio da vela de rejeição; filtro canal ≥40pt; gestão idêntica à diurna.
+- **Backtest combinado (sem domingo, honesto):** 96% / 11 dias / +$47k/ano / OOS 100%/93%.
+  (Com domingo dava 100%/8d/$52k, mas é ILUSÓRIO — trades de domingo vivem na abertura caótica do Globex.)
+- **Toggle `OperarNoite` + grupo "7. Noturna"** no NT8. Default `PularDomingoNoite` = ON.
+- **Status:** compilando e em forward test no Market Replay. A noturna é ACELERADOR (sozinha ~89%).
+- **Pendência:** forward test AO VIVO (replay distorce/fura breakeven); decidir se entra no produto
+  (custa ~4pp de taxa vs diurna pura 100%); variante de gatilho sem exigir rejeição (com backtest).
+- Detalhes em `historico/2026-06-16-estrategia-noturna.md`. Backtest: `backtest/run_diurna_noturna.py`.
+
+---
+
 
 ## 📌 Visão Geral
 - **Objetivo:** Bot de APROVAÇÃO de conta Apex (produto de entrada) → upsell do bot de operação
