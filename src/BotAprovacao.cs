@@ -357,6 +357,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				stopIntrabarEnviado = true;
 				Print(string.Format("{0}  [ALVO INTRABAR] {1} @ {2:F2} (alvo {3:F2})",
 					Time[0], isLong ? "LONG" : "SHORT", preco, alvoPrice));
+				// Neutraliza o server stop antes de fechar: move para nivel impossivel (5000 ticks)
+				// para evitar que o stop no servidor crie posicao fantasma (SHORT x5) caso o
+				// ExitLong ainda nao tenha sido processado pelo broker quando o preco continua.
+				try {
+					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
+						SetStopLoss(sinalAtivo, CalculationMode.Ticks, 5000, false);
+				} catch { }
 				FechaPosicao("AlvoTick");
 				return;
 			}
@@ -367,6 +374,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				stopIntrabarEnviado = true;
 				Print(string.Format("{0}  [STOP INTRABAR] {1} @ {2:F2} (stop {3:F2}, fav {4:F2}, BE={5}) — trava tick a tick",
 					Time[0], isLong ? "LONG" : "SHORT", preco, stopPrice, favPrice, beFeito ? "sim" : "nao"));
+				// Neutraliza o server stop antes de fechar: move para nivel impossivel (5000 ticks)
+				// para evitar que o stop no servidor crie posicao fantasma (SHORT x5) caso o
+				// ExitLong/ExitShort ainda nao tenha sido processado pelo broker quando o preco
+				// continua caindo/subindo e toca o nivel do breakeven no servidor.
+				try {
+					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
+						SetStopLoss(sinalAtivo, CalculationMode.Ticks, 5000, false);
+				} catch { }
 				FechaPosicao(beFeito ? "TrailingTick" : "StopTick");
 				return;
 			}
