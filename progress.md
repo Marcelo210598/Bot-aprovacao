@@ -1,21 +1,27 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-17 NOITE (noturna: gatilho corpo j2 + fuso-proof + entrada tick a tick)
+## Última atualização: 2026-06-18 madrugada (noturna: gatilho na LINHA/extremo — deploy p/ Andersson)
 
-## 🌙 NOTURNA — estado atual (17/06 noite, branch `feat/estrategia-noturna`)
-- **Gatilho 'corpo' (j2):** vela A toca a zona Fib (SEM rejeição, pode passar a linha) → arma no corpo de A
-  (min/max open,close) → vela B ou C que cruza o corpo dispara. Combinado 100% (27/27), PF 1.63, $60,9k/ano, OOS 100/100.
-- **Entrada TICK A TICK** (OnMarketData): entra no instante que o preço cruza o corpo de A, sem esperar a
-  vela fechar. Rede p/ backtest histórico (State!=Realtime) no fechamento da barra.
-- **FUSO-PROOF:** bot detecta sozinho o fuso do gráfico (reflection) e converte diurna→ET, noturna→BR.
-  Conserta janela que fechava 1h cedo com gráfico em BR. Fallback: assume ET.
-- **Gráfico DEVE ser 1min** (a diurna degrada em 5min: 100%→95%). Noturna roda 1min puro.
-- ⏳ **DECISÃO PENDENTE:** "TOQUE FRESCO" (re-arma só após preço sair da zona e voltar) — mesmo PF (1.58)
-  mas $60,9k→$44,1k. É escolha de estilo (menos trades/limpo vs mais $$). Marcelo vai decidir.
-- 🔑 LIÇÃO: toda restrição de seletividade na reversão REDUZ PnL (testados e rejeitados: corpo+pavio,
-  filtro anti-tendência, zona apertada, níveis à noite, fecha-além-close, 5min). Baseline é o ótimo.
-  Proteção de noite ruim = STOP DIÁRIO $750, não filtro de entrada.
-- Commits: `2ca5fe7` (corpo+fuso-proof), `deb0e6b` (5min), `486d4e4` (volta 1min + tick).
+## 🌙 NOTURNA — estado FINAL (branch `feat/estrategia-noturna`)
+- **Gatilho na LINHA (extremo do canal alta/baixa), NÃO nas Fib centrais:** vela A toca/passa a LINHA
+  (`zVenda = noiteHigh - LinhaToleranciaPontos`; `zCompra = noiteLow + LinhaToleranciaPontos`) → arma no
+  CORPO de A → vela B passa o corpo → entra TICK A TICK. Param `LinhaToleranciaPontos` default **5pt**.
+  Backtest `run_noturna_linha.py`: **+5pt → 100% (26/26), OOS 100/100, ~$48k/ano** (10pt $52k, 15pt $55k).
+- **Entrada TICK A TICK** (OnMarketData `TentaEntradaNoturnaTick`): entra no instante que o preço cruza o
+  corpo de A, sem esperar a vela fechar. Rede backtest histórico (State!=Realtime) no fechamento.
+- **FUSO-PROOF:** detecta o fuso do gráfico (reflection) → diurna→ET, noturna→BR em qualquer fuso. Fallback ET.
+- **Gráfico DEVE ser 1min** (diurna degrada em 5min). Desenho: LINHA alta/baixa + banda de tolerância dourada.
+- **`ToqueFresco`** = toggle default OFF (foi um fix de interpretação errada; a linha-extremo já restringe).
+- 🔑 LIÇÃO: toda restrição de seletividade na reversão REDUZ PnL ou não conserta o downtrend. Rejeitados:
+  corpo+pavio, filtro anti-tendência, zona apertada, toque fresco, níveis à noite, fecha-close, 5min.
+  Em downtrend a reversão SEMPRE sangra (a linha rompe) — proteção = STOP DIÁRIO $750, não filtro.
+- Replay 15/06 (downtrend) com gatilho na linha: net −$190 (L30+18,5 L31−124,5 L32−137 L33+53). Capado.
+- Commits: `2ca5fe7`(corpo+fuso) `486d4e4`(1min+tick) `8e4f0f3`(toque fresco) `6ea8471`(LINHA/extremo).
+
+## 🚀 DEPLOY (definido 18/06)
+- Andersson testa **quinta 18/06 e sexta 19/06** (Marcelo envia ZIP do bot).
+- **Segunda 22/06: início teste na CONTA REAL** (Apex, tentando aprovar).
+- ⚠️ Antes do real: StartBehavior → **AdoptAccountPosition**.
 
 
 
