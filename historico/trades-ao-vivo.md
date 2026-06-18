@@ -38,8 +38,13 @@ Corrigido com `BufferStopServidorPontos=5` (commit `7ff20d4`).
 | 10 | 19:26 | LONG | NOT_L32 | 30691,25 | 30693,50 | nao | StopTick | **−$130** | ✅ STOP CHEIO limpo = fix validado! |
 | 11 | 19:28 | LONG | NOT_L33 | 30688,95 | 30690,75 | nao | StopInicial | **−$18,5** | fill melhor que o stop (pavio+recupera) |
 | 12 | 19:34 | LONG | NOT_L34 | 30678,45 | 30680,25 | nao | StopTick | **−$128,5** | stop cheio limpo |
+| 13 | 19:42 | LONG | NOT_L35 | 30659,70 | 30664,25 | sim | TrailingTick | **+$26,5** | win pequeno (fav só +4,5pt) |
+| 14 | 19:44 | LONG | NOT_L36 | 30661,45 | 30666,75 | sim | TrailingTick | **+$18,5** | win pequeno (fav só +5,3pt) |
+| 15 | 19:48 | LONG | NOT_L37 | 30659,60 | 30664,75 | sim | TrailingTick | **+$28** | win pequeno (fav só +5,1pt) |
 
-**Noturna parcial: +$30 / −$130 / −$18,5 / −$128,5 = −$247.**
+**Noturna parcial: +30 / −130 / −18,5 / −128,5 / +26,5 / +18,5 / +28 = −$174.**
+**🔴 Assimetria viva: 4 wins (+$103) vs 3 stops (−$277). 1 stop apaga ~5 wins. Win rate baixo hoje (downtrend) = sangra.**
+**📌 Decisão 18/06: testar SL 15pt (backtest: WR 69%→74%, PnL +14%, OOS 100%/92%). Aplicado via param no gráfico.**
 
 **⚠️ Observação importante (padrão):** noite em **DOWNTREND** — canal de baixa caindo (linha de compra
 30771 → 30675 → 30673), todos os LONGs de reversão tomando stop (fav minúsculo, BE nunca arma). Isso bate
