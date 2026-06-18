@@ -1,6 +1,23 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-17 (1º forward test ao vivo — 3 bugs críticos corrigidos)
+## Última atualização: 2026-06-17 NOITE (noturna: gatilho corpo j2 + fuso-proof + entrada tick a tick)
+
+## 🌙 NOTURNA — estado atual (17/06 noite, branch `feat/estrategia-noturna`)
+- **Gatilho 'corpo' (j2):** vela A toca a zona Fib (SEM rejeição, pode passar a linha) → arma no corpo de A
+  (min/max open,close) → vela B ou C que cruza o corpo dispara. Combinado 100% (27/27), PF 1.63, $60,9k/ano, OOS 100/100.
+- **Entrada TICK A TICK** (OnMarketData): entra no instante que o preço cruza o corpo de A, sem esperar a
+  vela fechar. Rede p/ backtest histórico (State!=Realtime) no fechamento da barra.
+- **FUSO-PROOF:** bot detecta sozinho o fuso do gráfico (reflection) e converte diurna→ET, noturna→BR.
+  Conserta janela que fechava 1h cedo com gráfico em BR. Fallback: assume ET.
+- **Gráfico DEVE ser 1min** (a diurna degrada em 5min: 100%→95%). Noturna roda 1min puro.
+- ⏳ **DECISÃO PENDENTE:** "TOQUE FRESCO" (re-arma só após preço sair da zona e voltar) — mesmo PF (1.58)
+  mas $60,9k→$44,1k. É escolha de estilo (menos trades/limpo vs mais $$). Marcelo vai decidir.
+- 🔑 LIÇÃO: toda restrição de seletividade na reversão REDUZ PnL (testados e rejeitados: corpo+pavio,
+  filtro anti-tendência, zona apertada, níveis à noite, fecha-além-close, 5min). Baseline é o ótimo.
+  Proteção de noite ruim = STOP DIÁRIO $750, não filtro de entrada.
+- Commits: `2ca5fe7` (corpo+fuso-proof), `deb0e6b` (5min), `486d4e4` (volta 1min + tick).
+
+
 
 ## 🌙 ESTRATÉGIA NOTURNA (16/06 — branch `feat/estrategia-noturna`, NÃO mergeada)
 Reversão "ping-pong" nas bordas do canal Fibonacci **19h-21h BR**, integrada ao `BotAprovacao.cs`
