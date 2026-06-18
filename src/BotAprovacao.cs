@@ -98,6 +98,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private int    pendLado = 0;                  // setup pendente: -1 short, +1 long, 0 nenhum
 		private double pendNivel = 0;                 // nivel do corpo a romper (min/max de open,close)
 		private int    pendRestantes = 0;             // barras restantes p/ o rompimento acontecer
+		private bool   podeArmaVenda  = true;         // toque fresco: preco saiu da zona de venda -> pode armar
+		private bool   podeArmaCompra = true;         // toque fresco: preco saiu da zona de compra -> pode armar
 
 		private const double FIB_VENDA  = 0.764; // zona de venda: 76,4%-100%
 		private const double FIB_COMPRA = 0.236; // zona de compra: 0%-23,6%
@@ -160,6 +162,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CanalMinPontos		= 40.0;    // canal minimo: cravou 100% + OOS 100%/100% no combinado
 				GatilhoBarras		= 2;       // janela (barras) p/ a proxima romper o CORPO da vela que tocou (j2)
 				PularDomingoNoite	= true;    // domingo a noite = abertura do Globex (spikes), nao opera
+				ToqueFresco			= true;    // so re-arma apos o preco sair da zona e voltar a tocar (1 entrada por toque)
 			}
 			else if (State == State.Configure)
 			{
@@ -589,6 +592,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				{
 					noiteDia = brDia; noiteHigh = High[0]; noiteLow = Low[0];
 					pendLado = 0; notTradesDia = 0;
+					podeArmaVenda = true; podeArmaCompra = true;   // toque fresco: libera no inicio da sessao
 					Print(string.Format("{0}  [NOITE 1min] janela {1:D4}-{2:D4} BR aberta | grafico {3:HH:mm} = BR {4:HH:mm}",
 						Time[0], NoiteInicioBR, NoiteFimBR, Time[0], EmBR(Time[0])));
 				}
@@ -636,15 +640,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return;   // enquanto ha setup pendente, nao arma outro
 			}
 
-			// 5) Vela A TOCA a zona (sem exigir rejeicao, pode ter passado) -> arma no CORPO de A.
-			//    A entrada dispara tick a tick quando o preco cruzar este nivel na vela B (ou C).
-			if (h >= zVenda)
+			// 5) TOQUE FRESCO: so libera um novo arme depois que o preco SAIU da zona (vela inteira
+			//    fora da linha) e VOLTOU a tocar. Evita re-entrar enquanto o preco ronda a linha do
+			//    mesmo movimento. 1 entrada por toque. Backtest run_noturna_retouch.py: 100% / PF 1.58
+			//    (mesma qualidade do baseline) / ~$44k/ano / OOS 100%-100%.
+			if (Low[0]  > zCompra) podeArmaCompra = true;   // vela toda ACIMA da linha de compra -> saiu da zona
+			if (High[0] < zVenda)  podeArmaVenda  = true;   // vela toda ABAIXO da linha de venda -> saiu da zona
+
+			// Vela A TOCA a zona (sem exigir rejeicao, pode ter passado) -> arma no CORPO de A.
+			// A entrada dispara tick a tick quando o preco cruzar este nivel na vela B (ou C).
+			if (h >= zVenda && (!ToqueFresco || podeArmaVenda))
 			{
 				pendLado = -1; pendNivel = Math.Min(o, c); pendRestantes = GatilhoBarras;   // venda: cruza corpo inferior de A
+				podeArmaVenda = false;                                                       // consome o toque
 			}
-			else if (l <= zCompra)
+			else if (l <= zCompra && (!ToqueFresco || podeArmaCompra))
 			{
 				pendLado = 1; pendNivel = Math.Max(o, c); pendRestantes = GatilhoBarras;    // compra: cruza corpo superior de A
+				podeArmaCompra = false;                                                      // consome o toque
 			}
 		}
 
@@ -976,6 +989,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[NinjaScriptProperty]
 		[Display(Name="Pular domingo a noite", Description="Nao opera domingo a noite (abertura do Globex = spikes/baixa liquidez). Recomendado ON: o backtest 1min superestima esses trades.", Order=67, GroupName="7. Noturna")]
 		public bool PularDomingoNoite { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name="Toque fresco", Description="So re-arma a entrada depois que o preco SAIR da zona (vela inteira fora da linha) e VOLTAR a tocar. 1 entrada por toque (menos trades, mesma qualidade). OFF = re-arma em qualquer toque (mais trades/mais PnL).", Order=68, GroupName="7. Noturna")]
+		public bool ToqueFresco { get; set; }
 		#endregion
 	}
 }
