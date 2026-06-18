@@ -40,10 +40,10 @@ using System.Windows.Media;
 //  Backtest: +3 aprovacoes/ano (19->22), aprova mais rapido (15->13d), OOS 100%/100%.
 //
 //  ESTRATEGIA NOTURNA — "Nomads Trade da Noite" (16/06, toggle OperarNoite):
-//    Reversao nas extremidades do canal formado entre 19h-21h BR (Fibonacci):
-//      - VENDA na zona 76,4%-100% (topo): vela TOCA a zona (sem exigir rejeicao);
-//      - COMPRA na zona 0%-23,6% (fundo): idem na base;
-//      - gatilho = a PROXIMA vela rompe o CORPO da que tocou (j2: ate 2 barras);
+//    Reversao nas LINHAS do canal formado entre 19h-21h BR (extremos, NAO Fib centrais):
+//      - VENDA: vela A TOCA/PASSA a LINHA de ALTA (topo do canal) dentro da tolerancia;
+//      - COMPRA: vela A TOCA/PASSA a LINHA de BAIXA (fundo do canal) dentro da tolerancia;
+//      - gatilho = a PROXIMA vela (B) rompe o CORPO da que tocou (j2: ate 2 barras), tick a tick;
 //      - filtro CANAL >= 40pt (evita canal raso/ruido — cravou 100% no combinado);
 //      - MESMA gestao da diurna (SL 12,5 + BE 3,75/2,5 + trailing tick a tick).
 //    Backtest combinado (diurna + noturna, mesma conta 25K): 100% aprovacao,
@@ -101,8 +101,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private bool   podeArmaVenda  = true;         // toque fresco: preco saiu da zona de venda -> pode armar
 		private bool   podeArmaCompra = true;         // toque fresco: preco saiu da zona de compra -> pode armar
 
-		private const double FIB_VENDA  = 0.764; // zona de venda: 76,4%-100%
-		private const double FIB_COMPRA = 0.236; // zona de compra: 0%-23,6%
 
 		protected override void OnStateChange()
 		{
@@ -162,7 +160,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				CanalMinPontos		= 40.0;    // canal minimo: cravou 100% + OOS 100%/100% no combinado
 				GatilhoBarras		= 2;       // janela (barras) p/ a proxima romper o CORPO da vela que tocou (j2)
 				PularDomingoNoite	= true;    // domingo a noite = abertura do Globex (spikes), nao opera
-				ToqueFresco			= true;    // so re-arma apos o preco sair da zona e voltar a tocar (1 entrada por toque)
+				LinhaToleranciaPontos = 5.0;   // distancia max do EXTREMO (alta/baixa) p/ contar como "tocar a linha"
+				ToqueFresco			= false;   // OFF: a linha-extremo ja restringe; ON = 1 entrada por toque (ainda + restrito)
 			}
 			else if (State == State.Configure)
 			{
@@ -569,8 +568,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return null;
 		}
 
-		// NOTURNA EM 1 MINUTO (canal Fib 19h-21h BR). A barra A toca a zona (sem exigir rejeicao,
-		// pode ate ter passado a linha) -> ARMA o setup no CORPO de A (min/max open,close). A ENTRADA
+		// NOTURNA EM 1 MINUTO (canal 19h-21h BR). A barra A toca/passa a LINHA do canal (extremo de
+		// alta/baixa, dentro de LinhaToleranciaPontos) -> ARMA o setup no CORPO de A (min/max open,close). A ENTRADA
 		// acontece TICK A TICK no OnMarketData: entra no instante que o preco cruza o corpo de A, sem
 		// esperar a vela B fechar (j2 = vale na vela B ou C). Aqui so atualizamos canal, armamos e
 		// expiramos o setup. Backtest run_noturna_1min_rev.py (corpo+tick, j2): combinado 100% (27/27),
@@ -621,8 +620,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (aprovado || bloqueadoHoje) return;
 			if (Position.MarketPosition != MarketPosition.Flat) return;
 
-			double zVenda  = noiteLow + FIB_VENDA  * canal;   // 76,4% (topo da zona de venda)
-			double zCompra = noiteLow + FIB_COMPRA * canal;   // 23,6% (topo da zona de compra)
+			// A LINHA = o EXTREMO do canal (0% = fundo/Min, 100% = topo/Max), NAO as Fib centrais
+			// (23,6%/76,4%). A vela A toca/passa a linha (dentro de LinhaToleranciaPontos) -> arma no
+			// CORPO de A; a vela B passa o corpo -> entra (tick a tick). Backtest run_noturna_linha.py
+			// (linha +/-5pt): combinado 100% (26/26), OOS 100%/100%, ~$48k/ano.
+			double zVenda  = noiteHigh - LinhaToleranciaPontos;   // tocar/passar a LINHA de ALTA (topo do canal)
+			double zCompra = noiteLow  + LinhaToleranciaPontos;   // tocar/passar a LINHA de BAIXA (fundo do canal)
 			double h = High[0], l = Low[0], c = Close[0], o = Open[0];
 
 			// 4) Setup pendente: a ENTRADA real e tick a tick (OnMarketData -> TentaEntradaNoturnaTick).
@@ -778,23 +781,25 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (!DesenharNiveis || canal <= 0) return;
 
-			double topo  = noiteHigh;                       // 100% (zona de venda)
-			double fundo = noiteLow;                        // 0%   (zona de compra)
-			double z764  = fundo + FIB_VENDA  * canal;      // 76,4%
-			double z236  = fundo + FIB_COMPRA * canal;      // 23,6%
+			// As LINHAS que contam: o EXTREMO de alta (topo) e de baixa (fundo). O gatilho arma
+			// quando o preco entra na BANDA de tolerancia (dentro de LinhaToleranciaPontos da linha).
+			double topo  = noiteHigh;                            // linha de ALTA (vende aqui)
+			double fundo = noiteLow;                             // linha de BAIXA (compra aqui)
+			double bandaVenda  = topo  - LinhaToleranciaPontos;  // toca a linha de alta dentro daqui -> arma venda
+			double bandaCompra = fundo + LinhaToleranciaPontos;  // toca a linha de baixa dentro daqui -> arma compra
 
 			bool valido = canal >= CanalMinPontos;          // laranja forte = opera; cinza = canal raso (so observa)
 			Brush corCanal = valido ? Brushes.DarkOrange : Brushes.Gray;
 
-			Draw.HorizontalLine(this, "NoiteTopo",  topo,  corCanal,     DashStyleHelper.Solid, 2);
-			Draw.HorizontalLine(this, "NoiteFundo", fundo, corCanal,     DashStyleHelper.Solid, 2);
-			Draw.HorizontalLine(this, "NoiteZ764",  z764,  Brushes.Gold, DashStyleHelper.Dot,   1);
-			Draw.HorizontalLine(this, "NoiteZ236",  z236,  Brushes.Gold, DashStyleHelper.Dot,   1);
+			Draw.HorizontalLine(this, "NoiteTopo",  topo,        corCanal,     DashStyleHelper.Solid, 2);
+			Draw.HorizontalLine(this, "NoiteFundo", fundo,       corCanal,     DashStyleHelper.Solid, 2);
+			Draw.HorizontalLine(this, "NoiteBandaV", bandaVenda,  Brushes.Gold, DashStyleHelper.Dot,   1);
+			Draw.HorizontalLine(this, "NoiteBandaC", bandaCompra, Brushes.Gold, DashStyleHelper.Dot,   1);
 
 			Draw.TextFixed(this, "statusNoite",
 				"Canal NOITE (19h-21h BR): " + canal.ToString("F1") + "pt " + (valido ? "(operando)" : "(< minimo, so observa)") + "\n" +
-				"  Topo (venda 76,4-100%):  " + topo.ToString("F2") + " / " + z764.ToString("F2") + "\n" +
-				"  Fundo (compra 0-23,6%):  " + fundo.ToString("F2") + " / " + z236.ToString("F2"),
+				"  LINHA de ALTA (vende):  " + topo.ToString("F2")  + "  (toca ate " + bandaVenda.ToString("F2") + ")\n" +
+				"  LINHA de BAIXA (compra): " + fundo.ToString("F2") + "  (toca ate " + bandaCompra.ToString("F2") + ")",
 				TextPosition.BottomRight);
 		}
 
@@ -980,6 +985,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(0, 500)]
 		[Display(Name="Canal minimo (pontos)", Description="So opera se o canal 19h-21h tiver pelo menos X pontos (40 = cravou 100% no backtest combinado). Evita canal raso/ruido.", Order=65, GroupName="7. Noturna")]
 		public double CanalMinPontos { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0.25, 50)]
+		[Display(Name="Tolerancia da linha (pontos)", Description="Distancia max do EXTREMO do canal (alta/baixa = 0%/100%) p/ a vela A contar como 'tocou a linha'. NAO usa as Fib centrais. 5pt = otimizado (100%/OOS 100%). Maior = mais trades/mais PnL.", Order=65, GroupName="7. Noturna")]
+		public double LinhaToleranciaPontos { get; set; }
 
 		[NinjaScriptProperty]
 		[Range(1, 20)]
