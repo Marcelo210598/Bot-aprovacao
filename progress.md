@@ -1,6 +1,6 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-18 tarde (fix duplo-fill/fantasma + varredura trailing)
+## Última atualização: 2026-06-18 noite (fix fantasma VALIDADO ao vivo + SL15 em teste + Andersson em MNQ + TraderOS limpo)
 
 ## 🐛 FIX CRÍTICO 18/06 — duplo-fill / posição fantasma (forward test Sim101)
 - **Sintoma:** short S32 tomou stop, mas o bot "virou LONG" sozinho. Era posição FANTASMA.
