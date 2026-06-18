@@ -99,10 +99,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private double pendNivel = 0;                 // nivel do corpo a romper (min/max de open,close)
 		private int    pendRestantes = 0;             // barras restantes p/ o rompimento acontecer
 
-		// Vela de 5min SINTETICA (a noturna opera em 5min, agregando as barras de 1min do grafico)
-		private double n5o = 0, n5h = 0, n5l = 0, n5c = 0;
-		private bool   n5Ativo = false;               // ha bucket de 5min em formacao?
-
 		private const double FIB_VENDA  = 0.764; // zona de venda: 76,4%-100%
 		private const double FIB_COMPRA = 0.236; // zona de compra: 0%-23,6%
 
@@ -322,7 +318,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (CurrentBar < 0) return;
 
 			MarketPosition mp = Position.MarketPosition;
-			if (mp == MarketPosition.Flat) { stopIntrabarEnviado = false; return; }
+			if (mp == MarketPosition.Flat)
+			{
+				stopIntrabarEnviado = false;
+				// ENTRADA NOTURNA TICK A TICK: se ha setup armado (vela A tocou a zona), entra no
+				// instante que o preco cruza o CORPO de A — sem esperar a vela B fechar.
+				if (OperarNoite && pendLado != 0)
+					TentaEntradaNoturnaTick(e.Price);
+				return;
+			}
 			if (stopIntrabarEnviado) return;
 
 			bool isLong = mp == MarketPosition.Long;
@@ -562,11 +566,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return null;
 		}
 
-		// A NOTURNA OPERA EM 5 MINUTOS (a diurna fica em 1min). Em vez de adicionar uma 2a serie
-		// (multi-serie do NT = roteamento de ordem chato), agregamos as barras de 1min do grafico
-		// em velas de 5min SINTETICAS e so avaliamos o canal/gatilho quando a vela de 5min FECHA.
-		// Fiel ao backtest 'misto' (run_noturna_5min.py): combinado 100% (23/23), OOS 100%/100%.
-		// Gatilho = a proxima vela de 5min rompe o CORPO da que tocou a zona (j2, sem exigir rejeicao).
+		// NOTURNA EM 1 MINUTO (canal Fib 19h-21h BR). A barra A toca a zona (sem exigir rejeicao,
+		// pode ate ter passado a linha) -> ARMA o setup no CORPO de A (min/max open,close). A ENTRADA
+		// acontece TICK A TICK no OnMarketData: entra no instante que o preco cruza o corpo de A, sem
+		// esperar a vela B fechar (j2 = vale na vela B ou C). Aqui so atualizamos canal, armamos e
+		// expiramos o setup. Backtest run_noturna_1min_rev.py (corpo+tick, j2): combinado 100% (27/27),
+		// PF 1.63, ~$60,9k/ano, OOS 100%/100%.
 		private void ProcessaNoturna()
 		{
 			int brAgora    = HoraBR(Time[0]);
@@ -575,44 +580,37 @@ namespace NinjaTrader.NinjaScript.Strategies
 			bool naJanela  = brAgora >= NoiteInicioBR && brAgora < NoiteFimBR;
 
 			// Domingo a noite = ABERTURA do Globex (spikes/baixa liquidez). Nao operamos. (PularDomingoNoite)
-			if (PularDomingoNoite && emBr.DayOfWeek == DayOfWeek.Sunday) { pendLado = 0; n5Ativo = false; return; }
+			if (PularDomingoNoite && emBr.DayOfWeek == DayOfWeek.Sunday) { pendLado = 0; return; }
 
-			// Flatten de seguranca pos-sessao (so fecha posicao NOTURNA) — checado a cada barra de 1min
+			// 1) Atualiza o canal da sessao noturna (high/low acumulado desde 19h BR), a cada barra de 1min
+			if (naJanela)
+			{
+				if (brDia != noiteDia)
+				{
+					noiteDia = brDia; noiteHigh = High[0]; noiteLow = Low[0];
+					pendLado = 0; notTradesDia = 0;
+					Print(string.Format("{0}  [NOITE 1min] janela {1:D4}-{2:D4} BR aberta | grafico {3:HH:mm} = BR {4:HH:mm}",
+						Time[0], NoiteInicioBR, NoiteFimBR, Time[0], EmBR(Time[0])));
+				}
+				else
+				{
+					noiteHigh = Math.Max(noiteHigh, High[0]);
+					noiteLow  = Math.Min(noiteLow,  Low[0]);
+				}
+			}
+
+			if (naJanela && noiteHigh > 0)
+				DesenhaCanalNoturno(noiteHigh - noiteLow);
+
+			// 2) Flatten de seguranca pos-sessao (so fecha posicao NOTURNA)
 			if (brAgora >= NoiteFlattenBR && Position.MarketPosition != MarketPosition.Flat && origemAtual == "N")
 			{
 				FechaPosicao("FlattenNoite");
 				return;
 			}
 
-			if (!naJanela) { pendLado = 0; n5Ativo = false; return; }
-
-			// ----- Agrega 1min -> vela de 5min sintetica (alinhada :00/:05/:10...) -----
-			// minuto do relogio: offset de fuso e sempre hora cheia, entao Minute % 5 independe do fuso.
-			if (!n5Ativo) { n5o = Open[0]; n5h = High[0]; n5l = Low[0]; n5Ativo = true; }
-			else { n5h = Math.Max(n5h, High[0]); n5l = Math.Min(n5l, Low[0]); }
-			n5c = Close[0];
-			if (Time[0].Minute % 5 != 0) return;   // vela de 5min ainda nao fechou
-			n5Ativo = false;                        // proxima barra inicia bucket novo
-
-			// ===== vela de 5min recem-fechada: n5o/n5h/n5l/n5c =====
-			// 1) Atualiza o canal da sessao noturna com a vela de 5min
-			if (brDia != noiteDia)
-			{
-				noiteDia = brDia; noiteHigh = n5h; noiteLow = n5l;
-				pendLado = 0; notTradesDia = 0;
-				Print(string.Format("{0}  [NOITE 5min] janela {1:D4}-{2:D4} BR aberta | grafico {3:HH:mm} = BR {4:HH:mm}",
-					Time[0], NoiteInicioBR, NoiteFimBR, Time[0], EmBR(Time[0])));
-			}
-			else
-			{
-				noiteHigh = Math.Max(noiteHigh, n5h);
-				noiteLow  = Math.Min(noiteLow,  n5l);
-			}
-
-			if (noiteHigh > 0)
-				DesenhaCanalNoturno(noiteHigh - noiteLow);
-
-			// 2) So opera apos warm-up, com canal valido e sem posicao aberta
+			// 3) So opera dentro da janela, apos warm-up e com canal valido
+			if (!naJanela) { pendLado = 0; return; }
 			if (brAgora < NoiteWarmupBR || noiteHigh <= 0) return;
 			double canal = noiteHigh - noiteLow;
 			if (canal < CanalMinPontos) return;
@@ -621,28 +619,47 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 			double zVenda  = noiteLow + FIB_VENDA  * canal;   // 76,4% (topo da zona de venda)
 			double zCompra = noiteLow + FIB_COMPRA * canal;   // 23,6% (topo da zona de compra)
-			double h = n5h, l = n5l, c = n5c, o = n5o;
+			double h = High[0], l = Low[0], c = Close[0], o = Open[0];
 
-			// 3) Aciona setup pendente: a proxima vela de 5min rompeu o CORPO da que tocou (ate GatilhoBarras)?
+			// 4) Setup pendente: a ENTRADA real e tick a tick (OnMarketData -> TentaEntradaNoturnaTick).
+			//    Aqui so contamos a expiracao (B e C = j2). REDE p/ backtest historico (sem OnMarketData):
+			//    se nao for tempo real, dispara no fechamento da barra que cruzou o corpo de A.
 			if (pendLado != 0)
 			{
-				if (pendLado == -1 && l <= pendNivel) { EntraNoturna(-1, canal); return; }
-				if (pendLado ==  1 && h >= pendNivel) { EntraNoturna( 1, canal); return; }
+				if (State != State.Realtime)
+				{
+					if (pendLado == -1 && l <= pendNivel) { EntraNoturna(-1, canal); return; }
+					if (pendLado ==  1 && h >= pendNivel) { EntraNoturna( 1, canal); return; }
+				}
 				pendRestantes--;
 				if (pendRestantes <= 0) pendLado = 0;
 				return;   // enquanto ha setup pendente, nao arma outro
 			}
 
-			// 4) Vela de 5min TOCA a zona (sem exigir rejeicao) -> arma; gatilho = rompimento do CORPO.
-			//    O corpo (min/max de open,close) fica ACIMA do pavio -> venda entra mais cedo/mais alto.
+			// 5) Vela A TOCA a zona (sem exigir rejeicao, pode ter passado) -> arma no CORPO de A.
+			//    A entrada dispara tick a tick quando o preco cruzar este nivel na vela B (ou C).
 			if (h >= zVenda)
 			{
-				pendLado = -1; pendNivel = Math.Min(o, c); pendRestantes = GatilhoBarras;   // venda: rompe corpo inferior
+				pendLado = -1; pendNivel = Math.Min(o, c); pendRestantes = GatilhoBarras;   // venda: cruza corpo inferior de A
 			}
 			else if (l <= zCompra)
 			{
-				pendLado = 1; pendNivel = Math.Max(o, c); pendRestantes = GatilhoBarras;    // compra: rompe corpo superior
+				pendLado = 1; pendNivel = Math.Max(o, c); pendRestantes = GatilhoBarras;    // compra: cruza corpo superior de A
 			}
+		}
+
+		// Entrada noturna TICK A TICK: chamada pelo OnMarketData a cada tick enquanto ha setup armado.
+		// Entra no INSTANTE que o preco cruza o corpo de A (vela B/C), sem esperar a vela fechar.
+		private void TentaEntradaNoturnaTick(double preco)
+		{
+			if (aprovado || bloqueadoHoje) return;
+			int brAgora = HoraBR(Time[0]);
+			if (brAgora < NoiteWarmupBR || brAgora >= NoiteFimBR) return;   // so dentro da janela
+			double canal = noiteHigh - noiteLow;
+			if (canal < CanalMinPontos) return;
+
+			if (pendLado == -1 && preco <= pendNivel)      EntraNoturna(-1, canal);
+			else if (pendLado == 1 && preco >= pendNivel)  EntraNoturna( 1, canal);
 		}
 
 		// Entrada noturna a mercado no fechamento da barra que rompeu o corpo.
