@@ -134,6 +134,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				TrailingPontos		= 1.75;
 				TolToqueTicks		= 20;     // 20 ticks = 5pt (otimizado 13/06)
 				MaxDistPontos		= 15.0;   // 15pt = sweet spot (otimizado 14/06): 100% taxa, PF 1.60, OOS 100%/100%
+				BufferStopServidorPontos = 5.0;   // stop servidor 5pt mais largo que o gerenciado -> a saida a mercado dispara primeiro (anti-fantasma, 18/06)
 
 				StopDiarioDolar		= 750.0;
 				MaxTradesDia		= 0;
@@ -450,7 +451,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					sinalAtivo = "NIV_S" + tradeSeq;
 					origemAtual = "D";
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
-					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
+					SetStopLoss(sinalAtivo, CalculationMode.Ticks, (StopPontos + BufferStopServidorPontos) / TickSize, false);
 					EnterShort(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} {6} (H={3:F2}, dist {4:F2}pt) e FECHOU ABAIXO (C={5:F2})",
 						Time[0], c, nHi, h, distPontos, c, src));
@@ -479,7 +480,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					sinalAtivo = "NIV_L" + tradeSeq;
 					origemAtual = "D";
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
-					SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
+					SetStopLoss(sinalAtivo, CalculationMode.Ticks, (StopPontos + BufferStopServidorPontos) / TickSize, false);
 					EnterLong(Contratos, sinalAtivo);
 					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} {6} (L={3:F2}, dist {4:F2}pt) e FECHOU ACIMA (C={5:F2})",
 						Time[0], c, nLo, l, distPontos, c, src));
@@ -687,7 +688,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			origemAtual = "N";
 			notTradesDia++;
 			pendLado = 0;
-			SetStopLoss(sinalAtivo, CalculationMode.Ticks, StopPontos / TickSize, false);
+			SetStopLoss(sinalAtivo, CalculationMode.Ticks, (StopPontos + BufferStopServidorPontos) / TickSize, false);
 			if (lado == -1) EnterShort(Contratos, sinalAtivo);
 			else            EnterLong(Contratos, sinalAtivo);
 			Print(string.Format("{0}  >>> NOITE {1} @ {2:F2} | canal {3:F1}pt [{4:F2}-{5:F2}] | rompeu corpo {6:F2}",
@@ -733,7 +734,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar.
 					// Em recovery (sem signal original), atualiza todos os stops da estrategia.
 					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
-						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice + BreakevenLockPontos, false);
+						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice + BreakevenLockPontos - BufferStopServidorPontos, false);
 					// em recovery: server stop anterior ainda protege; trailing sintetico gerencia a saida
 				}
 				if (beFeito)
@@ -747,7 +748,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					beFeito = true;
 					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar.
 					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
-						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice - BreakevenLockPontos, false);
+						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice - BreakevenLockPontos + BufferStopServidorPontos, false);
 					// em recovery: server stop anterior ainda protege; trailing sintetico gerencia a saida
 				}
 				if (beFeito)
@@ -806,8 +807,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private void FechaPosicao(string motivo)
 		{
 			if (Position.MarketPosition == MarketPosition.Flat) return;
+			// ~saida aproximada: stop/trailing saem ~no stopPrice trilhado; alvo ~no alvoPrice; demais (flatten diario/EOD) ~no close.
+			double saidaAprox = Close[0];
+			if (motivo == "StopTick" || motivo == "TrailingTick" || motivo == "StopInicial" || motivo == "Trailing")
+				saidaAprox = stopPrice;
+			else if (motivo == "Alvo" || motivo == "AlvoTick")
+				saidaAprox = alvoPrice;
 			Print(string.Format("{0}  <<< SAIDA [{1}] | {2} {3} | entrada {4:F2} ~saida {5:F2} | fav {6:F2} | BE={7}",
-				Time[0], motivo, Position.MarketPosition, sinalAtivo, entryPrice, Close[0], favPrice, beFeito ? "sim" : "nao"));
+				Time[0], motivo, Position.MarketPosition, sinalAtivo, entryPrice, saidaAprox, favPrice, beFeito ? "sim" : "nao"));
 			// Em recovery (signal perdido no restart) fecha sem especificar o signal, para nao errar
 			bool semSignal = string.IsNullOrEmpty(sinalAtivo) || sinalAtivo == "RECOVERY";
 			if (Position.MarketPosition == MarketPosition.Long)
@@ -903,6 +910,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(0, 200)]
 		[Display(Name="Max dist. entrada (pontos)", Description="Close deve estar a no max X pontos da linha (0=sem filtro, 15=recomendado). Filtra entradas chase.", Order=16, GroupName="2. Saida")]
 		public double MaxDistPontos { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0, 50)]
+		[Display(Name="Buffer stop servidor (pontos)", Description="O stop NO SERVIDOR fica este tanto MAIS LARGO que o stop gerenciado (tick a tick). Garante que a saida a mercado dispare ANTES do stop do servidor — evita duplo-fill / posicao fantasma. 5pt recomendado. 0 = comportamento antigo (risco de fantasma).", Order=17, GroupName="2. Saida")]
+		public double BufferStopServidorPontos { get; set; }
 
 		[NinjaScriptProperty]
 		[Range(0, 100000)]

@@ -1,6 +1,27 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-18 madrugada (noturna: gatilho na LINHA/extremo — deploy p/ Andersson)
+## Última atualização: 2026-06-18 tarde (fix duplo-fill/fantasma + varredura trailing)
+
+## 🐛 FIX CRÍTICO 18/06 — duplo-fill / posição fantasma (forward test Sim101)
+- **Sintoma:** short S32 tomou stop, mas o bot "virou LONG" sozinho. Era posição FANTASMA.
+- **Causa-raiz:** stop em DOIS lugares no MESMO preço → saída a mercado (`OnMarketData`) + stop do
+  servidor (`SetStopLoss`) encheram no mesmo tick → comprou 10 estando vendido 5 → flip pra long 5.
+  A neutralização `SetStopLoss(5000)` PERDE a corrida (servidor já disparou). O long preso não fechava
+  porque `sinalAtivo` ainda era "NIV_S32" (short) → `ExitLong` não casava.
+- **Correção:** novo param **`BufferStopServidorPontos` (default 5pt)** — stop do servidor fica sempre
+  5pt MAIS LARGO que o gerenciado (entradas diurna+noturna E move de breakeven). A saída a mercado
+  dispara ANTES do servidor → impossível duplo-fill. Trade-off: backstop de desconexão ~5pt mais largo.
+- **Backtest INTACTO:** `OnMarketData` não roda no histórico → 94%/OOS 100% inalterados.
+- **Bônus:** fix do log `~saida` (mostrava close da vela, fazia win parecer loss; agora usa stop/alvoPrice).
+- ⚠️ Recompilar no NT (F5) + REMOVER e RE-ADICIONAR a estratégia (assinatura mudou: param novo).
+- Dia Sim101 fechou −$95,50 (a bagunça do fantasma comeu os 5 winzinhos +$144 vs stop −$111).
+
+## 📊 VARREDURA TRAILING x BREAKEVEN (18/06, `backtest/run_trailing_sweep.py`)
+- Pergunta: afrouxar o trailing pra trades maiores? **RESPOSTA: NÃO.** Baseline (BE3,75/tr1,75) venceu tudo:
+  100% aprov, 14d, WR 69%, PF 1,66, **$38,9k** (melhor PnL). OOS 100%/100% nas duas metades.
+- Afrouxar sobe o ganho médio ($99→$203) mas DESTRÓI o WR (69%→45%) e a taxa de aprovação → menos PnL.
+  Trailing apertado = feature (catar winzinhos consistentes), não bug. MANTÉM como está.
+
 
 ## 🌙 NOTURNA — estado FINAL (branch `feat/estrategia-noturna`)
 - **Gatilho na LINHA (extremo do canal alta/baixa), NÃO nas Fib centrais:** vela A toca/passa a LINHA
