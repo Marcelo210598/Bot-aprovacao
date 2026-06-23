@@ -14,6 +14,8 @@ using NinjaTrader.Core.FloatingPoint;
 using NinjaTrader.NinjaScript.Indicators;
 using NinjaTrader.NinjaScript.DrawingTools;
 using System.Windows.Media;
+using System.IO;
+using System.Globalization;
 #endregion
 
 // =============================================================================
@@ -80,6 +82,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private string diaCorrente = "";
 		private double pnlInicioDia = 0;
 		private bool   bloqueadoHoje = false;
+		private double pnlPreRestartDia = 0;   // PnL já realizado hoje ANTES de um restart (lido do arquivo)
 
 		// ---------- Controle de meta (opcional) ----------
 		private HashSet<string> diasOperados = new HashSet<string>();
@@ -186,6 +189,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 			else if (State == State.Realtime)
 			{
+				// A partir daqui as ordens vao DE VERDADE pro broker. Antes disso (State.Historical) o NT
+				// so recalcula/imprime os sinais SEM enviar ordem (ex.: ao (re)habilitar a estrategia no
+				// meio do dia). Deixa explicito no log p/ nunca confundir entrada real com recalculo.
+				Print(string.Format("{0}  ✅ BOT AO VIVO — entradas a partir daqui sao REAIS (ordens enviadas ao broker).", Time[0]));
+
+				// ANTI-RESET DO STOP DIARIO: se a estrategia reiniciou durante o dia (queda de internet,
+				// crash do NT8), restaura o PnL ja realizado antes do restart para que o stop diario
+				// continue de onde parou — sem "zerar" a protecao. O PnL e persistido em arquivo a cada
+				// barra no modo Realtime.
+				string hojeLocal = DateTime.Now.ToString("yyyy-MM-dd");
+				pnlPreRestartDia = CarregaPnlDiario(hojeLocal);
+				if (Math.Abs(pnlPreRestartDia) > 0.01)
+					Print(string.Format("{0}  ⚠️ ANTI-RESET: PnL ja realizado hoje antes do restart = ${1:F2} — stop diario continua de onde parou.",
+						Time[0], pnlPreRestartDia));
+
 				// RECOVERY: estrategia reiniciou (crash/rede) com posicao aberta.
 				// AdoptAccountPosition ja entrega a posicao; aqui so inicializamos o estado
 				// para o trailing assumir no proximo tick via OnMarketData.
@@ -215,7 +233,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			{
 				diaCorrente   = hoje;
 				bloqueadoHoje = false;
-				pnlInicioDia  = RealizadoAcumulado();
+				// pnlPreRestartDia: PnL ja realizado hoje antes de um restart (vem do arquivo).
+				// Subtraimos para que o stop diario "lembre" as perdas da sessao anterior.
+				// Ex: perdeu $78 antes do crash -> pnlInicioDia = 0 - (-78) = +78
+				//     -> pnlDia = RealizadoAcumulado - 78 = 0 - 78 = -78 (correto!)
+				pnlInicioDia     = RealizadoAcumulado() - pnlPreRestartDia;
+				pnlPreRestartDia = 0;   // consumido: proxima mudanca de dia comeca zerado
 			}
 
 			bool emSessao = agora >= SessaoInicio && agora < 1600;
@@ -274,6 +297,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (Position.MarketPosition != MarketPosition.Flat)
 					FechaPosicao("StopDiario");
 			}
+
+			// Persiste o PnL realizado do dia a cada barra (ao vivo).
+			// Se a estrategia cair/reiniciar, o proximo startup le esse valor e o stop
+			// diario continua de onde parou — sem "zerar" a protecao.
+			if (State == State.Realtime && !string.IsNullOrEmpty(diaCorrente))
+				SalvaPnlDiario(RealizadoAcumulado() - pnlInicioDia, diaCorrente);
 
 			// ---------------- Meta de aprovacao ----------------
 			if (PararAoAprovar && !aprovado)
@@ -447,14 +476,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 							Time[0], nHi, distPontos, MaxDistPontos, h, c, src));
 						return;
 					}
+					// GUARD DE CONEXAO (ao vivo): nao tenta enviar ordem com a conta desconectada.
+					if (State == State.Realtime && !ContaConectada())
+					{
+						Print(string.Format("{0}  ⚠️ SETUP PERDIDO — SHORT na Max {1:F2} {2} NAO ENVIADO: conta DESCONECTADA. (Perdido por CONEXAO, nao pela estrategia.)",
+							Time[0], nHi, src));
+						return;
+					}
 					tradeSeq++;
 					sinalAtivo = "NIV_S" + tradeSeq;
 					origemAtual = "D";
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
 					SetStopLoss(sinalAtivo, CalculationMode.Ticks, (StopPontos + BufferStopServidorPontos) / TickSize, false);
 					EnterShort(Contratos, sinalAtivo);
-					Print(string.Format("{0}  >>> SHORT @ {1:F2}  | tocou Max {2:F2} {6} (H={3:F2}, dist {4:F2}pt) e FECHOU ABAIXO (C={5:F2})",
-						Time[0], c, nHi, h, distPontos, c, src));
+					Print(string.Format("{0}  >>> SHORT {7} @ {1:F2}  | tocou Max {2:F2} {6} (H={3:F2}, dist {4:F2}pt) e FECHOU ABAIXO (C={5:F2})",
+						Time[0], c, nHi, h, distPontos, c, src, TagEstado()));
 				}
 				else if (h <= nHi + tol * 2)  // silencia spam quando mercado opera longe acima da linha
 				{
@@ -476,14 +512,21 @@ namespace NinjaTrader.NinjaScript.Strategies
 							Time[0], nLo, distPontos, MaxDistPontos, src));
 						return;
 					}
+					// GUARD DE CONEXAO (ao vivo): nao tenta enviar ordem com a conta desconectada.
+					if (State == State.Realtime && !ContaConectada())
+					{
+						Print(string.Format("{0}  ⚠️ SETUP PERDIDO — LONG na Min {1:F2} {2} NAO ENVIADO: conta DESCONECTADA. (Perdido por CONEXAO, nao pela estrategia.)",
+							Time[0], nLo, src));
+						return;
+					}
 					tradeSeq++;
 					sinalAtivo = "NIV_L" + tradeSeq;
 					origemAtual = "D";
 					// Stop no servidor (protege intrabar) — sem SetProfitTarget = sem OCO
 					SetStopLoss(sinalAtivo, CalculationMode.Ticks, (StopPontos + BufferStopServidorPontos) / TickSize, false);
 					EnterLong(Contratos, sinalAtivo);
-					Print(string.Format("{0}  >>> LONG @ {1:F2}  | tocou Min {2:F2} {6} (L={3:F2}, dist {4:F2}pt) e FECHOU ACIMA (C={5:F2})",
-						Time[0], c, nLo, l, distPontos, c, src));
+					Print(string.Format("{0}  >>> LONG {7} @ {1:F2}  | tocou Min {2:F2} {6} (L={3:F2}, dist {4:F2}pt) e FECHOU ACIMA (C={5:F2})",
+						Time[0], c, nLo, l, distPontos, c, src, TagEstado()));
 				}
 				else if (l >= nLo - tol * 2)  // silencia spam quando mercado opera longe abaixo da linha
 				{
@@ -683,6 +726,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 		// Reusa a mesma gestao da diurna: stop no servidor + trailing tick a tick (OnMarketData).
 		private void EntraNoturna(int lado, double canal)
 		{
+			// GUARD DE CONEXAO (ao vivo): nao tenta enviar ordem com a conta desconectada.
+			if (State == State.Realtime && !ContaConectada())
+			{
+				pendLado = 0;   // consome o setup (evita spam tick a tick)
+				Print(string.Format("{0}  ⚠️ SETUP PERDIDO — NOITE {1} NAO ENVIADO: conta DESCONECTADA. (Perdido por CONEXAO, nao pela estrategia.)",
+					Time[0], lado == -1 ? "SHORT" : "LONG"));
+				return;
+			}
 			tradeSeq++;
 			sinalAtivo  = (lado == -1 ? "NOT_S" : "NOT_L") + tradeSeq;
 			origemAtual = "N";
@@ -691,8 +742,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			SetStopLoss(sinalAtivo, CalculationMode.Ticks, (StopPontos + BufferStopServidorPontos) / TickSize, false);
 			if (lado == -1) EnterShort(Contratos, sinalAtivo);
 			else            EnterLong(Contratos, sinalAtivo);
-			Print(string.Format("{0}  >>> NOITE {1} @ {2:F2} | canal {3:F1}pt [{4:F2}-{5:F2}] | rompeu corpo {6:F2}",
-				Time[0], lado == -1 ? "SHORT" : "LONG", Close[0], canal, noiteLow, noiteHigh, pendNivel));
+			Print(string.Format("{0}  >>> NOITE {1} {7} @ {2:F2} | canal {3:F1}pt [{4:F2}-{5:F2}] | rompeu corpo {6:F2}",
+				Time[0], lado == -1 ? "SHORT" : "LONG", Close[0], canal, noiteLow, noiteHigh, pendNivel, TagEstado()));
 		}
 
 		// ---------------- Gestao de stop/alvo/breakeven/trailing — 100% SINTETICO ----------------
@@ -829,6 +880,41 @@ namespace NinjaTrader.NinjaScript.Strategies
 			}
 		}
 
+		// ---- Persistencia do PnL diario (anti-reset de stop apos restart/queda de internet) ----
+		// Salva/restaura o PnL realizado do dia num arquivo simples. Se a estrategia reiniciar
+		// no meio do dia, o proximo startup le o valor salvo e o stop diario continua de onde parou.
+		private string CaminhoArquivoPnl()
+		{
+			return Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+				"NinjaTrader 8", "BotAprovacao_pnl_diario.txt");
+		}
+
+		private void SalvaPnlDiario(double pnlRealizado, string data)
+		{
+			try
+			{
+				File.WriteAllText(CaminhoArquivoPnl(),
+					data + ":" + pnlRealizado.ToString("F2", CultureInfo.InvariantCulture));
+			}
+			catch { }
+		}
+
+		private double CarregaPnlDiario(string hoje)
+		{
+			try
+			{
+				string path = CaminhoArquivoPnl();
+				if (!File.Exists(path)) return 0;
+				string s = File.ReadAllText(path).Trim();
+				int sep = s.IndexOf(':');
+				if (sep < 0) return 0;
+				if (s.Substring(0, sep) != hoje) return 0;   // outro dia -> ignora
+				return double.Parse(s.Substring(sep + 1), CultureInfo.InvariantCulture);
+			}
+			catch { return 0; }
+		}
+
 		private double RealizadoAcumulado()
 		{
 			try
@@ -869,6 +955,27 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (Position.MarketPosition != MarketPosition.Flat) n++;
 			return n;
 		}
+
+		// ---------------- GUARD DE CONEXAO (anti "ordem nao enviada: conta desconectada") ----------------
+		// Antes de enviar qualquer entrada AO VIVO, confirma que a conta esta conectada ao broker. Se a
+		// conexao caiu (queda de internet/feed), NAO tenta enviar: evita o popup de erro modal que trava
+		// a tela e loga o setup perdido com clareza. FAIL-OPEN: se nao conseguir determinar o status,
+		// retorna true (deixa o NT tentar) — nunca bloqueia uma entrada valida por duvida. So vale ao
+		// vivo (a chamada e protegida por State==Realtime); backtest/historico ficam 100% inalterados.
+		private bool ContaConectada()
+		{
+			try
+			{
+				if (Account != null && Account.Connection != null)
+					return Account.Connection.Status == ConnectionStatus.Connected;
+			}
+			catch { }
+			return true;   // fail-open: na duvida, deixa tentar (nao perde entrada valida)
+		}
+
+		// Marcador de origem do log de entrada: [REAL] = ao vivo (ordem enviada ao broker);
+		// [HIST] = recalculo historico (NAO envia ordem — ex.: ao (re)habilitar a estrategia no meio do dia).
+		private string TagEstado() { return State == State.Realtime ? "[REAL]" : "[HIST]"; }
 
 		#region Properties
 		[NinjaScriptProperty]
