@@ -51,12 +51,29 @@ Rodamos `backtest/run_slippage_test.py` (varredura 0→4 ticks na config de prod
 
 ## 🔴 Alta prioridade (próximos passos)
 
-### #2 — News filter (FOMC / CPI / NFP) — PENDENTE
-FOMC/CPI/NFP causam 2-5+ ticks de slippage e moves erráticos. Comunidade para de
-operar 5 min antes e volta 5 min depois. Provavelmente são os dias que mais sangram.
-- Implementar: lista de horários de eventos ou pausa em janelas fixas (8:30 ET p/
-  CPI/NFP, 14:00 ET p/ FOMC).
-- Backtestar o impacto antes de aplicar.
+### #2 — News filter (FOMC) — ❌ TESTADO E REJEITADO (23/06)
+Hipótese: parar de operar em torno do FOMC (14h ET) reduziria perdas. **O backtest
+DERRUBOU a hipótese.** Rodado `backtest/run_news_filter.py` (diurna only, slippage
+2 ticks, 8 dias de FOMC reais no período 06/25-06/26):
+
+| Cenário | Taxa | PF | PnL$/ano | PnL dias FOMC |
+|---------|------|-----|----------|---------------|
+| SEM filtro (baseline) | 100% | 1.38 | $23.517 | **+$1.476** |
+| blackout ±15min | 100% | 1.37 | $23.176 | +$1.135 |
+| blackout ±30min | 100% | 1.36 | $22.716 | +$780 |
+| blackout ±60min | 100% | 1.36 | $22.347 | +$410 |
+
+**Por que não ajuda:** a diurna LUCRA nos dias de FOMC (+$1.476 em 8 dias). Pior dia
+foi só -$264 (bem dentro do stop diário $750). A reversão em nível do dia anterior
+aguenta a volatilidade do FOMC, e o stop diário já capa o tail risk. Qualquer
+blackout só REMOVE trades lucrativos → menos PnL.
+
+PnL por dia de FOMC (sem filtro): -264 / +574 / 0 / -134 / +767 / -240 / 0 / +774.
+Nenhum desastre. CPI/NFP (8h30 ET) são PRÉ-abertura → a diurna (9h30+) nem opera neles.
+
+**DECISÃO: não implementar.** Achismo da comunidade que não vale pro nosso bot
+(que já tem stop $125/trade + stop diário $750 + reversão em nível). Menos
+complexidade, menos ponto de falha. ✅
 
 ### #3 — VPS profissional (QuantVPS ~$60 ou FinTechVPS ~$50/mês) — PENDENTE
 Win 11 doméstico depende da internet de casa (causou os problemas dessa semana).
@@ -106,7 +123,8 @@ Vale backtest comparativo.
 | # | Melhoria | Esforço | Impacto | Status |
 |---|----------|---------|---------|--------|
 | 1 | Slippage realista no backtest | Baixo | Alto | ✅ FEITO 23/06 |
-| 2 | News filter | Médio | Alto | ⬜ Pendente |
+| 2 | News filter (FOMC) | Médio | — | ❌ TESTADO/REJEITADO 23/06 |
+| — | Desligar noturna | Baixo | Alto | ✅ FEITO 23/06 (OperarNoite=false) |
 | 3 | VPS QuantVPS/FinTechVPS | Baixo | Altíssimo | ⬜ Pendente |
 | 4 | MaxTradesDia = 10-12 | Baixo | Médio | ⬜ Pendente |
 | 5 | Regra consistência 50% | Médio | Alto | ⬜ Verificar |

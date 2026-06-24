@@ -156,7 +156,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				DesenharNiveis		= true;
 
 				// ----- Estrategia noturna (Nomads Trade da Noite) -----
-				OperarNoite			= true;    // toggle: liga a noturna junto da diurna
+				// DESLIGADA em 23/06/2026: o backtest de slippage (run_slippage_test.py) mostrou que a
+				// noturna desaba sob atrito realista (40% aprov a 2 ticks, PREJUIZO a 3 ticks) — os wins
+				// curtos nao absorvem slippage. A DIURNA e robusta (100% ate 2 ticks). Foco so na diurna.
+				// Codigo da noturna mantido dormente (nunca executa com OperarNoite=false). Ver
+				// docs/melhorias-sugeridas.md.
+				OperarNoite			= false;   // OFF: foco exclusivo na diurna (robusta a slippage)
 				NoiteInicioBR		= 1900;    // 19h00 Brasilia
 				NoiteFimBR			= 2100;    // 21h00 Brasilia (nao abre depois)
 				NoiteWarmupBR		= 1915;    // so opera apos 19h15 (canal precisa formar)
