@@ -1,6 +1,24 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-18 noite (fix fantasma VALIDADO ao vivo + SL15 em teste + Andersson em MNQ + TraderOS limpo)
+## Última atualização: 2026-06-23 (noturna DESLIGADA + max12 + DD real $1000 confirmado)
+
+## 🔴 23/06 — SLIPPAGE REALISTA muda o jogo + foco só na DIURNA
+- **Backtests rodavam com slippage ZERO.** Sob 2 ticks (real MNQ): DIURNA robusta, **NOTURNA desaba**
+  (40% a 2t, prejuízo a 3t — wins curtos não absorvem atrito). → **`OperarNoite=false`** (noturna desligada,
+  código dormente). `backtest/run_slippage_test.py`.
+- **DD REAL confirmado = $1.000** (conta 25K EOD, dashboard Apex), NÃO $1.500. Todos backtests atualizados.
+- **`MaxTradesDia=12`** aplicado: sobe aprovação 57%→70% no DD real (corta overtrading). Validado OOS.
+- **Número real que vai pro ar** ($25K DD1000, slippage 2t, max12, só diurna): **~70% aprovação,
+  14 aprov/6 busts/ano, PnL $21.562, PF 1.41, OOS 62%|75%.**
+- **News filter (FOMC) testado e REJEITADO**: bot lucra nos dias de FOMC, filtro só reduz PnL.
+- **Conta $50K (futuro)**: mesmas 5 MNQ → 100% sem busts (gordura DD $2.000). Avaliar na próxima.
+- ⚠️ **Consistência 50% Apex 4.0**: ~40% das aprovações concentram >50% do lucro em 1 dia (risco de saque).
+- Pesquisa pesada + plano: `docs/pesquisa-bots-nt8-apex.md`, `docs/melhorias-sugeridas.md`.
+- ⚠️ **PRECISA RECOMPILAR o `.cs` na VM** — noturna off + max12 ainda NÃO estão rodando ao vivo.
+- 🚨 Apex proíbe automação OFICIALMENTE (eval tolera, PA confisca). Alternativas: TopstepX, Tradeify, MFF, TPT.
+- Commits `deb1dab`→`c3735eb` (branch `feat/estrategia-noturna`).
+
+## Última atualização anterior: 2026-06-21 (revisão pré-22/06: deploy = Sim101 dia todo via Andersson, NÃO conta real; log SL15 do 18/06 registrado)
 
 ## 🐛 FIX CRÍTICO 18/06 — duplo-fill / posição fantasma (forward test Sim101)
 - **Sintoma:** short S32 tomou stop, mas o bot "virou LONG" sozinho. Era posição FANTASMA.
@@ -39,10 +57,13 @@
 - Replay 15/06 (downtrend) com gatilho na linha: net −$190 (L30+18,5 L31−124,5 L32−137 L33+53). Capado.
 - Commits: `2ca5fe7`(corpo+fuso) `486d4e4`(1min+tick) `8e4f0f3`(toque fresco) `6ea8471`(LINHA/extremo).
 
-## 🚀 DEPLOY (definido 18/06)
-- Andersson testa **quinta 18/06 e sexta 19/06** (Marcelo envia ZIP do bot).
-- **Segunda 22/06: início teste na CONTA REAL** (Apex, tentando aprovar).
-- ⚠️ Antes do real: StartBehavior → **AdoptAccountPosition**.
+## 🚀 DEPLOY (atualizado 21/06)
+- Andersson testou **quinta 18/06 e sexta 19/06** (Marcelo enviou ZIP do bot).
+- **Segunda 22/06: 1º dia rodando o dia TODO (diurna + noturna) — AINDA Sim101, NÃO conta real.**
+- Fluxo: Marcelo no serviço de dia → **Andersson manda as operações**, Marcelo organiza à noite no
+  `historico/trades-ao-vivo.md` (seção 2026-06-22 já montada).
+- Conta real fica pra depois de validar uns dias de Sim101 com o log vivo.
+- ⚠️ Antes do real (quando for): StartBehavior → **AdoptAccountPosition** (já no código).
 
 
 
