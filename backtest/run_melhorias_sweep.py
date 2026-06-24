@@ -71,7 +71,7 @@ def domingo_ranges(bars):
     return {k: tuple(v) for k, v in dom.items()}
 
 
-def bt(bars, dom_map=None, meta=1500.0, dd=1500.0, stop_dia=750.0,
+def bt(bars, dom_map=None, meta=1500.0, dd=1000.0, stop_dia=750.0,
        max_trades=0, slip_ticks=SLIP_BASE, n_contr=5):
     """DIURNA only. Rastreia consistencia 50% por ciclo de aprovacao."""
     pv = MNQ_PV * n_contr; rt = RT_PER * n_contr

@@ -31,7 +31,7 @@ from zoneinfo import ZoneInfo
 
 ET = ZoneInfo('America/New_York'); BR = ZoneInfo('America/Sao_Paulo'); UTC = timezone.utc
 MNQ_PV = 2.0; RT_PER = 1.20
-META = 1500.0; DD = 1500.0; MIN_DIAS = 7
+META = 1500.0; DD = 1000.0; MIN_DIAS = 7   # DD REAL = $1.000 (conta 25K EOD, confirmado no dashboard Apex 23/06)
 TICK = 0.25; N_CONTR = 5
 PTS_SL = 12.5; PTS_BE_TRIG = 3.75; PTS_BE_LOCK = 2.5; PTS_TRAIL = 1.75
 

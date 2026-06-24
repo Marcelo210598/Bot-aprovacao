@@ -128,13 +128,18 @@ $50K/5MNQ = ZERO busts nas duas metades OOS. Trade-off: meta 2x ($3.000) → apr
 menos vezes/ano (7) e demora mais (41d), MAS nunca quebra (sem reset fees) e cada
 aprovação vale 2x. **Melhor escolha risco-ajustada.** Combinado com max12: 100% + PF melhor.
 
-### #7 — DD real $1.000 (não $1.500) — ✅ TESTADO: muda tudo (23/06)
-**Descoberta importante:** com o DD real de $1.000 (conta EOD), a diurna cai de
-**100% → 57%** de aprovação (13 aprov / 10 busts em 23 ciclos). O backtest com DD
-$1.500 era otimista. Stop diário não muda muito (750 vs 1000 = mesma taxa).
-- Se a conta do Marcelo tem DD $1.500 (Intraday) → 100% segue valendo.
-- Se tem DD $1.000 (EOD) → bot é 57% sozinho; subir pra $50K resolve (100%).
-- ⚠️ **CONFIRMAR no dashboard Apex qual é o DD real da conta.**
+### #7 — DD real $1.000 — ✅ CONFIRMADO no dashboard Apex (23/06)
+**Confirmado: a conta $25K tem DD = $1.000** (variante EOD, NÃO $1.500). O backtest
+antigo (DD $1.500) era otimista. Todos os scripts atualizados pra DD $1.000.
+
+**Número REAL que vai pro ar ($25K, DD $1.000, slippage 2 ticks, max 12 trades):**
+- **70% de aprovação** | 14 aprov / 6 busts no ano | PnL $21.562 | PF 1.41
+- OOS: 62% | 75% (segura nas duas metades)
+- Sem o max12 seria 57% (13 aprov / 10 busts) → **o max12 tira 4 busts**
+
+Tradução: na conta $25K real, o bot aprova ~14x/ano mas busta ~6x (cada bust = comprar
+nova eval). É lucrativo no agregado, mas tem reset fees. Próxima conta → $50K elimina
+os busts (100%). Por ora o Marcelo testa na $25K já comprada.
 
 ---
 
