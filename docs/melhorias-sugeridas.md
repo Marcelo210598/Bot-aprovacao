@@ -81,27 +81,60 @@ AWS/Azure não servem (Rithmic bloqueia — já confirmamos na prática).
 - Maior ROI do projeto agora: elimina ~100% dos problemas de conexão.
 - Opcional: Ninja Watchdog ($49/mês) pra relançar NT8 sozinho.
 
-### #4 — MaxTradesDia = 10-12 (hoje = 0/ilimitado) — PENDENTE
-Comunidade usa 3-5 trades/dia. Nosso bot tem o parâmetro mas desligado. Limitar
-reduz dias de overtrading. Já temos `run_diurna_noturna.py` com varredura maxN —
-revisar e escolher o limite.
+### #4 — MaxTradesDia = 8-12 — ✅ VIÁVEL E VALIDADO OOS (23/06)
+Testado em `backtest/run_melhorias_sweep.py` (DD real 1000, slippage 2 ticks).
+**Limitar trades/dia SOBE a aprovação cortando overtrading:**
+
+| Limite | Taxa | Aprov | Trades | OOS (1a\|2a) |
+|--------|------|-------|--------|--------------|
+| sem limite (atual) | 57% | 13/23 | 1419 | 56% \| 54% |
+| max 8/dia | **68%** | 13/19 | 934 | 71% \| 67% |
+| max 12/dia | **70%** | 14/20 | 1166 | 62% \| 75% |
+
+**max 8** = melhor eficiência (mesmas 13 aprovações com 34% menos trades = menos
+slippage/comissão). **max 12** = maior taxa (70%, 14 aprovações). Ambos seguram OOS.
+✅ **Implementação ZERO risco: o parâmetro `MaxTradesDia` JÁ EXISTE no .cs** (só está
+em 0). Basta setar 8 ou 12 no gráfico — sem recompilar código.
 
 ---
 
 ## 🟡 Média prioridade
 
-### #5 — Regra de consistência Apex 4.0 (50%) — VERIFICAR
-Nenhum dia pode ser >50% do lucro total acumulado. Se o bot faz $800 num dia e
-precisa de $1.500 total, esse dia "gastou" 53% → viola mesmo sem estourar DD.
-- Analisar se o padrão de trades respeita isso.
+### #5 — Regra de consistência Apex 4.0 (50%) — ⚠️ RISCO REAL CONFIRMADO (23/06)
+Medido no sweep: **~40% das nossas "aprovações" violariam a regra dos 50%** (um único
+dia fez >50% do lucro total). Pior caso: 1 dia = 82% do lucro. Média do melhor dia =
+45-51% do total (bem no limite).
 
-### #6 — Conta $50K em vez de $25K — AVALIAR
-Comunidade unânime: $25K tem DLL muito apertado ($500). $50K tem melhor
-custo-benefício (DD $2.000, meta $3.000, DLL $1.000).
+| Config | Aprov | Válidas (≤50%/dia) | Pior dia |
+|--------|-------|--------------------|---------| 
+| DD1500 | 14 | 8 (57%) | 82% |
+| DD1000 | 13 | 10 (77%) | 81% |
 
-### #7 — Corrigir DD do backtest ($1.000, não $1.500) — VERIFICAR
-A conta $25K Intraday real tem DD=$1.000. Nosso backtest usa $1.500 (otimista).
-Rodar de novo com DD=$1.000 pra ver a taxa real de aprovação.
+**O bot concentra lucro em poucos dias.** Mesmo batendo a meta, pode não qualificar
+pro saque/aprovação na Apex 4.0. Mitigação possível (testar): cap de lucro diário, ou
+o MaxTradesDia (espalha o lucro). ⬜ Avaliar cap diário em backtest.
+
+### #6 — Conta $50K em vez de $25K — ✅ VIÁVEL E FORTE (23/06)
+Testado: **$50K com as MESMAS 5 MNQ elimina os busts.** A gordura maior (DD $2.000 vs
+$1.000) transforma um bot de 57% num bot de **100%**:
+
+| Conta | Taxa | Aprov | d.med | OOS (1a\|2a) |
+|-------|------|-------|-------|--------------|
+| $25K (5 MNQ) | 57% | 13/23 | 15d | 56% \| 54% |
+| **$50K (5 MNQ)** | **100%** | **7/7** | 41d | 100% \| 100% |
+| $50K (10 MNQ) | 57% | 13/23 | 15d | (escala risco junto) |
+
+$50K/5MNQ = ZERO busts nas duas metades OOS. Trade-off: meta 2x ($3.000) → aprova
+menos vezes/ano (7) e demora mais (41d), MAS nunca quebra (sem reset fees) e cada
+aprovação vale 2x. **Melhor escolha risco-ajustada.** Combinado com max12: 100% + PF melhor.
+
+### #7 — DD real $1.000 (não $1.500) — ✅ TESTADO: muda tudo (23/06)
+**Descoberta importante:** com o DD real de $1.000 (conta EOD), a diurna cai de
+**100% → 57%** de aprovação (13 aprov / 10 busts em 23 ciclos). O backtest com DD
+$1.500 era otimista. Stop diário não muda muito (750 vs 1000 = mesma taxa).
+- Se a conta do Marcelo tem DD $1.500 (Intraday) → 100% segue valendo.
+- Se tem DD $1.000 (EOD) → bot é 57% sozinho; subir pra $50K resolve (100%).
+- ⚠️ **CONFIRMAR no dashboard Apex qual é o DD real da conta.**
 
 ---
 
@@ -125,13 +158,31 @@ Vale backtest comparativo.
 | 1 | Slippage realista no backtest | Baixo | Alto | ✅ FEITO 23/06 |
 | 2 | News filter (FOMC) | Médio | — | ❌ TESTADO/REJEITADO 23/06 |
 | — | Desligar noturna | Baixo | Alto | ✅ FEITO 23/06 (OperarNoite=false) |
-| 3 | VPS QuantVPS/FinTechVPS | Baixo | Altíssimo | ⬜ Pendente |
-| 4 | MaxTradesDia = 10-12 | Baixo | Médio | ⬜ Pendente |
-| 5 | Regra consistência 50% | Médio | Alto | ⬜ Verificar |
-| 6 | Conta $50K | Financeiro | Alto | ⬜ Avaliar |
-| 7 | DD backtest $1.000 | Baixo | Alto | ⬜ Verificar |
+| 3 | VPS QuantVPS/FinTechVPS | Baixo | Altíssimo | ⬜ Pendente (infra) |
+| 4 | MaxTradesDia = 8-12 | Baixo | Alto | ✅ VIÁVEL — setar no gráfico (param já existe) |
+| 5 | Regra consistência 50% | Médio | Alto | ⚠️ RISCO confirmado — avaliar cap diário |
+| 6 | Conta $50K | Financeiro | Alto | ✅ VIÁVEL — 100% s/ busts (vs 57% no $25K) |
+| 7 | DD real $1.000 | Baixo | Alto | ✅ TESTADO — confirmar DD real no dashboard |
 | 8 | ORB complementar | Alto | Incerto | ⬜ Backlog |
-| 9 | MCL alternativa | Médio | Incerto | ⬜ Backlog |
+| 9 | MCL alternativa | Médio | Incerto | ⬜ Backlog (sem dados) |
+
+---
+
+## 🎯 VEREDICTO DA VARREDURA (23/06) — o que vale e o que não
+
+**Vale implementar (comprovado por backtest + OOS):**
+1. **MaxTradesDia = 12** (ou 8 p/ eficiência) — sobe 57%→70%, zero risco (param já existe).
+2. **Migrar pra conta $50K** com as mesmas 5 MNQ — 100% sem busts vs 57% no $25K.
+   Combinado: **$50K + max12 = 100% aprovação, PF melhor, sem reset fees.**
+
+**Atenção (não é melhoria, é risco a gerenciar):**
+3. **Consistência 50%** — ~40% das aprovações concentram lucro em 1 dia. Pode travar
+   saque na Apex 4.0. Avaliar cap de lucro diário no próximo backtest.
+4. **DD real** — confirmar no dashboard se é $1.000 (EOD) ou $1.500 (Intraday). Muda
+   a expectativa de 57% pra 100%.
+
+**Não vale:**
+5. **News filter** (já rejeitado). **MCL/ORB** = backlog (estratégia/dados novos).
 
 ---
 
