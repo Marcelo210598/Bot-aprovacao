@@ -140,7 +140,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				BufferStopServidorPontos = 5.0;   // stop servidor 5pt mais largo que o gerenciado -> a saida a mercado dispara primeiro (anti-fantasma, 18/06)
 
 				StopDiarioDolar		= 750.0;
-				MaxTradesDia		= 0;
+				MaxTradesDia		= 12;   // limite anti-overtrading (otimizado 23/06): sobe aprovacao 57%->70% no backtest (DD real $1000, slippage 2t), validado OOS. Corta dias de reentrada em sequencia.
 
 				SessaoInicio		= 930;
 				EntradaFim			= 1600;
