@@ -51,3 +51,92 @@ Corrigido com `BufferStopServidorPontos=5` (commit `7ff20d4`).
 com a lição já documentada: *"em downtrend a reversão SEMPRE sangra; a proteção é o STOP DIÁRIO $750, não
 filtro"*. Os 4 longs seguidos contra = mercado furando a linha de baixa repetidamente. Acompanhar se o
 stop diário trava antes de piorar.
+
+---
+
+### 🔁 Rodada SL15 — replay 18/06 (FRAGMENTO de log, parcial — não fechou o dia)
+> Logs colados pelo Marcelo em 21/06. É **outra rodada** do mesmo dia 18/06 (provável teste do SL15),
+> com sinais/preços diferentes da tabela acima. Só os trades com `<<< SAIDA` no trecho estão fechados;
+> entradas sem saída ficaram fora do recorte. **Não tirar conclusão de PnL do dia daqui — é fragmento.**
+
+**☀️ Diurna (linha Max dia anterior = 30544,75):**
+| # | Hora | Lado | Sinal | Entrada | Saída | fav | BE | Motivo | PnL |
+|---|------|------|-------|---------|-------|-----|-----|--------|-----|
+| 1 | 11:16 | SHORT | NIV_S24 | 30537,75 | 30503,25 | 30501,50 (+36pt) | sim | Trailing | **+$345** |
+| 2 | 12:46 | SHORT | NIV_S27 | 30544,25 | 30531,50 | 30529,75 (+14,5pt) | sim | Trailing | **+$127,5** |
+
+Filtro CHASE rejeitou corretamente 10:35 (−59,5pt), 10:54 (−21,75pt), 11:29 (−20pt), 12:39 (−40,5pt).
+11:35 tocou SEM rejeição (C≥linha) → não entrou. **Confirmados: +$472,5 nos 2 trailing.** Entradas
+11:11/11:14/11:36/12:40/12:44/12:49 sem saída no recorte.
+
+**🌙 Noturna (canal 19-21h BR, downtrend de novo):**
+| # | Hora | Lado | Sinal | Entrada | Saída | fav | BE | Motivo | PnL |
+|---|------|------|-------|---------|-------|-----|-----|--------|-----|
+| 3 | 19:28 | LONG | NOT_L29 | 30691,00 | 30678,50 | +2,5pt | nao | StopInicial | **−$125** |
+| 4 | 19:33 | LONG | NOT_L30 | 30686,75 | 30674,25 | +2pt | nao | StopInicial | **−$125** |
+| 5 | 19:36 | LONG | NOT_L31 | 30676,75 | 30664,25 | 0pt | nao | StopInicial | **−$125** |
+| 6 | 19:51 | LONG | NOT_L34 | 30665,50 | 30677,50 | +13,75pt | sim | Trailing | **+$120** |
+
+Canal expandindo pra baixo (30675,50 → 30650,00) = mesma faca caindo de sempre. **3 stops seguidos
+(−$375) antes do L34 ganhar (+$120).** Entradas L32 (19:38) e L33 (19:45) sem saída no recorte.
+Confirma de novo: **proteção em downtrend = stop diário $750, não filtro de entrada.**
+
+---
+
+## 2026-06-22 (Sim101) — 1º dia com Andersson rodando o dia todo
+> ⚠️ **Sim101, NÃO conta real ainda.** Marcelo no serviço de dia → Andersson manda as operações,
+> Marcelo organiza aqui à noite. Diurna (9h30-16h ET) + Noturna (19h15-21h BR). Esperar comportamento:
+> diurna filtra bem; noturna brilha em range, sangra em downtrend (capada pelo stop diário $750).
+
+### ☀️ Diurna (linha Max dia anterior = ____)
+| # | Hora | Lado | Sinal | Entrada | Saída | fav | BE | Motivo | PnL |
+|---|------|------|-------|---------|-------|-----|-----|--------|-----|
+| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |
+
+### 🌙 Noturna (canal 19-21h BR)
+| # | Hora | Lado | Sinal | Entrada | Saída | fav | BE | Motivo | PnL |
+|---|------|------|-------|---------|-------|-----|-----|--------|-----|
+| _ | _ | _ | _ | _ | _ | _ | _ | _ | _ |
+
+**Resumo do dia:** diurna ___ | noturna ___ | total ___ | bateu stop diário? ___
+
+---
+
+## 2026-06-23 (Sim101) — 1º dia rodando no Windows 11 após abandono da VPS Azure
+> ⚠️ **Sim101, NÃO conta real.** Bot voltou pro Windows 11 (UTM no Mac) após 2 dias tentando resolver VPS Azure.
+> VPS abandonada: Rithmic detecta IP Azure e não completa feed de preços (amarelo infinito).
+> Monitorar via AnyDesk do trabalho. Diurna perdida (problemas de conexão). Noturna iniciada às 19h28.
+
+### ☀️ Diurna — perdida (problemas de conexão o dia todo)
+
+### 🌙 Noturna (canal 19-21h BR)
+| # | Hora | Lado | Sinal | Entrada | fav | BE | Motivo | PnL | Obs |
+|---|------|------|-------|---------|-----|-----|--------|-----|-----|
+| 1 | 19:28 | LONG | NOT_L22 | 29715,45 | 29719,50 | sim | TrailingTick | **+$25** | canal 104pt [29700,75-29804,75] |
+| 2 | 19:30 | LONG | NOT_L23 | 29715,25 | 29719,50 | sim | TrailingTick | **+$23** | saiu em +2,5pt — preço continuou forte +40pt após saída ⚠️ |
+| 3 | 19:37 | LONG | NOT_L24 | 29679,20 | 29681,75 | nao | StopTick | **−$126,5** | stop 29666,50 | vela vermelha anterior (bearish forte) não era rejeição → bot pulou; L24 entrou na vela seguinte c/ pavio correto |
+
+**Resumo do dia:** diurna — | noturna: +25 +23 −126,5 = **−$78,5** até 19:37
+
+> ⚠️ **Observação L23 (backtest respondeu 23/06):** BE armou (fav +4,25pt), trailing travou em +2,5pt, saiu. Preço subiu +40pt depois. Backtest (sweep trailing 1.75→12pt): **1.75pt JÁ É ÓTIMO para a noturna**. Aumentar trail reduz WR e PF sistematicamente — o L23 foi outlier, não erro de parâmetro.
+> 
+> **Por que não entrou na vela vermelha que tocou a linha?** Vela bearish forte (corpo grande, pavio inferior pequeno) → `eh_rejeicao_baixa()` = False → sem setup armado. Verde que "passou o corpo" não tinha pend ativo. NOT_L24 entrou pela vela seguinte que tinha pavio inferior dominante correto.
+
+---
+
+## 2026-06-24 (Sim101) — diurna: 1 trade limpo (LONG reversão na mínima do dia anterior)
+> ⚠️ **Sim101, NÃO conta real.** Andersson rodando. **Apenas 1 entrada no dia inteiro** (diurna). Saída
+> via TrailingTick **sem posição fantasma** — comportamento modelo. Bot desabilitado após o trade.
+
+### ☀️ Diurna (linha Mín dia anterior = 29577,25)
+| # | Hora | Lado | Sinal | Entrada | Saída | fav | BE | Motivo | PnL | Obs |
+|---|------|------|-------|---------|-------|-----|-----|--------|-----|-----|
+| 1 | 10:49 | LONG | NIV_L21 | 29587,55 | ~29596,50 | 29598,25 (+10,7pt) | sim | TrailingTick | **~+$89,5** ⚠️ | tocou mín 29577,25 (L=29564, dist 10pt) e FECHOU ACIMA (C=29587,25) → rejeição válida; trava tick a tick, devolveu 1,75pt do topo |
+
+**Resumo do dia:** diurna +1 trade (win) | noturna **DESLIGADA** (decisão 23/06) | **total ~+$89,5** | bateu stop diário? não.
+
+> ⚠️ **PnL a confirmar (fonte da verdade = TraderOS/corretora):** cálculo pelo log = (29596,50 − 29587,55) × 5 MNQ × $2 ≈ **+$89,5** (fill 29595,00 no log → ~+$74,5). **Painel do print mostrava `$ 60,50`** — divergência possível por taxas/comissão ou fill real pior. O `A: 29665 / B: 29664,25` do print é só o book no momento (não o trade).
+>
+> ✅ **Saída LIMPA, sem fantasma** — mais um dia validando o fix `BufferStopServidorPontos=5`. Trade-livro: reversão na mínima do dia anterior, vela fechou acima da linha (rejeição válida), BE armou (fav +10,7pt), trailing tick saiu no lucro. 1 só entrada = dentro do esperado pós-`MaxTradesDia=12`.
+>
+> 🧪 **Feedback Andersson+Marcelo (trailing apertado) → TESTADO e REJEITADO (25/06):** a sensação de "saiu cedo, pegou a merreca e depois correu" foi investigada com 3 backtests (300k candles): trailing uniforme largo, escalonado e saída parcial — **todos pioram**. O 1,75pt é o ótimo. Detalhe completo em `docs/trailing-veredito.md`. Scripts: `run_trailing_fino.py`, `run_trailing_escalonado.py`, `run_saida_parcial.py`.
