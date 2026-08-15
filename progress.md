@@ -1,6 +1,139 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-06-23 (noturna DESLIGADA + max12 + DD real $1000 confirmado)
+## Última atualização: 2026-08-14 (SL 15pt testado ao vivo em 01-12/06 — PIOR que SL 12,5, teste interrompido)
+
+## 🔴 14/08 — SL 15pt testado manualmente (01-12/06) — RESULTADO PIOR, teste interrompido pelo Marcelo
+
+Marcelo rodou o replay de junho de novo, agora com SL 15pt (a melhoria que o backtest de 13/08
+tinha "validado 2x"), registrando os trades manualmente dia a dia. **Parou no dia 12/06** (mesmo
+ponto de corte usado pra comparar com o teste 1min de 13/08) porque o resultado já estava pior e
+não queria perder mais tempo.
+
+**Comparação direta, mesmos 10 pregões (01/06→12/06), mesma engine/config exceto o SL:**
+
+| Dia | Acumulado SL 12,5 (13/08) | Acumulado SL 15 (manual, 14/08) |
+|---|---|---|
+| 01/06 | +$101,5 | +$270,5 |
+| 02/06 | +$266,0 | +$373,0 |
+| 03/06 | +$509,0 | +$616,0 |
+| 04/06 | +$377,5 | +$407,0 |
+| 05/06 | +$377,5 | +$407,0 |
+| 08/06 | +$367,5 | +$374,0 |
+| 09/06 | +$458,5 | +$465,0 |
+| 10/06 | +$458,5 | +$465,0 |
+| 11/06 | +$377,0 | +$287,5 |
+| 12/06 | **+$243,5** | **+$96,0** |
+
+- Até o dia 10/06 o SL 15 estava até um pouco **à frente** (+$465 vs +$458,5) — consistente com a
+  ideia do backtest de que o stop mais largo evita saídas prematuras.
+- **Nos dias 11/06 e 12/06 o SL 15 devolveu tudo**: -$177,5 e -$191,5 (dois dias seguidos de stop
+  largo batendo cheio), contra -$81,5 e -$133,5 do SL 12,5 nos mesmos dias. Só nesses 2 dias a
+  diferença foi de -$154 — mais que o suficiente pra virar a comparação do mês inteiro.
+- **Contradiz a expectativa do backtest** (+32% sob slippage 2 ticks, ou seja ~$243,5 → ~$320+).
+  Na prática, na mesma janela, deu **60% pior** (+$96,0 vs +$243,5).
+
+**Conclusão do Marcelo: "isso também não deu certo" — registrado, sem aplicar SL 15pt em
+produção.** Terceiro veredito seguido (depois do timeframe 1min/5min e das travas de gestão do
+dia) que o backtest sugeriu como melhoria e o teste real não confirmou — ou pelo menos não nessa
+amostra pequena (10 dias, stop batendo forte 2x seguidas pode ser variância, não é
+necessariamente prova de que o SL 15 é pior no longo prazo — mas também não é a confirmação que
+o Marcelo esperava, e ele decidiu não insistir).
+
+**Decisão: não aplicar SL 15pt em produção. Config de produção segue SL 12,5, inalterada.**
+Precisamos repensar a estratégia de base — ver `docs/melhorias-sugeridas.md` (#13 atualizado) e
+retomar a discussão de fundo sobre se "reversão em nível único" tem edge suficiente depois do
+atrito real (mesma pergunta já levantada em 12/08 e 13/08).
+
+## 🔴 13/08 — Junho refeito no 1min: +$168,0. O timeframe não era o problema.
+- **Mês 06/2026 no 1min FECHADO**: +$168,0 de $1.500 (11,2%), 73 trades (49G/24L, WR 67,1%),
+  DD máx $546,5/$1.000 (54,6%), 16 dias operados. Detalhe: `forward-test-replay-25k/2026-06-1min/`.
+- **Empatou com o 5min** (+$170,5) apesar de 3x mais trades e menos dias zerados (5 vs 12) —
+  o diagnóstico de 12/08 ("era só o timeframe") **não se confirmou**.
+- **Assimetria é o problema estrutural**: ganho médio $40 vs perda média $75. Precisa 65,1% de WR
+  só pra empatar; tem 67,1%. 13 stops cheios (18% dos trades) consumiram 84% do lucro bruto.
+- **Testadas e REJEITADAS** (`backtest/run_gestao_dia.py`, 13 meses): max trades/dia (−28% a −64%),
+  cooldown entre entradas (−23% a −57%), parar após stop cheio (−59%). Eram achados do mês real
+  que não sobreviveram ao dado longo (overfitting: 73 trades vs 1.440).
+- **✅ SL 15pt VALIDADO 2x** (18/06 e 13/08) e **nunca aplicado** — junho inteiro rodou com SL 12,5.
+  +14% sem slippage, **+32% com 2 ticks**, WR 69→74%. Ver `docs/gestao-dia-veredito.md`.
+- Nada alterado em `src/BotAprovacao.cs`.
+
+## 🔴 12/08 — Mês 06 fechou INCOMPLETO + achado crítico: timeframe errado no forward test
+- **Mês 06/2026 (Market Replay) FECHADO**: +$170,5 de $1.500 (11,4% da meta), DD máx $298,5/$1.000
+  (29,9%, nunca perto de estourar), 10 de 22 pregões com trade (12 zerados), 25 trades, WR 76%.
+  Detalhe completo em `forward-test-replay-25k/2026-06/placar-mes.md`.
+- Marcelo achou o resultado insatisfatório, pediu revisão da estratégia + estratégia nova (ORB).
+  Implementado `src/NomadeBot_ORB_Manha.cs` (ORB 15min) já validado por backtest próprio
+  (`backtest/run_orb_15min.py`) — PF 1,90 mas edge modesta (+$2.766/ano), NÃO resolve o problema
+  principal sozinha.
+- **🔴🔴 ACHADO CRÍTICO ao revisar tudo:** o forward test de junho rodou num gráfico de **5
+  MINUTOS** — mas o backtest original que validou 100%/PF1.60/$36.978 foi feito em **1 MINUTO**
+  (isso já estava documentado abaixo, seção "Como usar o bot", passo 4: "MNQ 1min" — mas ninguém
+  conferiu contra o gráfico real do forward test até hoje).
+- Mesma regra, só mudando o TF: **1min = 82% de aprovação em janelas de 30 dias, 0 estouros.
+  5min = 54% de aprovação, 5 estouros.** OOS: 1min robusto (82%/74%, zero bust); 5min degrada
+  (70%→38%, 5 bust) no semestre recente. Causa: barra de 5min percorre mais antes de fechar →
+  `MaxDistPontos=15pt` (calibrado pra 1min) rejeita reversões válidas — explica boa parte dos
+  12 dias zerados de junho. Comparação direta mesmos 11 dias: 1min=$1.240 | 5min ao vivo=$206.
+  Com slippage 2 ticks: 1min=44% aprov/4 busts; 5min=26%/21 busts.
+- Funil de 10 estratégias novas testado (`backtest/run_funil_estrategias.py`, pesquisa web +
+  backtest próprio) pela métrica de aprovação Apex — **todas piores que a atual em 1min**: VWAP
+  reversão (28%, PF 0,93, 102 busts), inverter a estratégia (9%, 181 busts), ORB15 (6%), ORB30
+  (0%), Initial Balance (0%). Claims de blog/YouTube sobre ORB/mean-reversion não se sustentaram.
+- Doc completo: `docs/revisao-estrategias-12-08.md`.
+- **Próximo passo (combinado): Marcelo roda o mês 06 inteiro de novo no gráfico de 1min** pra
+  confirmar o achado na prática. Se confirmar → 1min vira padrão definitivo, ORB fica em standby.
+  Se o resultado negativo persistir mesmo no 1min → revisar tudo de novo, considerando que o
+  problema pode ser a própria lógica de "reversão em nível único", não só o timeframe.
+
+## Última atualização anterior: 2026-08-11 (forward test 25K em andamento — 9 dias úteis rodados, WR 86,7%)
+
+## 🆕 11/08 — Forward test de aprovação (contas 25K) em andamento no Market Replay
+- Dado do Market Replay (NT8) **completo: 01/06 a 10/08/2026** (fechava a janela que faltava desde
+  o `historico/2026-08-10.md`, limite de 90 dias corridos do Market Replay gratuito).
+- Objetivo: rodar o `BotAprovacao` de produção nesse dado e contar quantas contas **25K**
+  seriam **aprovadas vs. estouradas (bust)** — forward test real no NT8, não backtest Python.
+  Config: TP60/SL12,5/BE3,75-2,5/trail1,75/tol20t/maxDist15pt/maxTrades12/stopDiário$750,
+  `OperarNoite=false`, DD real $1.000 EOD.
+- Registro estruturado em `forward-test-replay-25k/2026-06/` (`placar-mes.md` = acumulado +
+  histórico completo de trades; `dia-XX-DD-MM.md` = detalhe por dia).
+- **Progresso até 09/06/2026 (5 dias úteis operados de 7 mínimos):** 15 trades, **13 gain / 2 loss
+  (WR 86,7%)**, PnL **+$206 de $1.500 (13,7% da meta)**, pico $327, **drawdown atual $121** (12,1%
+  do limite $1.000). As 2 perdas foram stop cheio (nunca ativaram breakeven), -$113 e -$124,5.
+- Detalhe completo da sessão em `historico/2026-08-11.md`.
+
+## Última atualização anterior: 2026-08-10 (3 estratégias novas p/ comparar no Strategy Analyzer — só 1 tem edge real)
+
+## 🆕 10/08 — 3 estratégias diurnas novas (IB, VWAP, Momentum ATR) + backtest Python no dado real
+- Pedido: 3 `.cs` separados pra comparar no Strategy Analyzer (MNQ 5min, RTH ET — **não são pra noturna
+  19h-21h BRT**, isso ficou explícito com o usuário antes de codar).
+  `src/NomadeBot_InitialBalance.cs`, `src/NomadeBot_VWAPReversao.cs`, `src/NomadeBot_MomentumBreakout.cs`.
+  Não compilados no NT8 ainda (sem Windows aqui) — só revisão manual de sintaxe.
+- **Antes de mandar pro NT8, rodei as 3 em Python no NQ real** (`backtest/run_comparativo_3estrategias.py`,
+  1 ano jun/2025-jun/2026, 1min→5min agregado) — lição do 23/06 aplicada: testado **com E sem slippage**
+  (2 ticks + comissão $1,20 RT) desde o início, não só depois.
+- **Resultado — só a Estratégia 1 (Initial Balance) tem edge real:**
+  - **IB:** 173 trades/ano, WR 57%, PF 1,18 (realista), net +$2.398/ano (1 MNQ). OOS fraco na 1ª metade
+    (PF 1,04 ~empate) mas segura na 2ª (PF 1,31). Meses negativos existem (set, nov, jan, mar) — edge
+    real mas não é "toda semana ganha".
+  - **VWAP Reversão:** PF 0,26 — **quebrada**. Long E short perdem igual (~20% WR nos dois lados) — não é
+    viés direcional de ano em alta, é sinal fraco mesmo (toque de banda + confirmação de 1 candle é ruído
+    demais em 5min). Não recomendo compilar no NT8 sem redesenhar o gatilho.
+  - **Momentum/ATR:** limiar padrão do `.cs` (12pt) quase não dispara (4 trades/ano) — ATR real do MNQ
+    5min no período: mediana 17,6pt, p25 11,6pt (limiar tá alto demais pro regime do ano). Recalibrado
+    pro real (~17,6pt): só 21-25 trades/ano, PF ~1,3 — **amostra pequena demais pra confiar**.
+- Próximo passo: só compilar/validar a **IB** no NT8 Strategy Analyzer de verdade. VWAP e Momentum como
+  estão não valem o tempo de compilar — precisam de redesenho antes.
+- **Comparei a IB (menos pior) contra a estratégia ATUAL de produção**, mesmo dado/custo
+  (`backtest/run_comparativo_atual_vs_ib.py`, espelha `EntradaNiveis()`+`GerenciaPosicao()` do `.cs`
+  linha a linha). **ATUAL ganha em tudo:** WR 68,7% vs 57,2%, PF 1,46 vs 1,18, Net $4.415 vs $2.398,
+  MaxDD -$330 vs -$1.926 (1 MNQ). OOS: ATUAL lucrativa nas 2 metades do ano; IB empatou na 1ª (PF 1,04).
+  **Conclusão: nenhuma das 3 novas bate a atual — não trocar nada em produção.**
+- **Baixando dado real pro Market Replay** (NT8, manual): limite é 90 dias corridos, 1 dia por vez.
+  `MNQ JUN26` até 11/06/2026, `MNQ SEP26` de 12/06/2026 em diante (contrato expira ~19/06). Baixado até
+  agora: 12/05→18/06/2026. Falta 19/06→09/08/2026. Detalhe completo em `historico/2026-08-10.md`.
+
+## Última atualização anterior: 2026-06-23 (noturna DESLIGADA + max12 + DD real $1000 confirmado)
 
 ## 🔴 23/06 — SLIPPAGE REALISTA muda o jogo + foco só na DIURNA
 - **Backtests rodavam com slippage ZERO.** Sob 2 ticks (real MNQ): DIURNA robusta, **NOTURNA desaba**
@@ -168,9 +301,36 @@ Parar:       ao bater meta $1.500 + 7 dias operados
 ### Monitorar (baixa prioridade)
 - Overtrading: ~14 trades/dia no backtest — decisão: manter (fiel ao backtest). Soluções mapeadas se der problema ao vivo (cooldown / max 12 trades-dia).
 - Dias de mercado lateral (range extremo dia anterior): zero entradas. Comportamento esperado, já no backtest dos 100%.
+- **[13/08] PnL real não bate com a matemática simples de pontos** — vários trades no forward test
+  1min (dias 08, 09, 11 e 12/06) fecham com PnL real (via `[MeuTrade]`) diferente do que a diferença
+  entrada→saída do texto do log sugeriria — às vezes até com sinal trocado (pontos sugerem ganho,
+  PnL fecha negativo). Não é erro de transcrição isolado, é recorrente o suficiente pra investigar:
+  pode ser slippage no fill real não capturado no texto resumido do trailing, comissão, ou algo a
+  conferir no `BotAprovacao.cs`. Ainda não afeta a confiança nos números agregados (o PnL usado nos
+  placares é sempre o real, via `[MeuTrade]`), mas vale entender a causa. Ver
+  `forward-test-replay-25k/2026-06-1min/dia-12-12-06.md` pro exemplo mais recente.
 
 ## 📋 Próximos passos (roadmap)
-1. **Forward test semana 02–06/06** — baixar dados e rodar
+1. **Forward test junho inteiro no 1min — CONCLUÍDO (13/08).** Todos os 21 pregões de junho
+   registrados em `forward-test-replay-25k/2026-06-1min/`. **Resultado final: +$168,0 (11,2% da
+   meta de $1.500), 73 trades (49G/24L, WR 67,1%), drawdown máximo $546,5/$1.000 (54,6%, não
+   estourou), 16 dias operados.**
+   🔴 **Veredito: o diagnóstico "era só o timeframe" NÃO se confirmou.** O 1min real fechou o mês
+   quase EMPATADO com o 5min real original (+$168,0 vs +$170,5) — apesar de gerar quase 3x mais
+   trades (73 vs 25) e menos dias zerados (5 vs 12), os stops cheios de -12,50pt consumiram o
+   ganho extra, e o drawdown máximo quase dobrou (54,6% vs 29,9%). O backtest projetava +$1.240
+   pros primeiros 11 dias — o real bateu 30% disso no dia 11 e não recuperou a diferença até o
+   fim. Ver veredito completo e a tabela comparativa em
+   `forward-test-replay-25k/2026-06-1min/placar-mes.md` (seção "🏁 VEREDITO FINAL DO MÊS").
+   **Próximo passo é decisão do Marcelo** — não mudar nada em produção sem essa decisão.
+2. ~~🎯 APLICAR SL 15pt~~ — ❌ **TESTADO AO VIVO E REJEITADO (14/08).** Marcelo rodou 01-12/06
+   manualmente com SL 15pt: +$96,0 contra +$243,5 do SL 12,5 na mesma janela (60% pior),
+   contrariando os +32% projetados pelo backtest sob slippage. Teste interrompido no dia 12/06.
+   **Config de produção segue SL 12,5.** Ver entrada 14/08 acima e `docs/melhorias-sugeridas.md` (#13).
+3. ~~Trava de lucro por horário~~ — ❌ **TESTADO E REJEITADO 13/08.** Todas as variantes (max
+   trades/dia, cooldown entre entradas, parar após stop cheio) pioram de −23% a −64% no backtest de
+   13 meses. O padrão visto em junho era overfitting (73 trades vs 1.440).
+3. **Forward test semana 02–06/06** — baixar dados e rodar
 2. **Forward test completo** — validar slippage real ao vivo no Sim101
 3. **Confirmar Andersson** — regra 7 dias + custo MNQ
 4. **Bot Funded 25K** — 🟡 backtest iniciado e refinado (15/06, pasta `Estrategia 25/`). Falta `.cs` + forward test.

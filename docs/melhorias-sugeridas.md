@@ -154,6 +154,90 @@ exclusiva 9:30-10:00 ET.
 Apareceu nos backtests ICT com DD de só -$788 (vs -$3.703 do MNQ). Menos volátil.
 Vale backtest comparativo.
 
+### #10 — Filtro anti-chase (`MaxDistPontos=15pt`) pode estar cortando reversões boas
+Observado no forward test replay 25K, dia 11/06/2026 (ver `forward-test-replay-25k/2026-06/dia-11-11-06.md`):
+4 toques na linha do dia, todos bloqueados por `CHASE ignorado` (candle fechou mais de 15pt
+além da linha) — dia inteiro sem operação. Duas velas (15:05 e 15:25 ET) tocaram a linha e
+reverteram de forma limpa, mas fecharam 137pt e 58pt de distância, respectivamente — acima do
+limite fixo de 15pt.
+
+Hipótese a testar: distância fixa em pontos pode ser rígida demais em dias de candle grande
+(alta volatilidade), rejeitando reversões válidas. Alternativas a comparar em backtest:
+- `MaxDistPontos` maior (ex.: 20-25pt) e medir se sobe trades sem estourar DD;
+- regra relativa ao tamanho do candle/ATR do dia em vez de distância fixa em pontos;
+- separar o limite por regime de volatilidade (ligado ao trabalho já feito em
+  [[project_vida_de_trader_regime_dia]] sobre agitação do pregão, se aplicável).
+
+⬜ **Não implementar sem backtest** — é a mesma trava de 0 trades que já vimos em mercado
+lateral/esticado ([[project_bot_aprovacao_mercado_lateral]]); mudar sem medir pode abrir
+espaço pra entradas ruins (perseguir movimento já esgotado).
+
+**Sweep rodado 12/08** (`backtest/run_proximity_filter.py`, dados atuais):
+
+| Filtro | Taxa aprovação | Aprov/Reprov | Mediana dias | PF | PnL$/ano | OOS (1ª\|2ª) |
+|---|---|---|---|---|---|---|
+| **15pt (atual)** | **100%** | 19/0 | 15d | 1.60 | $36.978 | **100% \| 100%** |
+| 20pt | 91% | 20/2 | 14d | 1.57 | $38.414 | 90% \| 92% |
+| 25pt | 91% | 20/2 | 13d | 1.54 | $37.794 | 90% \| 92% |
+| 30pt | 91% | 21/2 | 14d | 1.55 | $39.380 | 91% \| 92% |
+
+Afrouxar pra 20pt+ ganha PnL bruto (+$1,4k a +$2,4k/ano) e mais trades/dia, mas introduz **2
+estouros de conta por ano** que não existem em 15pt — padrão consistente nas duas metades OOS,
+não é ruído. 15pt segue sendo o único ponto do sweep com **0 busts** em 1 ano de dado real.
+
+**🔴 DECISÃO (12/08): manter 15pt como está.** Marcelo vai terminar o forward test dos meses
+06 e 07 com a config atual pra ver se aprova alguma conta. **Só revisitar afrouxar o filtro
+(20-30pt) se o resultado desses dois meses não for satisfatório** (ex.: muitos dias zerados
+matando o mínimo de 7 dias operados, ou não bater a meta $1.500 mesmo com dias bons). Até lá,
+não mexer.
+
+**🔴 GATILHO ACIONADO (12/08): mês de junho fechou incompleto** — +$170,5 de $1.500 (11,4%),
+12 de 22 pregões zerados (quase metade do mês). Isso é o cenário que a decisão acima previu como
+"resultado não satisfatório". Diagnóstico de causa dos 12 dias zerados (revendo os `dia-XX.md`):
+- **~5 dias** tiveram toque na linha bloqueado pelo filtro anti-chase (11, 22, 25, 26/06 + outros)
+- **~7 dias** o preço nunca chegou perto da linha (estrutural — reversão em nível único é
+  seletiva por natureza, afrouxar o `MaxDistPontos` NÃO resolve esses dias)
+- Ou seja: afrouxar o filtro recuperaria no máximo **~5 dos 12 dias zerados**, não todos.
+- **Pendente decisão do Marcelo:** testar 20pt ao vivo em julho (troca ~5 dias zerados por ~2
+  busts/ano de risco, ver sweep acima) OU manter 15pt e confiar no módulo ORB (abaixo) pra
+  aumentar a frequência de trade sem mexer no risco da diurna.
+
+## 🟠 #11 — Módulo ORB 15min (9h30-9h45 ET) — implementado e validado por backtest (12/08)
+
+Segundo módulo independente (`src/NomadeBot_ORB_Manha.cs`), pedido do Marcelo pra aumentar a
+frequência de trade sem mexer no risco da diurna. **Testado em `backtest/run_orb_15min.py`
+sobre ~1 ano de dados 1min reais do NQ antes de escrever qualquer linha de `.cs`** (regra do
+Marcelo: nada de achismo).
+
+**Achado principal:** os números de "433%/ano, WR 65-78%" que circulam na internet pra ORB **NÃO
+se sustentaram nos dados reais**. ORB "cru" (sem filtro de range): PF 0.58, WR 24% — perde
+dinheiro. Config validada, depois de sweep de filtros:
+
+| Config | n/ano | WR | PF | net/ano (5 MNQ) | OOS (1ª\|2ª) |
+|---|---|---|---|---|---|
+| Sem filtro de range | 291 | 24,4% | 0,58 | -$9.634 | — |
+| + range 15-80pt | 77 | 37,7% | 1,08 | +$388 | 1,17 \| 0,84 (instável) |
+| + EMA200(1h) | 49 | 42,9% | 1,34 | +$956 | 1,49 \| 1,10 |
+| **+ SL12,5/TP37,5 (3x)** | **46** | **43,5%** | **1,90** | **+$2.766** | **1,72 \| 2,19** ✅ |
+
+- **Filtro de range (15-80pt): ESSENCIAL**, não é opcional — sem ele o resultado é negativo
+  mesmo com EMA200.
+- **EMA200(1h): o filtro que mais ajudou isolado** (PF 1,08→1,34).
+- **Reteste (entrada conservadora): REJEITADO** — piora (PF 0,96 vs 1,90 do breakout direto).
+- **VWAP: REJEITADO** — redundante, não bloqueou 1 único trade no ano inteiro no backtest.
+- **Notícias (CPI/NFP 8h30 ET): sem calendário pra backtestar de verdade** — mitigação indireta
+  via o filtro de range máximo (80pt), que já descarta a maioria dos dias distorcidos.
+
+**Veredito:** edge real mas modesta — ~46 trades/ano (~3-4/mês), +$2.766/ano com 5 MNQ. **NÃO é
+"a solução" pros dias zerados da diurna** — é um complemento que adiciona uns 3-4 dias de trade/mês
+que a diurna sozinha não teria. Rodar em forward test (Market Replay) antes de ligar ao vivo,
+mesmo processo da diurna.
+
+Status: ✅ Implementado (`src/NomadeBot_ORB_Manha.cs`), config validada por backtest. Kill switch
+diário próprio + kill switch GLOBAL opcional (soma PnL dos outros bots via arquivo compartilhado
+em `%AppData%/NinjaTrader 8/*_pnl_diario.txt`). Pendente: **BotAprovacao já grava seu PnL diário
+nesse formato — NomadeTraderNoite ainda não** (checar antes de ligar `UsaKillSwitchGlobal=true`).
+
 ---
 
 ## 📋 Tabela de prioridade
@@ -170,6 +254,10 @@ Vale backtest comparativo.
 | 7 | DD real $1.000 | Baixo | Alto | ✅ TESTADO — confirmar DD real no dashboard |
 | 8 | ORB complementar | Alto | Incerto | ⬜ Backlog |
 | 9 | MCL alternativa | Médio | Incerto | ⬜ Backlog (sem dados) |
+| 10 | Filtro anti-chase 15pt pode cortar reversões | Médio | Incerto | 🔴 Mês 06 no 1min FECHADO 13/08: +$168,0 (11,2% da meta), quase empatado com o 5min (+$170,5) — diagnóstico "era só o timeframe" NÃO confirmado. Ver veredito final em `forward-test-replay-25k/2026-06-1min/placar-mes.md` |
+| 11 | Módulo ORB 15min (complemento, não substitui a diurna) | Alto | Modesto (+$2.766/ano) | ✅ Implementado e validado — `src/NomadeBot_ORB_Manha.cs` |
+| 12 | Trava de lucro por horário (bot "sabe" o PnL do dia + a hora) | Médio | Incerto — precisa backtest | ❌ **TESTADO/REJEITADO 13/08** — variantes (max trades/dia, cooldown, parar após stop cheio) todas piores −23% a −64%. Ver `docs/gestao-dia-veredito.md` |
+| 13 | **SL 12,5 → 15pt** | Baixo (param no gráfico) | — | ❌ **TESTADO AO VIVO E REJEITADO (14/08)** — validado 2x em backtest (18/06 e 13/08: +14%/+32% s/ slippage, WR 69→74%), mas o teste real manual (01-12/06, mesma janela) deu +$96,0 contra +$243,5 do SL 12,5 (60% pior). Não aplicado em produção. Ver `progress.md` 14/08. |
 
 ---
 
@@ -188,6 +276,56 @@ Vale backtest comparativo.
 
 **Não vale:**
 5. **News filter** (já rejeitado). **MCL/ORB** = backlog (estratégia/dados novos).
+
+---
+
+## 💡 Item #12 — Trava de lucro por horário (registrado 13/08)
+
+**Origem:** forward test 1min, dia 04/06/2026 (`forward-test-replay-25k/2026-06-1min/dia-04-04-06.md`).
+O bot abriu o dia com uma loss de -$124, emendou 3 gains e chegou a -$0,5 (praticamente zerou o
+prejuízo) — e aí o **último trade do dia** foi outro stop cheio (-$131), devolvendo toda a
+recuperação. Resultado: dia que "deveria" ter fechado neutro/positivo fechou em -$131,5.
+
+**Confirmado de novo no dia 08/06** (`dia-08-08-06.md`): bot chegou a +$120,5 no meio do dia, e o
+**último trade** (13:11) foi um stop cheio de -$130,5, fechando o dia em -$10.
+
+**Terceira confirmação no dia 11/06** (`dia-11-11-06.md`): pico intraday de +$23,5 (após trade 4),
+e o **último trade do dia** (15:56) foi outro stop cheio de -$105, fechando em -$81,5.
+
+**Quarta confirmação no dia 18/06** (`dia-18-18-06.md`) — o caso mais limpo até agora: 4 trades
+seguidos de ganho (+$34, +$33,5, +$36,5, +$30,5, pico +$134,5) e o **último trade do dia** foi um
+stop cheio de -$134,5, fechando o dia em **exatamente $0,00**. Um dia que valeria quase 9% da meta
+sozinho fechou zerado.
+
+**4 de 4 dias com recuperação/lucro no meio do pregão acabaram devolvendo tudo no último trade** —
+já não é mais coincidência isolada, é um padrão recorrente. Reforça bastante a prioridade de validar
+essa trava por backtest assim que o mês inteiro estiver registrado.
+
+**Ideia (Marcelo, 13/08):** dar ao bot noção de **quanto ele já fez no dia + que horas são**. Perto
+do fim da janela de operação, se ele já tiver recuperado um dia ruim (voltou perto de $0) ou já
+estiver no lucro, **parar de abrir novas entradas** — trava o resultado em vez de arriscar o último
+trade devolver tudo.
+
+**O que precisa pra implementar (esboço, NÃO implementado ainda):**
+- O bot já rastreia PnL acumulado do dia (usa isso pro `StopDiário $750`) — a infra de "saber
+  quanto já fez" já existe, é só reaproveitar.
+- Precisa de: (1) um horário de corte configurável (ex.: últimos 30-60min antes do `Flatten`), (2)
+  uma condição de "dia já está bom" (ex.: `PnLDoDia >= 0` ou `PnLDoDia >= algumX`), (3) um toggle
+  pra ligar/desligar (`TravarLucroPertoDoFechamento`, default OFF até validar).
+- Trades já abertos continuam sendo geridos normalmente (BE/trailing/stop) — a trava é só pra
+  **novas entradas**, não fecha posição aberta.
+
+**Perguntas em aberto antes de codar:**
+- Qual o horário de corte ideal? Testar algumas janelas (ex.: últimos 30min, 45min, 60min) no
+  backtest e comparar aprovação/PF.
+- "Já recuperado" = voltar a $0, ou nunca ter ficado negativo, ou já estar acima de algum valor
+  mínimo (ex.: metade do StopDiário)? Precisa definir o gatilho exato.
+- Quantas vezes esse padrão (recupera e devolve no fim) realmente aconteceu no histórico completo
+  de backtest? Se for raro, o ganho esperado pode não justificar a complexidade.
+
+**Regra do projeto (não pular):** só vai pra produção depois de rodar em `backtest/` e comparar
+aprovação/PF com e sem a trava — mesma regra de todas as outras melhorias desta lista. Nenhuma
+mudança de comportamento em produção sem backtest + confirmação explícita do Marcelo.
 
 ---
 
