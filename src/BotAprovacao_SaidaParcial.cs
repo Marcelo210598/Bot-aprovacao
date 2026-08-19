@@ -180,7 +180,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 				// ----- EXPERIMENTO 19/08: breakeven-lock proporcional ao MFE (Prioridade 2 da auditoria) -----
 				UsarBELockProporcional	= true;   // OFF = comportamento 100% identico ao baseline (lock fixo BreakevenLockPontos)
-				BELockFracaoMFE			= 0.5;    // lock = fracao * (fav-entry) desde que o BE aciona, ao inves de fixo +2,5pt
+				BELockFracaoMFE			= 0.75;   // lock = fracao * (fav-entry) desde que o BE aciona, ao inves de fixo +2,5pt
+				// [CORRIGIDO 19/08 apos 4 dias de replay com 0,5 = zero efeito] Pra fracao*MFE bater o
+				// trailing (1,75pt) precisa fracao > 1 - TrailingPontos/BreakevenTrigPontos (~0,53 aqui).
+				// Com 0,5 a trava proporcional NUNCA vencia o trailing -> era codigo morto matematicamente,
+				// nao so nos 4 dias testados. Com 0,75, domina o trailing p/ MFE entre 3,75 e 7,0pt.
 
 				SessaoInicio		= 930;
 				EntradaFim			= 1600;
@@ -1166,7 +1170,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		[NinjaScriptProperty]
 		[Range(0.05, 1.0)]
-		[Display(Name="[EXP2] Fracao do MFE p/ lock", Description="Quando UsarBELockProporcional=ON: lock = fracao * (favoravel - entrada) no momento em que o BE aciona (e a cada tick depois). 0,5 = testa a hipotese da auditoria 18/08.", Order=91, GroupName="10. Experimento BE-Lock Proporcional")]
+		[Display(Name="[EXP2] Fracao do MFE p/ lock", Description="Quando UsarBELockProporcional=ON: lock = fracao * (favoravel - entrada) no momento em que o BE aciona (e a cada tick depois). PRECISA ser > 1-(TrailingPontos/BreakevenTrigPontos) [~0,53 na config padrao] p/ ter QUALQUER efeito -- abaixo disso o trailing sempre vence e a trava vira codigo morto (testado e confirmado 19/08 com 0,5). 0,75 = testa a hipotese da auditoria 18/08 de verdade.", Order=91, GroupName="10. Experimento BE-Lock Proporcional")]
 		public double BELockFracaoMFE { get; set; }
 
 		[NinjaScriptProperty]
