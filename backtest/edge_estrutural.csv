@@ -1,0 +1,3 @@
+tipo,n,ganhou,perdeu,timeout,taxa_ganho_pct,mfe_medio,mae_medio,razao_mfe_mae
+real,627,296,331,0,47.21,87.9,62.93,1.397
+aleatorio,627,259,368,0,41.31,74.84,74.81,1.0

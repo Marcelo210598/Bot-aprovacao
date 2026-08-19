@@ -1,0 +1,12 @@
+Parametro,Valor,ValorPts,MaxDistPontos,TolToqueTicks,DiasOperados,DiasZerados,Trades
+TolToqueTicks,10,2.5,15.0,,6,2,9
+TolToqueTicks,15,3.75,15.0,,7,1,12
+TolToqueTicks,20,5.0,15.0,,7,1,13
+TolToqueTicks,25,6.25,15.0,,7,1,15
+TolToqueTicks,30,7.5,15.0,,7,1,16
+MaxDistPontos,10,10,,20,7,1,11
+MaxDistPontos,12,12,,20,7,1,12
+MaxDistPontos,15,15,,20,7,1,13
+MaxDistPontos,18,18,,20,7,1,13
+MaxDistPontos,20,20,,20,7,1,14
+MaxDistPontos,25,25,,20,7,1,17

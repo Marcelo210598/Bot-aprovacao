@@ -1,6 +1,21 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-08-14 (SL 15pt testado ao vivo em 01-12/06 — PIOR que SL 12,5, teste interrompido)
+## Última atualização: 2026-08-18 (auditoria profunda + investigação do gargalo — ver `historico/2026-08-18.md` e `docs/auditoria-profunda-18-08.md`)
+
+## 🔴 18/08 — Sessão longa: auditoria de código, teste real de trailing em Replay, e diagnóstico do "gargalo" de aprovação
+
+Resumo curto (detalhe completo em `historico/2026-08-18.md`):
+- Achado a causa do teto de ganho ao vivo (~+2,50 a +7,45pt): motor de saída tick-a-tick (Replay/real) é bem mais apertado que o motor de barra do backtest.
+- Testado trailing 5,0 em Replay real → **piorou**. BE lock testado controlado → quase não importa.
+- Filtro de regime por ATR (Q4): melhora qualidade por trade mas **derruba aprovação de 47%→19,2%** → rejeitado.
+- Investigação do gargalo: top 10% dos trades = 161% do PnL; os outros 90% perdem dinheiro no agregado. O que separa janela aprovada de não-aprovada não é "sorte de pegar trade grande" (isso é estável) — é quanto os 90% comuns sangram naquela janela específica.
+- Sizing 1-8 MNQ testado: **5 MNQ já é o ótimo local** pra meta $1.500/DD $1.000.
+- **Veredito: problema estrutural do formato de payoff (cauda longa), não parâmetro.** Config de produção inalterada.
+- Pendente: auditoria estatística de estabilidade temporal dos 47% (rodando agora).
+
+---
+
+## Última atualização anterior: 2026-08-14 (SL 15pt testado ao vivo em 01-12/06 — PIOR que SL 12,5, teste interrompido)
 
 ## 🔴 14/08 — SL 15pt testado manualmente (01-12/06) — RESULTADO PIOR, teste interrompido pelo Marcelo
 
