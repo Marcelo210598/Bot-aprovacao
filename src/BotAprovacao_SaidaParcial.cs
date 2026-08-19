@@ -19,22 +19,32 @@ using System.Globalization;
 #endregion
 
 // =============================================================================
-//  BotAprovacao_SaidaParcial — EXPERIMENTO Market Replay (18/08/2026)
+//  BotAprovacao_SaidaParcial — EXPERIMENTO Market Replay (18-19/08/2026)
 // -----------------------------------------------------------------------------
 //  DERIVADO de src/BotAprovacao.cs (baseline de producao). NAO E' O BOT REAL.
 //  Backup identico do baseline em src/BotAprovacao_BASELINE_BACKUP.cs.
 //
-//  UNICA diferenca funcional: saida parcial E(4+1) — 4 dos 5 MNQ saem num
-//  alvo de +20pt, 1 continua com a MESMA gestao de sempre (BE/trailing/alvo
-//  60pt) ate o fim do trade. Entrada, stop inicial, sizing, horarios,
-//  tolerancia, filtro anti-chase: TUDO IDENTICO ao baseline. Busque
-//  "EXPERIMENTO 18/08" no arquivo pra achar cada trecho alterado.
+//  DUAS diferencas funcionais, testadas JUNTAS neste mesmo arquivo:
 //
-//  Motivo do teste: backtest de barra (1min) mostrou aprovacao 30d subindo de
-//  ~47% pra ~56-62% com essa saida, mas ja provamos hoje (teste do trailing
-//  5,0pt) que mecanismos dependentes do timing exato de cruzamento de preco
-//  sao superestimados em barra vs. tick real. Isso so vira decisao depois de
-//  validar em Market Replay.
+//  1) [18/08] Saida parcial E(4+1) — 4 dos 5 MNQ saem num alvo de +20pt, 1
+//     continua com a MESMA gestao de sempre (BE/trailing/alvo 60pt) ate o
+//     fim do trade. Busque "EXPERIMENTO 18/08" no arquivo.
+//     Status (19/08, 4 dias de Replay/26 trades): AINDA NAO DISPAROU NENHUMA
+//     VEZ — maior MFE real visto foi 9,10pt, longe dos 20pt do gatilho. Deixado
+//     LIGADO (nao atrapalha o teste abaixo, so nao produz dado novo por ora).
+//
+//  2) [19/08] Breakeven-lock PROPORCIONAL ao MFE — Prioridade 2 da auditoria
+//     de 18/08 (docs/auditoria-profunda-18-08.md). Hipotese causal: 24,2% de
+//     TODOS os ganhos reais (84 trades do forward test) saem EXATAMENTE no
+//     lock fixo de +2,50pt — um piso artificial que domina a distribuicao de
+//     saidas. Testa lock = fracao * (fav-entry) no momento em que o BE aciona
+//     e a cada tick depois, em vez de um valor fixo. Busque "EXPERIMENTO
+//     19/08" no arquivo.
+//
+//  Entrada, stop inicial, sizing, horarios, tolerancia, filtro anti-chase:
+//  TUDO IDENTICO ao baseline nos dois experimentos. Cada um tem um toggle ON/
+//  OFF independente (UsarSaidaParcial / UsarBELockProporcional) — pode
+//  desligar qualquer um pra isolar o efeito do outro se precisar.
 // -----------------------------------------------------------------------------
 //  BotAprovacao  —  Bot de APROVACAO de conta Apex (config "94 em 15 dias")
 // -----------------------------------------------------------------------------
@@ -130,7 +140,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (State == State.SetDefaults)
 			{
-				Description					= @"EXPERIMENTO 18/08 — BotAprovacao com saida parcial E(4+1)@20pt, p/ validar em Market Replay. Entrada/stop/sizing IDENTICOS ao BotAprovacao original.";
+				Description					= @"EXPERIMENTO 18-19/08 — BotAprovacao com saida parcial E(4+1)@20pt + breakeven-lock proporcional ao MFE, p/ validar em Market Replay. Entrada/stop/sizing IDENTICOS ao BotAprovacao original.";
 				Name						= "BotAprovacao_SaidaParcial";
 				Calculate					= Calculate.OnBarClose;
 				EntriesPerDirection			= 1;
@@ -167,6 +177,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				UsarSaidaParcial	= true;   // OFF = comportamento 100% identico ao BotAprovacao original
 				ParcialContratos	= 4;      // quantos dos 5 MNQ saem no alvo parcial
 				ParcialAlvoPontos	= 20.0;   // alvo da saida parcial, em pontos desde a entrada
+
+				// ----- EXPERIMENTO 19/08: breakeven-lock proporcional ao MFE (Prioridade 2 da auditoria) -----
+				UsarBELockProporcional	= true;   // OFF = comportamento 100% identico ao baseline (lock fixo BreakevenLockPontos)
+				BELockFracaoMFE			= 0.5;    // lock = fracao * (fav-entry) desde que o BE aciona, ao inves de fixo +2,5pt
 
 				SessaoInicio		= 930;
 				EntradaFim			= 1600;
@@ -456,10 +470,15 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (!beFeito && (favPrice - entryPrice) >= BreakevenTrigPontos)
 				{
 					beFeito = true;
-					stopPrice = Math.Max(stopPrice, entryPrice + BreakevenLockPontos);
+					// EXPERIMENTO 19/08: lock proporcional ao MFE ja alcancado, em vez de fixo.
+					double lockPts0 = UsarBELockProporcional ? (favPrice - entryPrice) * BELockFracaoMFE : BreakevenLockPontos;
+					stopPrice = Math.Max(stopPrice, entryPrice + lockPts0);
 				}
 				if (beFeito)
-					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + BreakevenLockPontos, favPrice - TrailingPontos));
+				{
+					double lockPts = UsarBELockProporcional ? (favPrice - entryPrice) * BELockFracaoMFE : BreakevenLockPontos;
+					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + lockPts, favPrice - TrailingPontos));
+				}
 			}
 			else
 			{
@@ -467,10 +486,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (!beFeito && (entryPrice - favPrice) >= BreakevenTrigPontos)
 				{
 					beFeito = true;
-					stopPrice = Math.Min(stopPrice, entryPrice - BreakevenLockPontos);
+					double lockPts0 = UsarBELockProporcional ? (entryPrice - favPrice) * BELockFracaoMFE : BreakevenLockPontos;
+					stopPrice = Math.Min(stopPrice, entryPrice - lockPts0);
 				}
 				if (beFeito)
-					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - BreakevenLockPontos, favPrice + TrailingPontos));
+				{
+					double lockPts = UsarBELockProporcional ? (entryPrice - favPrice) * BELockFracaoMFE : BreakevenLockPontos;
+					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - lockPts, favPrice + TrailingPontos));
+				}
 			}
 
 			// 2) Alvo: fecha a mercado se cruzou o alvo neste tick
@@ -854,14 +877,19 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (!beFeito && (favPrice - entryPrice) >= BreakevenTrigPontos)
 				{
 					beFeito = true;
+					// EXPERIMENTO 19/08: lock proporcional ao MFE ja alcancado, em vez de fixo.
+					double lockPts0 = UsarBELockProporcional ? (favPrice - entryPrice) * BELockFracaoMFE : BreakevenLockPontos;
 					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar.
 					// Em recovery (sem signal original), atualiza todos os stops da estrategia.
 					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
-						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice + BreakevenLockPontos - BufferStopServidorPontos, false);
+						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice + lockPts0 - BufferStopServidorPontos, false);
 					// em recovery: server stop anterior ainda protege; trailing sintetico gerencia a saida
 				}
 				if (beFeito)
-					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + BreakevenLockPontos, favPrice - TrailingPontos));
+				{
+					double lockPts = UsarBELockProporcional ? (favPrice - entryPrice) * BELockFracaoMFE : BreakevenLockPontos;
+					stopPrice = Math.Max(stopPrice, Math.Max(entryPrice + lockPts, favPrice - TrailingPontos));
+				}
 			}
 			else
 			{
@@ -869,13 +897,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 				if (!beFeito && (entryPrice - favPrice) >= BreakevenTrigPontos)
 				{
 					beFeito = true;
+					double lockPts0 = UsarBELockProporcional ? (entryPrice - favPrice) * BELockFracaoMFE : BreakevenLockPontos;
 					// Move stop servidor para nivel de breakeven — garante lucro minimo intrabar.
 					if (!string.IsNullOrEmpty(sinalAtivo) && sinalAtivo != "RECOVERY")
-						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice - BreakevenLockPontos + BufferStopServidorPontos, false);
+						SetStopLoss(sinalAtivo, CalculationMode.Price, entryPrice - lockPts0 + BufferStopServidorPontos, false);
 					// em recovery: server stop anterior ainda protege; trailing sintetico gerencia a saida
 				}
 				if (beFeito)
-					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - BreakevenLockPontos, favPrice + TrailingPontos));
+				{
+					double lockPts = UsarBELockProporcional ? (entryPrice - favPrice) * BELockFracaoMFE : BreakevenLockPontos;
+					stopPrice = Math.Min(stopPrice, Math.Min(entryPrice - lockPts, favPrice + TrailingPontos));
+				}
 			}
 		}
 
@@ -1126,6 +1158,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(1, 200)]
 		[Display(Name="[EXP] Alvo parcial (pontos)", Description="Distancia em pontos, desde a entrada, do alvo da saida parcial (padrao 20 = a hipotese testada no backtest)", Order=82, GroupName="9. Experimento Saida Parcial")]
 		public double ParcialAlvoPontos { get; set; }
+
+		// ----- EXPERIMENTO 19/08: breakeven-lock proporcional ao MFE -----
+		[NinjaScriptProperty]
+		[Display(Name="[EXP2] Usar BE-lock proporcional", Description="ON = lock do breakeven vira fracao do MFE ja alcancado (em vez de fixo). OFF = comportamento 100% identico ao baseline (BreakevenLockPontos fixo).", Order=90, GroupName="10. Experimento BE-Lock Proporcional")]
+		public bool UsarBELockProporcional { get; set; }
+
+		[NinjaScriptProperty]
+		[Range(0.05, 1.0)]
+		[Display(Name="[EXP2] Fracao do MFE p/ lock", Description="Quando UsarBELockProporcional=ON: lock = fracao * (favoravel - entrada) no momento em que o BE aciona (e a cada tick depois). 0,5 = testa a hipotese da auditoria 18/08.", Order=91, GroupName="10. Experimento BE-Lock Proporcional")]
+		public double BELockFracaoMFE { get; set; }
 
 		[NinjaScriptProperty]
 		[Range(0, 100)]
