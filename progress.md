@@ -1,17 +1,31 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-08-18 (auditoria profunda + investigação do gargalo — ver `historico/2026-08-18.md` e `docs/auditoria-profunda-18-08.md`)
+## Última atualização: 2026-08-18 (sessão longa — auditoria + gargalo + saída parcial preparada pra Market Replay — ver `historico/2026-08-18.md` e `docs/auditoria-profunda-18-08.md`)
 
-## 🔴 18/08 — Sessão longa: auditoria de código, teste real de trailing em Replay, e diagnóstico do "gargalo" de aprovação
+## 🟡 AMANHÃ (19/08 ou próxima sessão): RODAR O TESTE EM MARKET REPLAY
+
+**Não fizemos o teste ainda — só preparamos tudo.** Próxima sessão é: abrir o NT8, compilar
+`src/BotAprovacao_SaidaParcial.cs`, rodar em Market Replay (conta Sim/Playback, NUNCA real) a
+partir de ~01/06, e comparar trade a trade contra o baseline já registrado.
+**Ponto crítico a observar no 1º trade que ativar a saída parcial:** confirmar na aba Ordens que
+o stop residual mostra quantidade **1** (não 5) depois da saída dos 4 contratos — se não ajustar
+sozinho, PARAR o teste e avisar antes de continuar. Mínimo recomendado antes de tirar qualquer
+conclusão: **15-20 dias de replay** (só ~30% dos trades tocam os 20pt da parcial, precisa de
+volume pra ter amostra decente do mecanismo disparando).
+
+## 🔴 18/08 — Sessão longa: auditoria de código, teste real de trailing em Replay, diagnóstico do "gargalo" de aprovação, e implementação da saída parcial pra Market Replay
 
 Resumo curto (detalhe completo em `historico/2026-08-18.md`):
 - Achado a causa do teto de ganho ao vivo (~+2,50 a +7,45pt): motor de saída tick-a-tick (Replay/real) é bem mais apertado que o motor de barra do backtest.
 - Testado trailing 5,0 em Replay real → **piorou**. BE lock testado controlado → quase não importa.
 - Filtro de regime por ATR (Q4): melhora qualidade por trade mas **derruba aprovação de 47%→19,2%** → rejeitado.
 - Investigação do gargalo: top 10% dos trades = 161% do PnL; os outros 90% perdem dinheiro no agregado. O que separa janela aprovada de não-aprovada não é "sorte de pegar trade grande" (isso é estável) — é quanto os 90% comuns sangram naquela janela específica.
-- Sizing 1-8 MNQ testado: **5 MNQ já é o ótimo local** pra meta $1.500/DD $1.000.
-- **Veredito: problema estrutural do formato de payoff (cauda longa), não parâmetro.** Config de produção inalterada.
-- Pendente: auditoria estatística de estabilidade temporal dos 47% (rodando agora).
+- Estado temporal do edge: nenhuma persistência real encontrada (permutação p=0,213) — sequência de trades é ruído, não sinal.
+- Auditoria do modelo de aprovação Apex: `.cs` não faz tracking de DD (só o Python), modelo já sempre foi EOD. Sizing oficial confirmado (até 4 NQ/40 MNQ): **5 MNQ segue sendo o ótimo**, tudo acima piora aprovação E dispara risco de estouro junto.
+- **Veredito do dia: problema estrutural do formato de payoff (cauda longa), não parâmetro.**
+- **Última descoberta do dia:** distribuindo os 5 MNQ (não aumentando contratos) — saída parcial de 4 contratos em +20pt, 1 contrato continua com a gestão normal — melhorou aprovação e eliminou estouro em backtest, robusto em sensibilidade (10-25pt) e nos 5 blocos cronológicos. **Ainda não validado em Replay real** (mesma ressalva de sempre: backtest de barra tende a superestimar mecanismo sensível a timing de saída — já provado hoje mesmo com o trailing=5,0).
+- **Preparação pro teste real:** backup do baseline (`src/BotAprovacao_BASELINE_BACKUP.cs`, idêntico byte a byte) + versão nova isolada (`src/BotAprovacao_SaidaParcial.cs`, classe separada, só adiciona a lógica de saída parcial, resto 100% igual — verificado por diff). `BotAprovacao.cs` de produção **nunca foi tocado**. Tudo commitado no git (`feat/estrategia-noturna`, commit `8ad859c`).
+- Config de produção segue **inalterada**: SL 12,5 / TP 60 / BE 3,75→2,5 / trailing 1,75 / 5 MNQ.
 
 ---
 
