@@ -258,6 +258,9 @@ nesse formato — NomadeTraderNoite ainda não** (checar antes de ligar `UsaKill
 | 11 | Módulo ORB 15min (complemento, não substitui a diurna) | Alto | Modesto (+$2.766/ano) | ✅ Implementado e validado — `src/NomadeBot_ORB_Manha.cs` |
 | 12 | Trava de lucro por horário (bot "sabe" o PnL do dia + a hora) | Médio | Incerto — precisa backtest | ❌ **TESTADO/REJEITADO 13/08** — variantes (max trades/dia, cooldown, parar após stop cheio) todas piores −23% a −64%. Ver `docs/gestao-dia-veredito.md` |
 | 13 | **SL 12,5 → 15pt** | Baixo (param no gráfico) | — | ❌ **TESTADO AO VIVO E REJEITADO (14/08)** — validado 2x em backtest (18/06 e 13/08: +14%/+32% s/ slippage, WR 69→74%), mas o teste real manual (01-12/06, mesma janela) deu +$96,0 contra +$243,5 do SL 12,5 (60% pior). Não aplicado em produção. Ver `progress.md` 14/08. |
+| 14 | BE-lock proporcional (0,75) | Baixo (já implementado) | Modesto, real | ✅ **VALIDADO EM MARKET REPLAY (18-20/08)** — Δ +$122,5 confirmado no bloco 01-18/06 (baseline +$147,0 → nova +$269,5). Zero efeito adicional em 19-28/06 (mecanismo só age quando MFE cai entre 3,75-7,0pt). Único mecanismo de saída que sobreviveu a todos os testes. |
+| 15 | Saída parcial 4+1 em alvo MENOR (5/8/10/12,5/15pt) | Baixo | — | ❌ **TESTADO E REJEITADO (20/08)** — backtest completo (motor de aprovação, DD real $1000): quanto menor o alvo, PIOR o resultado (taxa 71%→5% no extremo). Até o alvo original de 20pt fica abaixo do "só BE-lock" (63% vs 71%) quando testado no motor de barra. Ver seção detalhada abaixo. |
+| 16 | Corte de perda antecipado (loss-cut 2 de 5 contratos) | Baixo | — | ❌ **TESTADO E REJEITADO (20/08)** — corta futuros vencedores junto (10,7% dos vencedores tocam até -12,5pt de MAE antes de reverter); WR desaba de 68%→47-61%, taxa de aprovação cai em todos os thresholds testados (4/6/8/10pt). Ver seção detalhada abaixo. |
 
 ---
 
@@ -326,6 +329,90 @@ trade devolver tudo.
 **Regra do projeto (não pular):** só vai pra produção depois de rodar em `backtest/` e comparar
 aprovação/PF com e sem a trava — mesma regra de todas as outras melhorias desta lista. Nenhuma
 mudança de comportamento em produção sem backtest + confirmação explícita do Marcelo.
+
+---
+
+## 💡 Itens #14-16 — BE-lock validado + duas tentativas de atacar ganho/perda direto na gestão (registrado 20/08)
+
+**Contexto:** depois do Δ +$122,5 confirmado do BE-lock 0,75 em Replay (item #14), o Marcelo pediu
+pra achar formas de subir o ganho médio por trade E diminuir o tamanho das perdas — sem ficar só
+em filtro de entrada (item extra abaixo, dist_nivel/sexta, também testados e rejeitados no mesmo
+dia). Rodado em `backtest/run_gestao_saida_sweep.py` (motor de aprovação completo: DD real $1000,
+MaxTradesDia=12, slippage 2 ticks, nível de domingo — 300k barras de 1min, ano inteiro + OOS
+1ª/2ª metade).
+
+### #15 — Saída parcial 4+1 em alvos menores que 20pt
+
+Hipótese: já que o alvo de 20pt nunca disparou em ~20 dias de Replay real (MFE mediano dos
+vencedores no backtest é só 12,5pt), um alvo menor deveria disparar de verdade e capturar mais
+ganho. **Testado o oposto do esperado:**
+
+| Alvo da parcial | Taxa aprovação | PF | avgW | OOS 1ª\|2ª |
+|---|---|---|---|---|
+| (sem parcial, só BE-lock 0,75) | 71% | 1,43 | $95 | 67%\|75% |
+| 5pt | 5% | 0,73 | $26 | 0%\|20% |
+| 8pt | 17% | 0,94 | $39 | 0%\|20% |
+| 10pt | 27% | 1,04 | $47 | 17%\|33% |
+| 12,5pt | 39% | 1,12 | $55 | 38%\|40% |
+| 15pt | 47% | 1,19 | $63 | — |
+| 20pt (o valor já em teste) | 63% | 1,29 | $74 | — |
+
+Quanto menor o alvo, pior — monotônico, confirmado nas duas metades do ano. **Causa raiz:** o
+mecanismo fecha 4 contratos no lucro parcial mas o 1 que sobra continua exposto ao stop
+**completo** de 12,5pt. Em alvos baixos, dispara em trades que só tiveram favor passageiro e
+reverteram pra loss de qualquer forma — trava um lucro pequeno em 4 contratos, mas ainda leva o
+stop cheio no 1 restante (o `avgL` fica travado em ~$140 em todo cenário, só o `avgW` desaba).
+**Achado extra relevante:** mesmo o alvo de 20pt (o que já está no experimento) fica abaixo do
+"só BE-lock" (63% vs 71%) nesse motor de barra — reforça que ele não tem ajudado nem atrapalhado
+no Replay real só porque nunca disparou, não porque seria neutro se disparasse.
+
+**Status: REJEITADO.** Não mudar o alvo da parcial. Considerar até desligar `UsarSaidaParcial` no
+experimento, já que o motor de barra sugere que ela piora se algum dia disparar.
+
+### #16 — Corte de perda antecipado (loss-cut)
+
+Hipótese nova: cortar 2 dos 5 contratos se o preço for contra em X pontos **sem nunca ter
+favorecido o suficiente pra ativar o BE** — reduziria o tamanho em $ dos "loss cheios imediatos"
+sem mexer nos trades que já mostraram algum sinal de vida.
+
+| Corte em | Taxa aprovação | PF | WR | avgL | OOS 1ª\|2ª |
+|---|---|---|---|---|---|
+| (sem corte) | 70% | 1,41 | 68% | $140 | 62%\|75% |
+| 4pt | 28% | 1,05 | 47% | $65 | — |
+| 6pt | 40% | 1,12 | 51% | $78 | 43%\|42% |
+| 8pt | 47% | 1,20 | 56% | $92 | 50%\|50% |
+| 10pt | 60% | 1,30 | 61% | $110 | — |
+
+O `avgL` cai como esperado, mas o **WR desaba junto** (68%→47-61%) — confirma nos dados reais a
+preocupação já levantada no diagnóstico: **10,7% dos vencedores tocam até -12,5pt de MAE antes de
+reverter pra cima.** Cortar cedo baseado só em "foi contra X pontos sem favor" pega esses futuros
+vencedores também, travando perda garantida em 2 contratos de trades que iriam virar lucro nos 5.
+Confirmado nas duas metades do ano (não é ruído).
+
+**Status: REJEITADO.** Não implementar.
+
+### Leitura geral dos dois
+
+Mesmo problema estrutural nos dois lados: **MFE e MAE de vencedores e perdedores se sobrepõem
+demais** pra dar pra distinguir "vai reverter" de "vai continuar" olhando só o movimento parcial
+do trade. Qualquer decisão antecipada (trava ganho ou corta perda) erra pros dois lados. Reforça
+o veredito da auditoria de 18/08: o teto está no formato do payoff da estratégia base, não em
+parâmetro de gestão de saída — já foram tentados SL maior/menor, trailing maior, parcial em vários
+tamanhos, corte de perda, BE-lock em várias frações. Só o BE-lock 0,75 sobrou como melhoria real,
+e é pequena.
+
+### Extra do mesmo dia — filtros de entrada por qualidade (dist_nivel / sexta-feira)
+
+Diagnóstico (`backtest/diagnostico_mfe_mae_trades.csv`, 1.091 trades, robusto nas duas metades do
+ano): trades com `dist_nivel < 5pt` têm WR 73% vs 62% em `10-15pt`; sexta-feira tem WR ~74% vs
+~67% no resto da semana (independente do dist_nivel). **Como FILTRO DE CORTE** (só operar
+dist<10pt, ou só sexta): rejeitado em `backtest/run_qualidade_entrada_sweep.py` — reduz demais a
+frequência de trade, mediana de dias até bater a meta sobe pra 31-85 dias, estourando o prazo real
+de 30 dias do produto Apex. **Como SIZING SELETIVO** (manter todos os trades, só aumentar
+contratos nos de qualidade): testado em `backtest/run_sizing_seletivo_sweep.py` — boost por
+`dist_nivel` piora muito (critério comum demais, ~metade dos trades, só aumenta variância: taxa
+70%→44% no boost de 8 MNQ); boost por sexta fica neutro-a-levemente-positivo mas modesto e OOS
+misto (não é achado forte o suficiente pra implementar). Nenhum dos dois implementado.
 
 ---
 
