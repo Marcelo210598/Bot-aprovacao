@@ -2,22 +2,25 @@
 
 ## Última atualização: 2026-08-20 (Market Replay em andamento — saída parcial 4+1@20pt + BE-lock fração 0,75, junho inteiro registrado dia a dia)
 
-## 🟡 PRÓXIMA SESSÃO: fechar a comparação de junho e decidir sobre julho
+## 🔴 20/08 — Junho fechado (quase): melhoria confirmada, mas insuficiente pra aprovar. Marcelo NÃO vai fazer julho — próxima sessão é debate estratégico.
 
-**Junho (01-30/06) está todo registrado** em `forward-test-replay-25k/2026-06-saidaparcial/`:
-acumulado da versão nova (saída parcial + BE-lock 0,75) = **+$365,5** no mês inteiro.
-- Bloco 01-18/06: Δ **confirmado** vs baseline = **+$122,5** (baseline +$147,0 → nova +$269,5).
-- Bloco 19-30/06 (registrado 20/08): **+$96,0** na versão nova, mas o **Δ vs baseline está
-  pendente** — nenhum trade do bloco tocou os 20pt da parcial, só o BE-lock pode ter mexido em
-  algum, e não tenho um replay do baseline rodado nesses mesmos dias pra confirmar (o baseline
-  antigo salvo em `forward-test-replay-25k/2026-06/` é de uma versão anterior do bot e bate mal
-  com os trades de hoje — não é comparável).
-- **Próximo passo:** rodar `BotAprovacao_BASELINE_BACKUP.cs` no Replay nos dias 19-30/06 pra
-  fechar o Δ real do mês, ou seguir direto pra julho se preferir não gastar tempo nisso (o
-  mecanismo não disparou nesse bloco de qualquer forma).
-**Ponto crítico ainda válido pro resto do teste:** confirmar na aba Ordens que o stop residual
-mostra quantidade **1** (não 5) depois da saída dos 4 contratos, no primeiro trade que realmente
-tocar os 20pt — ainda não aconteceu em nenhum dia até agora.
+**Baseline certo pro bloco 19-30/06 era o `2026-06-1min/placar-mes.md`** (mesmo timeframe/numeração
+dos dias 01-18) — não precisou rodar nada de novo no NT8, só comparar arquivos que já existiam.
+Achado ao comparar: dias 19, 22, 23, 24, 25, 26, 30/06 batem **100% idênticos** entre baseline e
+versão nova (BE-lock 0,75 não mexeu em nada, mecanismo de parcial nunca disparou). **29/06 ficou
+incompleto** — faltam 2 trades da versão nova (baseline tem 7 trades naquele dia, só temos prints
+de 5) — pendente pro Marcelo mandar o resto.
+
+**Resultado confirmado até 28/06:** baseline +$58,5 → nova versão +$181,0 → **Δ +$122,5**, e essa
+melhoria inteira veio do bloco 01-18/06 (19-28/06 teve Δ zero cravado). Falta só 29-30/06 pra
+fechar o mês.
+
+**Decisão do Marcelo: não vai testar julho.** Quer debater a estratégia de base em vez de seguir
+empilhando meses — mesmo com a melhoria real (+83% relativo no período confirmado), o mês inteiro
+projetado fica em torno de +$290 de $1.500 (≈19-20% da meta), longe de aprovar. Bate com o
+diagnóstico estrutural de 18/08 ("problema é o formato do payoff, não parâmetro").
+**Próxima sessão: debate aberto sobre pra onde levar a estratégia** (filtro de entrada, saída, ou
+repensar a tese do zero) — ver a resposta completa dada ao Marcelo em 20/08 pra retomar o fio.
 
 ## 🔴 18/08 — Sessão longa: auditoria de código, teste real de trailing em Replay, diagnóstico do "gargalo" de aprovação, e implementação da saída parcial pra Market Replay
 
