@@ -183,7 +183,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				MaxTradesDia		= 12;   // limite anti-overtrading (otimizado 23/06): sobe aprovacao 57%->70% no backtest (DD real $1000, slippage 2t), validado OOS. Corta dias de reentrada em sequencia.
 
 				// ----- EXPERIMENTO 18/08: saida parcial E(4+1) -----
-				UsarSaidaParcial	= true;   // OFF = comportamento 100% identico ao BotAprovacao original
+				// [DECISAO 20/08] Desligada por padrao — ver docs/taxa-aprovacao-30dias-20-08.md
+				// e docs/melhorias-sugeridas.md item #15 (piora consistente em todos os testes).
+				UsarSaidaParcial	= false;  // OFF = comportamento 100% identico ao BotAprovacao original
 				ParcialContratos	= 4;      // quantos dos 5 MNQ saem no alvo parcial
 				ParcialAlvoPontos	= 20.0;   // alvo da saida parcial, em pontos desde a entrada
 
