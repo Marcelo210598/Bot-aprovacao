@@ -1,8 +1,50 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-08-20 (Market Replay em andamento — saída parcial 4+1@20pt + BE-lock fração 0,75, junho inteiro registrado dia a dia)
+## Última atualização: 2026-08-20 (tarde/noite — sessão de pesquisa: taxa de aprovação REAL medida em 50%, nenhuma estratégia nova bate a reversão, recomendação final dada)
 
-## 🔴 20/08 — Junho fechado (quase): melhoria confirmada, mas insuficiente pra aprovar. Marcelo NÃO vai fazer julho — próxima sessão é debate estratégico.
+## 🎯 20/08 (noite) — TAXA DE APROVAÇÃO REAL: 50%. Nenhuma alternativa testada supera. Recomendação: BOT 2 com saída parcial DESLIGADA.
+
+**Resumo executivo** (detalhe completo em `docs/taxa-aprovacao-30dias-20-08.md`,
+`docs/comparativo-estrategias-20-08.md`, `docs/melhorias-sugeridas.md` itens 14-16):
+
+1. **Testamos 3 jeitos de medir "taxa de aprovação"** — ciclo infinito sem limite de
+   tempo (70%, otimista demais), mês calendário puro (15%, pessimista demais
+   porque desperdiça dias após estouro cedo), e **janela de 30 dias rolante com
+   retry imediato (a correta): 50%**. Esse é o número real pro negócio: de cada 2
+   avaliações $25K compradas, 1 aprova.
+2. **Testamos 4 famílias de estratégia** (reversão atual, ORB, EMA+VWAP+RSI,
+   "ICT-lite" com FVG) sozinhas e mescladas, no mesmo teste rigoroso de 30 dias.
+   **Nenhuma bate a reversão sozinha** (ORB 1%, EMAV 19%, ICT 10%, melhor mescla
+   REV+EMAV 29% — todas abaixo dos 50% da reversão pura). Mesclar com a reversão
+   sempre piora ela (`MaxTradesDia` compartilhado "engole" o espaço da reversão).
+3. **BOT 1 vs BOT 2, no teste de 30 dias:** BE-lock 0,75 sozinho deu **exatamente
+   a mesma taxa (50%, 24 tentativas, 12 aprovações — número idêntico ao bot 1)**
+   nesse backtest de barra de 1 ano — não contradiz o Δ +$122,5 real confirmado em
+   Replay (é real, só pequeno demais pra virar tentativas inteiras de 30 dias
+   nesse dataset). **A saída parcial piorou de novo** (50%→40%) — mais uma
+   confirmação de que ela não presta (item #15).
+4. **Testamos também, no mesmo dia:** abaixar o alvo da saída parcial (piorou
+   quanto mais baixo, item #15), corte de perda antecipado (piorou, corta
+   futuros vencedores, item #16), filtro de entrada por `dist_nivel`/sexta-feira
+   como corte (estoura prazo de 30 dias) e como sizing seletivo (dist piora
+   muito, sexta neutro-modesto).
+
+### 🎯 RECOMENDAÇÃO FINAL: seguir o Market Replay com BOT 2 (`BotAprovacao_SaidaParcial.cs`
+ou as cópias `_REPLAY`), mas com **`UsarSaidaParcial=false`** (só o BE-lock 0,75
+ligado). É a única config que bate ou empata o baseline em TODOS os testes de hoje,
+sem o componente (saída parcial) que consistentemente piora. Não precisa recompilar
+— é só mudar o parâmetro no gráfico do NT8.
+
+**Estado real:** taxa de aprovação de 50% parece ser o teto estrutural da
+estratégia de reversão em nível único, testado exaustivamente hoje (gestão de
+saída, sizing, filtro de entrada, e 3 famílias de estratégia alternativa — nada
+melhora). Próxima conversa: decidir se 50% é um número com que dá pra tocar o
+negócio (quantas avaliações rodar em paralelo, custo de cada estouro) ou se vale
+buscar uma estratégia completamente nova do zero (não mais variação da atual).
+
+---
+
+## 🔴 20/08 (tarde) — Junho fechado (quase): melhoria confirmada, mas insuficiente pra aprovar. Marcelo NÃO vai fazer julho — próxima sessão é debate estratégico.
 
 **Baseline certo pro bloco 19-30/06 era o `2026-06-1min/placar-mes.md`** (mesmo timeframe/numeração
 dos dias 01-18) — não precisou rodar nada de novo no NT8, só comparar arquivos que já existiam.
