@@ -1,17 +1,23 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-08-18 (sessão longa — auditoria + gargalo + saída parcial preparada pra Market Replay — ver `historico/2026-08-18.md` e `docs/auditoria-profunda-18-08.md`)
+## Última atualização: 2026-08-20 (Market Replay em andamento — saída parcial 4+1@20pt + BE-lock fração 0,75, junho inteiro registrado dia a dia)
 
-## 🟡 AMANHÃ (19/08 ou próxima sessão): RODAR O TESTE EM MARKET REPLAY
+## 🟡 PRÓXIMA SESSÃO: fechar a comparação de junho e decidir sobre julho
 
-**Não fizemos o teste ainda — só preparamos tudo.** Próxima sessão é: abrir o NT8, compilar
-`src/BotAprovacao_SaidaParcial.cs`, rodar em Market Replay (conta Sim/Playback, NUNCA real) a
-partir de ~01/06, e comparar trade a trade contra o baseline já registrado.
-**Ponto crítico a observar no 1º trade que ativar a saída parcial:** confirmar na aba Ordens que
-o stop residual mostra quantidade **1** (não 5) depois da saída dos 4 contratos — se não ajustar
-sozinho, PARAR o teste e avisar antes de continuar. Mínimo recomendado antes de tirar qualquer
-conclusão: **15-20 dias de replay** (só ~30% dos trades tocam os 20pt da parcial, precisa de
-volume pra ter amostra decente do mecanismo disparando).
+**Junho (01-30/06) está todo registrado** em `forward-test-replay-25k/2026-06-saidaparcial/`:
+acumulado da versão nova (saída parcial + BE-lock 0,75) = **+$365,5** no mês inteiro.
+- Bloco 01-18/06: Δ **confirmado** vs baseline = **+$122,5** (baseline +$147,0 → nova +$269,5).
+- Bloco 19-30/06 (registrado 20/08): **+$96,0** na versão nova, mas o **Δ vs baseline está
+  pendente** — nenhum trade do bloco tocou os 20pt da parcial, só o BE-lock pode ter mexido em
+  algum, e não tenho um replay do baseline rodado nesses mesmos dias pra confirmar (o baseline
+  antigo salvo em `forward-test-replay-25k/2026-06/` é de uma versão anterior do bot e bate mal
+  com os trades de hoje — não é comparável).
+- **Próximo passo:** rodar `BotAprovacao_BASELINE_BACKUP.cs` no Replay nos dias 19-30/06 pra
+  fechar o Δ real do mês, ou seguir direto pra julho se preferir não gastar tempo nisso (o
+  mecanismo não disparou nesse bloco de qualquer forma).
+**Ponto crítico ainda válido pro resto do teste:** confirmar na aba Ordens que o stop residual
+mostra quantidade **1** (não 5) depois da saída dos 4 contratos, no primeiro trade que realmente
+tocar os 20pt — ainda não aconteceu em nenhum dia até agora.
 
 ## 🔴 18/08 — Sessão longa: auditoria de código, teste real de trailing em Replay, diagnóstico do "gargalo" de aprovação, e implementação da saída parcial pra Market Replay
 
