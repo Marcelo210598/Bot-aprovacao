@@ -629,6 +629,30 @@ mais "trendy", favorece o custo do gatilho baixo mais que o benefício). Recomen
 forward test passando de junho, sem abandonar — ver `forward-test-replay-25k/2026-06-betrigger25/
 placar-mes.md` pra detalhe completo.
 
+### Atualização 23/08 (mesmo dia) — Marcelo pediu "mais trades", 2 alavancas testadas
+
+Motivo: aprovar mais rápido reduz tempo de exposição a risco. Testadas duas formas de aumentar
+frequência sem trocar de estratégia nem aumentar tamanho de posição (tamanho maior já foi testado
+e piora — ver abaixo):
+
+- **TolToqueTicks mais solto** (25/30/40 ticks em vez de 20): **PIOROU** (54,2-54,5% vs 59,1% com
+  BE trig 2,5). Apertar (10 ticks) na verdade MELHOROU (63,2%) — direção oposta à esperada. Não
+  mexido, fica 20 ticks.
+- **MaxDistPontos mais largo** (20pt em vez de 15pt), combinado com BE trig 2,5: **59,1% -> 64,0%
+  no ano inteiro, melhora nas DUAS metades OOS** (70%->80%, 50%->53,3%) — achado robusto. Aplicado
+  direto no `BotAprovacao_BETrigger25.cs` (mesmo arquivo do item anterior, não criou arquivo novo).
+
+**Tamanho de posição (contratos) testado e REJEITADO como forma de acelerar aprovação:** sweep de
+3 a 10 contratos mostra que aumentar SEMPRE piora a taxa (10 contratos: 9,0%, pior resultado do
+projeto inteiro). Motivo matemático: meta ($1.500) e DD ($1.000) são fixos em dólar (não escalam
+com o tamanho), então aumentar contratos aproxima o resultado de "moeda ao ar" em vez de deixar o
+edge real se manifestar. 4 contratos parecia melhor no ano inteiro mas não passou no teste OOS
+(ruído de amostra pequena).
+
+**Config atual do `BotAprovacao_BETrigger25.cs`:** `BreakevenTrigPontos=2,5` + `MaxDistPontos=20`
++ BE-lock proporcional 0,75 + saída parcial off. Resto idêntico à produção. Aguardando forward
+test no Replay pra confirmar fora do backtest.
+
 ---
 
 ## ⚖️ Risco jurídico (não é melhoria de código, mas decisão de negócio)

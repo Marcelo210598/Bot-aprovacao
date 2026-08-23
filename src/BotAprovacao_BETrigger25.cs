@@ -25,26 +25,34 @@ using System.Globalization;
 //  src/BotAprovacao.cs, baseline de producao). NAO E' O BOT REAL.
 //  Backup identico do baseline em src/BotAprovacao_BASELINE_BACKUP.cs.
 //
-//  UNICA diferenca funcional vs. BotAprovacao_SaidaParcial.cs (que ja roda o
+//  DUAS diferencas funcionais vs. BotAprovacao_SaidaParcial.cs (que ja roda o
 //  forward test de julho no Replay, config atual):
 //
-//  [23/08] Gatilho de breakeven mais baixo: BreakevenTrigPontos 3,75 -> 2,5pt.
-//  Testado em backtest Python (backtest/testa_gap_e_be_trigger.py) com o
-//  motor de aprovacao real (30 dias, retry imediato) + confirmado OOS (1a e
-//  2a metade do ano, ambas melhoram): 50,0% -> 59,1% no ano inteiro (1a
-//  metade 60,0%->70,0%, 2a metade 42,9%->50,0%). Maior ganho isolado
-//  encontrado ate agora no projeto (mais que qualquer variacao de saida
-//  parcial, sizing, filtro de entrada ou os 4 testes de IA de 23/08 — ver
-//  docs/melhorias-sugeridas.md item #21).
+//  1) [23/08] Gatilho de breakeven mais baixo: BreakevenTrigPontos 3,75 -> 2,5pt.
+//     Testado em backtest Python (backtest/testa_gap_e_be_trigger.py) com o
+//     motor de aprovacao real (30 dias, retry imediato) + confirmado OOS (1a e
+//     2a metade do ano, ambas melhoram): 50,0% -> 59,1% no ano inteiro (1a
+//     metade 60,0%->70,0%, 2a metade 42,9%->50,0%). Forward test em 01-04/06
+//     mostrou piora local (-$387,5) — investigado (item #21): junho e' o mes
+//     historicamente ruim pra esse achado (os DOIS junhos do dataset pioram),
+//     mas 9 de 13 meses melhoram no backtest. Nao abandonado.
+//
+//  2) [23/08] MaxDistPontos mais largo: 15,0 -> 20,0pt. Deixa entrar sinais
+//     com toque um pouco mais longe da linha (mais entradas), testado JUNTO
+//     com o gatilho de BE acima: 59,1% -> 64,0% no ano inteiro, e — ao
+//     contrario do item 1 — melhora nas DUAS metades (70%->80%, 50%->53,3%).
+//     TolToqueTicks tambem foi testado (mais solto) e PIOROU — nao mexido,
+//     continua 20 ticks.
 //
 //  Resto 100% identico ao BotAprovacao_SaidaParcial.cs: BE-lock proporcional
 //  0,75 ligado (UsarBELockProporcional=true, BELockFracaoMFE=0,75), saida
 //  parcial DESLIGADA (UsarSaidaParcial=false). Entrada, stop inicial, sizing,
-//  horarios, tolerancia, filtro anti-chase: TUDO IDENTICO ao baseline.
+//  horarios, tolerancia: TUDO IDENTICO ao baseline, exceto os 2 itens acima.
 //
-//  Proximo passo: forward test dia a dia no Market Replay, comparando contra
-//  o que o BotAprovacao_SaidaParcial.cs (BE trig 3,75) ja registrou nos
-//  mesmos dias, antes de cogitar levar pra producao.
+//  Proximo passo: forward test dia a dia no Market Replay (a partir de onde
+//  o teste do item 1 parou, seguindo pra julho), comparando contra o que o
+//  BotAprovacao_SaidaParcial.cs (config atual) ja registrou nos mesmos dias,
+//  antes de cogitar levar pra producao.
 // -----------------------------------------------------------------------------
 //  BotAprovacao  —  Bot de APROVACAO de conta Apex (config "94 em 15 dias")
 // -----------------------------------------------------------------------------
@@ -140,7 +148,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (State == State.SetDefaults)
 			{
-				Description					= @"EXPERIMENTO 23/08 — BotAprovacao com gatilho de breakeven mais baixo (2,5pt em vez de 3,75pt) + BE-lock proporcional 0,75, p/ validar em Market Replay. Entrada/stop/sizing IDENTICOS ao BotAprovacao original.";
+				Description					= @"EXPERIMENTO 23/08 — BotAprovacao com gatilho de breakeven mais baixo (2,5pt em vez de 3,75pt) + MaxDistPontos mais largo (20pt em vez de 15pt) + BE-lock proporcional 0,75, p/ validar em Market Replay. Entrada/stop/sizing IDENTICOS ao BotAprovacao original, exceto os 2 ajustes citados.";
 				Name						= "BotAprovacao_BETrigger25";
 				Calculate					= Calculate.OnBarClose;
 				EntriesPerDirection			= 1;
@@ -166,8 +174,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 				BreakevenTrigPontos	= 2.5;    // [EXP3 23/08] era 3,75 — testado em backtest: 50,0%->59,1% (OOS confirmado)
 				BreakevenLockPontos	= 2.5;
 				TrailingPontos		= 1.75;
-				TolToqueTicks		= 20;     // 20 ticks = 5pt (otimizado 13/06)
-				MaxDistPontos		= 15.0;   // 15pt = sweet spot (otimizado 14/06): 100% taxa, PF 1.60, OOS 100%/100%
+				TolToqueTicks		= 20;     // 20 ticks = 5pt (otimizado 13/06) — mexer aqui testado e PIOROU (23/08), nao mexer
+				MaxDistPontos		= 20.0;   // [EXP4 23/08] era 15,0 — testado em backtest junto com BE trig 2,5: 59,1%->64,0% (OOS confirmado nas 2 metades). Mais entradas (deixa toque um pouco mais longe da linha), sem perder qualidade.
 				BufferStopServidorPontos = 5.0;   // stop servidor 5pt mais largo que o gerenciado -> a saida a mercado dispara primeiro (anti-fantasma, 18/06)
 
 				StopDiarioDolar		= 750.0;
