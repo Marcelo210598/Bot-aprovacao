@@ -416,6 +416,126 @@ misto (não é achado forte o suficiente pra implementar). Nenhum dos dois imple
 
 ---
 
+## 🔍 Item #17 — Stops cheios com favor quase zero, apontado pelo Marcelo (13/07, registrado 23/08)
+
+**Contexto:** forward test de julho (`forward-test-replay-25k/2026-07-saidaparcial/`), dia
+13/07/2026. 2 dos 5 trades do dia (`NIV_L5` e `NIV_L7`, ambos LONG) tomaram **stop cheio -12,5pt**
+com favor máximo de apenas **+0,55pt** e **+0,75pt** respectivamente — a entrada foi na direção
+certa (sinal de reversão pra cima, vela do gatilho fechou verde), mas o preço reverteu quase
+imediatamente após o fill, sem dar tempo de qualquer gestão de saída (BE/trailing) agir.
+
+**Ainda NÃO investigado** (só documentado por enquanto, ver `2026-07-saidaparcial/dia-13-13-07.md`
+pros dois casos completos). Diferença do padrão "stop cheio normal" já visto em outros dias (ex.
+08/07 `NIV_L14`, fav chegou a 14pt antes de reverter) — aqui o favor nunca saiu do zero.
+
+**Hipóteses a checar antes de qualquer mudança** (regra do projeto: backtest com motor de
+aprovação real antes de mexer em produção):
+- Se é um padrão recorrente no backtest histórico (não só acaso de 2 trades) — rodar um sweep
+  tipo "favor máximo < 1pt antes do stop cheio" nos ~1.400 trades do backtest de 13 meses e ver
+  se a frequência/PnL desse subgrupo já está capturada, ou se há algo sistemático no timing do
+  gatilho de entrada.
+- Conferir se o fill de entrada (preço real reportado) está vindo tarde em relação ao toque na
+  linha — se a entrada só sai depois que o preço já começou a reverter, dist_nivel pequeno na
+  vela de sinal pode ser um fator (ambos os casos tinham H bem perto da linha: dist 11,50pt e
+  8,50pt, não é caso extremo).
+- Ainda não há sinal de bug de código — pode ser característica normal do mercado (reversão em V
+  que o próprio SL de 12,5pt existe pra limitar). Precisa de mais amostra pra distinguir "só
+  aconteceu 2x" de "padrão real".
+
+**Próximo passo:** continuar registrando o forward test e watch se esse padrão (favor <1pt antes
+do stop cheio) se repete; se aparecer com frequência, rodar backtest dedicado antes de propor
+qualquer mudança de gestão.
+
+---
+
+## 🐛 Item #18 — pdHigh/pdLow (nível dia anterior) zera ao reiniciar a estratégia (23/08, NÃO CORRIGIDO)
+
+**Apontado pelo Marcelo:** no dia 21/07/2026 (Market Replay), o painel de níveis mostrou
+"Níveis dia anterior: Max (short) (aguardando 1º dia) / Min (long) (aguardando 1º dia)" — mesmo
+já tendo vários pregões de forward test rodados antes (14 a 20/07). Achei a causa no código.
+
+**Causa:** `pdHigh`/`pdLow`/`curHigh`/`curLow`/`diaNiveis` (linhas 89-91) são variáveis de
+instância sem NENHUMA persistência ou recálculo a partir do histórico de barras. `pdHigh` só é
+preenchido na transição de dia (linha 300-306), herdando de `curHigh` — que por sua vez só
+acumula enquanto a MESMA instância da estratégia está viva. Toda vez que a estratégia é
+desabilitada/reabilitada no gráfico (acontece com frequência ao mexer no Replay — os logs mostram
+"Desabilitando estratégia... Permitindo estratégia..." repetidas vezes), essas variáveis voltam a
+zero. Se o histórico atualmente carregado no gráfico não reprocessar um pregão anterior completo
+antes da nova instância chegar no dia seguinte, `curHigh` nunca acumula esse dia e `pdHigh` nunca
+herda nada — fica 0.
+
+**Por que é grave:** `NivelAtivo()` (linha 557-558) retorna `false` quando `pdHigh`/`pdLow` são 0,
+e `EntradaNiveis()` (linha 563-566) simplesmente **retorna sem fazer nada** nesse caso — ou seja,
+**o bot fica incapaz de dar qualquer entrada no dia inteiro**, silenciosamente, sem nenhum aviso
+de erro. Isso só afeta dias que NÃO são segunda-feira (segunda usa `onHigh`/`onLow`, o range do
+domingo à noite, que é calculado de forma independente dentro da própria sessão — não depende do
+dia anterior).
+
+**Risco pro forward test:** qualquer dia já registrado como "sem entradas" nos arquivos de
+`forward-test-replay-25k/2026-07-saidaparcial/` PODE, na verdade, ter sido um dia afetado por
+esse bug (nível zerado = zero entradas possíveis) em vez de genuinamente não ter tocado a linha.
+Não dá pra distinguir os dois casos sem ter visto a tela na hora.
+
+**Ainda NÃO corrigido** — aguardando o Marcelo confirmar como o dia 21/07 evoluiu (se o
+"aguardando" ficou a sessão toda ou só um instante) antes de propor um fix. Ideia de correção (a
+validar): recalcular `pdHigh`/`pdLow` varrendo pra trás no histórico de barras já carregado
+(`Bars`/`BarsArray`) na inicialização da estratégia, em vez de depender só do acúmulo ao vivo
+desde que a instância atual nasceu. Mudança só nos arquivos experimentais
+(`BotAprovacao_SaidaParcial*.cs`) — produção (`BotAprovacao.cs`) nunca é tocada sem autorização
+explícita, e mesmo essa mudança nos experimentais precisa ser validada e autorizada antes.
+
+---
+
+## 🤖 Item #19 — IA (Claude) como filtro/seletor/gestor, 4 testes (23/08) — TODOS REJEITADOS
+
+**Contexto:** Marcelo pediu pra integrar Claude no bot pra tentar sair dos 50% de aprovação pros
+70%. Testados 4 jeitos diferentes de aplicar IA em cima da REV, todos via backtest com o motor de
+aprovação real (`run_janela_30d.py`, 30 dias, retry imediato) antes de cogitar qualquer mudança
+no NinjaScript. Scripts em `backtest/ia_filtro_entrada.py`, `backtest/ia_seletor_estrategia_diario.py`
+e `backtest/ia_gestao_completa.py`.
+
+| # | O que testou | Modelo | Δ vs. baseline (50%) |
+|---|---|---|---|
+| 1 | Filtro de entrada (IA aceita/recusa cada sinal) | Sonnet 5 | **-19,2pp** (30,8%) |
+| 2 | Seletor diário de estratégia, contexto simples (dow + range) | Haiku 4.5 | 0,0pp (neutro) |
+| 3 | Seletor diário, contexto RICO (+ desempenho recente 15 pregões) | Haiku 4.5 | **-45,7pp** (4,3%) |
+| 4 | Gestão por trade (contratos/trailing/BE-lock decididos na entrada) | Haiku 4.5 | -4,5pp (45,5%) |
+
+**#1 (filtro de entrada):** IA recusou 58% dos sinais com raciocínio coerente (preferia toque
+perto da linha, desconfiava do nível de domingo/Globex) — mas qualquer redução de frequência
+esbarra no prazo de 30 dias (dias.med subiu de 13d pra 23d). Mesmo padrão já visto no item #12 e
+no filtro `dist_nivel`/sexta (seção anterior): **não importa quão bom seja o critério de recusa,
+recusar sempre piora nesse formato de avaliação.**
+
+**#2 e #3 (seletor diário):** com contexto pobre (dia da semana + range), a IA manteve REV sozinha
+em 100% dos 236 dias — resultado neutro, ela só confirmou o que já sabíamos. Dando contexto mais
+rico (desempenho de cada estratégia nos últimos 5-15 pregões), a IA passou a misturar em 156/236
+dias — e a conta desmoronou (4,3%). Causa raiz identificada: ORB/ICT disparam MUITO mais vezes
+por dia que a REV, então em qualquer janela curta acumulam PnL absoluto maior só por volume, não
+por qualidade — a IA (racionalmente, dada a métrica que eu dei) leu isso como "estratégia
+superando REV" e adicionou como reserva. **É o mesmo erro de "achado de 1 mês não é regra"** já
+documentado no projeto — só que dessa vez a métrica passada pra IA que induziu ao erro, não uma
+decisão dela por conta própria.
+
+**#4 (gestão por trade):** IA ajustou contratos/trailing/BE-lock em 24% dos 1.441 trades (reduzia
+risco em sinais de nível Globex/dist_nivel grande, mantinha padrão em sinais de qualidade) —
+comportamento sensato, mas **não achou edge real**, só trocou o resultado de lugar (-4,5pp).
+
+**Veredito consolidado:** os 4 testes convergem pro mesmo lugar — nenhum bate os 50% do baseline,
+a maioria piora. Ou a IA fica neutra (confirma o que já fazíamos) ou piora (cai em armadilha de
+ruído de curto prazo, ou reduz frequência de trade demais pro prazo de 30 dias). Reforça a
+conclusão da auditoria de 18/08: **o teto de ~50% parece estrutural** (do instrumento, do
+timeframe, ou do formato de avaliação de 30 dias), não uma falta de inteligência na decisão de
+entrada/saída — uma IA vendo os mesmos números não tem informação que os meses de backtest
+quantitativo já não tenham testado.
+
+**Decisão (23/08, Marcelo concordou):** parar de tentar integrar IA por cima da REV. Não
+implementado nada em produção nem no NinjaScript — tudo ficou em backtest Python. Se algum dia
+retomar essa linha, NÃO repetir os testes #1-3 (já mostrados ruins); #4 é o único com espaço pra
+uma tentativa diferente (ex.: contexto de qualidade de sinal mais rico que só dist_nivel/dia).
+
+---
+
 ## ⚖️ Risco jurídico (não é melhoria de código, mas decisão de negócio)
 
 A Apex proíbe automação OFICIALMENTE em toda fase (ver pesquisa). Eval tolera na

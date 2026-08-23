@@ -1,0 +1,1794 @@
+{
+  "2026-05-25": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB demonstra desempenho superior nos últimos 7 pregões (WR 61%, PnL $10.448) em comparação com REV (WR 54%, PnL $944). Volume alto de trades (1000) reforça a consistência. ICT também forte (WR 68%, PnL $7.634), mas ORB lidera em lucro absoluto. REV mantida como reserva por seu histórico sólido agregado e para preservar limite de trades. Range anterior de 311.75pt oferece suporte técnico para a estratégia de reversão."
+  },
+  "2026-05-15": {
+    "estrategias": [
+      "REV",
+      "ICT"
+    ],
+    "confianca": 0.65,
+    "motivo": "ICT está claramente outperformando REV no recorte recente (PnL +$1419 vs -$12, WR 77% vs 50%). Apesar do risco de misturar estratégias reduzir limite de trades, a performance excepcional de ICT nos últimos pregões justifica incluí-la como reserva. REV mantém prioridade 1 por histórico agregado sólido, ICT como prioridade 2 para explorar o momentum positivo recente. Range amplo (323.50pt) do dia anterior oferece boas oportunidades para ambas."
+  },
+  "2026-05-19": {
+    "estrategias": [
+      "ICT",
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "Nos últimos 3 pregões, ICT apresentou WR 72% (melhor taxa) com PnL $5290 e ORB com WR 60% e PnL $5272 — ambas claramente superiores a REV (WR 61%, PnL $872). Mantém-se REV como base, mas ICT e ORB são reservas ativas hoje. EMAV descartada (WR 56%, PnL negativo). Range do dia anterior de 544.25pt oferece boa amplitude para capturar reversões e breakouts. ICT em primeiro por consistência de taxa."
+  },
+  "2026-05-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.95,
+    "motivo": "Sem histórico de desempenho nos últimos 15 pregões para comparação. REV é a estratégia com melhor taxa de aprovação agregada em produção. Misturar estratégias historicamente piora o resultado devido ao compartilhamento do mesmo limite de trades por avaliação. Na ausência de dados recentes que comprovem desempenho superior de outras estratégias, mantemos REV como única estratégia, conforme protocolo. Range do dia anterior (490.50pt) fornece base sólida para reversão no nível do dia."
+  },
+  "2026-05-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada historicamente. Embora ORB e ICT mostrem melhor PnL recente, REV com 58% WR continua sólida. Considerei incluir ORB (61% WR, $10010) como reserva dado seu desempenho superior, mas o risco de misturar estratégias que compartilham limite de trades histórico a piora agregada prevalece. Range anterior de 83.75pt oferece nível claro para reversão. Mantenho REV sozinha com confiança moderada-alta pela consistência comprovada."
+  },
+  "2026-05-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém estabilidade com WR 54% e volume controlado (37 trades). ORB é atraente (61% WR, $10.8k), mas historicamente misturar estratégias piora o resultado agregado pela competição pelo mesmo limite de trades por avaliação. EMAV está negativa ($-96). ICT tem ótimo WR (68%) mas volume muito alto (290 trades) — risco de saturação. Com range anterior moderado (427pt) e origem clara, priorizar REV como âncora é a escolha mais prudente. Se ORB continuar performando bem na próxima amostra, reavalia-se."
+  },
+  "2026-05-27": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV é a base (melhor taxa agregada histórica). ORB nos últimos 9 pregões está com desempenho significativamente superior: 1196 trades com 63% WR e PnL de $12056 vs REV com 77 trades, 62% WR e $1338. O volume e lucro de ORB justificam incluí-la como estratégia secundária hoje. EMAV está negativa (-$410). ICT tem boa taxa (68%), mas ORB gera mais valor absoluto. Range anterior de 292pt é robusto para REV no nível do fechamento anterior."
+  },
+  "2026-05-21": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "Nos últimos 5 pregões, ORB e ICT mostram desempenho superior a REV em PnL absoluto e taxa de acerto (ORB: 59% WR com $5904; ICT: 70% WR com $7755 vs REV: 57% WR com $1378). ORB é mais conservador em volume (853 vs 240 do ICT) e oferece melhor relação risk/reward recente. Incluo ORB como reserva estratégica hoje, mantendo REV como estratégia primária conforme protocolo. Range anterior de 387pt oferece oportunidades para breakout sólido. Confiança moderada porque esses 5 pregões ainda são curto prazo, mas o sinal é claro."
+  },
+  "2026-05-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Embora ICT tenha mostrado PnL superior ($3035) e WR alta (74%) nos últimos 2 pregões, REV mantém a melhor taxa de aprovação agregada historicamente com 67% WR e é a estratégia em produção. ORB teve bom resultado recente ($501) mas com volume muito alto (349 trades) indica ruído. EMAV está negativa (-$8). Misturar estratégias historicamente piora a performance por compartilhar limite de trades. Na dúvida, REV sozinha é a escolha mais conservadora e confiável. O recorte de apenas 2 pregões é curto demais para justificar mudança estrutural, especialmente considerando a volatilidade esperada em segunda-feira com range de domingo de 357.75pt."
+  },
+  "2026-05-20": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ICT está claramente outperformando nos últimos 4 pregões (WR 69%, PnL $6143) — seu melhor resultado absoluto. REV fica como base confiável (WR 61%, histórico agregado superior). ORB, apesar do volume alto, tem WR 57% e PnL apenas $4130. EMAV muito fraco (WR 55%, PnL $114). ICT é a reserva legítima hoje pelo desempenho recente concreto. Range anterior 463.50pt é moderado—favorável a ambas. Confiança moderada porque misturar estratégias reduz limite de trades, mas o diferencial de ICT justifica o risco."
+  },
+  "2026-06-01": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 12 pregões: $11.225 vs $906 de PnL líquido, com WR 63% vs 61% de REV. Volume de trades (1515 vs 89) confirma robustez estatística. Hoje é segunda com origem em range de domingo (Globex) — condição ideal para ORB. ICT tem WR superior (69%) e PnL excelente ($10.400), mas ORB oferece melhor equilíbrio risco/retorno. Mantendo ORB como prioridade principal, seguindo regra de não misturar (degrada limite de trades)."
+  },
+  "2026-05-29": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresentou desempenho significativamente superior nos últimos 11 pregões: $12.306 de PnL vs $1.197 de REV, com 1439 trades e WR 63%. Embora REV historicamente tenha melhor taxa de aprovação agregada, o recorte recente mostra ORB claramente dominante. ICT também está forte ($9.766, WR 69%), mas ORB é a prioridade como reserva. Manter REV como estratégia principal dado seu histórico robusto, mas ORB como reserva estratégica hoje é justificado pelos dados concretos. Range anterior 424pt fornece bom espaço operacional."
+  },
+  "2026-06-03": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ICT demonstra desempenho superior nos últimos 14 pregões: WR 71% (maior entre todas), PnL $12.832 (92% acima de REV), com volume de 620 trades oferecendo solidez estatística. REV mantém-se como base (WR 65%, histórico comprovado), mas ICT merece prioridade hoje como estratégia principal, com REV como reserva. Range anterior de 295.50pt oferece boa amplitude para ambas operarem dentro de seus limites de trades."
+  },
+  "2026-06-10": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente superando REV nos últimos 15 pregões: $18.199 vs $1.292 (14x maior). Apesar de volume alto (1896 trades), mantém WR sólida (62%) e eficiência de capital muito superior. ICT também forte ($17.384), mas ORB lidera. Range do dia anterior de 1620.50pt oferece setup viável para breakout. REV historicamente melhor em taxa agregada, mas desempenho recente de ORB justifica priorização como estratégia principal hoje."
+  },
+  "2026-06-08": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho superior nos últimos 15 pregões (PnL $13.184 vs REV $2.066, com WR 65% e volume muito maior de 1914 trades), sugerindo adaptação melhor ao regime recente. REV mantém-se como base por ser a estratégia mais confiável em média, mas ORB justifica ser prioridade hoje como reserva concreta baseada em dados reais. ICT também forte (PnL $12.540, WR 70%) mas com muitos trades pode compartilhar limite. ORB é o trade-off ideal: prova de desempenho recente sem sobrecarregar filtros."
+  },
+  "2026-05-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém-se como estratégia primária (62% WR, $1197 PnL). Embora ORB e ICT mostrem métricas superiores nos últimos 10 pregões (ORB: 63% WR/$13387, ICT: 68% WR/$9298), a regra estabelecida é clara: misturar estratégias historicamente piora o resultado agregado por compartilharem o mesmo limite de trades. O desempenho recente de ORB e ICT pode representar variância temporal. REV sozinha foi validada em produção e tem a melhor taxa de aprovação agregada (histórico completo). EMAV descartada por PnL negativo (-$663). Range anterior moderado (320.50pt) não justifica desvio da estratégia base. Mantém-se foco em consistência comprovada.\""
+  },
+  "2026-06-02": {
+    "estrategias": [
+      "ICT",
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Nos últimos 13 pregões, ICT apresentou desempenho superior significativo: WR 71% (vs REV 62%), PnL $13524 (vs REV $905) — ratio de lucro 14.9x. ORB também supera REV com WR 63% e PnL $10183 (11.2x). Range anterior de 401pt oferece setup favorável para ORB e ICT. REV mantida como terceira opção por ser a estratégia base com melhor taxa de aprovação agregada histórica, funcionando como segurança. A inclusão de ICT e ORB como prioritárias é justificada pelo desempenho concreto recente, não por achismo."
+  },
+  "2026-06-04": {
+    "estrategias": [
+      "ICT",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "Nos últimos 15 pregões, ICT mostrou desempenho superior com WR 70% (melhor que REV's 66%) e PnL líquido $13.318 (6.2x melhor que REV's $2.133). ORB também superou REV com WR 64% mas PnL $11.106 (5.2x melhor). Range anterior de 311.75pt oferece boa amplitude para breakout e FVG. ICT como prioridade 1 por edge recente mais sólido; ORB como reserva por consistência e volume. REV temporariamente em standby apesar da melhor taxa histórica agregada."
+  },
+  "2026-06-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Apesar de ICT e ORB mostrarem PnL superior nos últimos 15 pregões, REV mantém a melhor taxa de aprovação agregada histórica (66% WR com apenas 120 trades bem selecionados vs 664 e 1846 trades). O range do dia anterior é moderado (411.50pt), ambiente favorável para REV. Misturar estratégias historicamente piora o resultado devido ao compartilhamento do limite de trades. Mantém-se REV como prioridade única, com confiança moderada dados os sinais recentes de ORB/ICT."
+  },
+  "2026-06-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação (66% WR) e maior eficiência por trade (~$8.8/trade vs. $10.3 ORB, $7.8 EMAV, $27.1 ICT). Embora ORB e ICT tenham PnL bruto superior nos 15 dias, REV é a estratégia validada em produção com melhor risco/benefício. A regra de que misturar piora o resultado (limite de trades compartilhado) mantém-se válida. Mantém-se focus em REV como prioridade única."
+  },
+  "2025-06-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sem histórico de desempenho dos últimos 15 pregões disponível. Na dúvida, REV sozinha mantém a melhor taxa de aprovação agregada em produção. Origem do nível (máx/mín RTH do dia anterior) está disponível e alinhada. Evito misturar estratégias para não competir pelo mesmo limite de trades."
+  },
+  "2025-06-15": {
+    "estrategias": [
+      "REV",
+      "ICT"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente WR (91%) e consistência. ICT mostra performance excepcional nos últimos 2 pregões (79% WR, +$3150 PnL) — significativamente superior a REV neste recorte. ICT como reserva justificada por desempenho real concreto, não achismo. ORB e EMAV com PnL negativo serão descartadas."
+  },
+  "2025-06-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém WR de 73% com apenas 22 trades (eficiência máxima) e PnL consistente. Apesar de ICT mostrar PnL absoluto superior ($3732), seu volume de 265 trades é 12x maior — a métrica de qualidade (PnL por trade) é similar e REV carrega menos risco de saturação de limite de trades por avaliação. Na dúvida, REV sozinha é a escolha prudente. Range anterior 136.50pt permite setup claro."
+  },
+  "2025-06-19": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ICT está claramente outperformando REV nos últimos 6 pregões ($4258 vs $223 PnL, WR 75% vs 73%). Embora historicamente misturar estratégias piore os resultados pela competição por limite de trades, o desempenho recente de ICT é tão superior que justifica mantê-la como reserva secundária. REV segue como estratégia primária (melhor taxa de aprovação agregada e mais consistente), mas ICT é uma cobertura de valor para hoje."
+  },
+  "2025-06-22": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB com performance clara nos últimos 8 pregões: 755 trades, WR 71%, PnL $3462 (16x melhor que REV). ICT também forte (PnL $5344), mas com 319 trades vs 27 de REV — volatilidade de resultado muito maior. ORB mantém WR consistente (71% vs 70%) com volume operacional que permite validação. Prioridade: ORB como principal hoje + REV como backup (filosofia original ainda válida). Range amplo do dia anterior (365.50pt) favorece breakouts."
+  },
+  "2025-06-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.45,
+    "motivo": "REV sem trades no período analisado (1 pregão recente), mas é a estratégia com melhor taxa de aprovação agregada histórica. ORB mostra alto volume (99 trades) e WR de 71% com bom PnL ($798), porém misturar estratégias piora historicamente devido ao compartilhamento do limite de trades por avaliação. Range do dia anterior de 158.25pt oferece potencial para reversão. Mantém-se REV como prioridade por prudência, mas confiança moderada pela ausência de atividade recente de REV."
+  },
+  "2025-06-17": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.95,
+    "motivo": "REV mantém excelente WR de 91% e foi lucrativa nos últimos 4 pregões ($346). Embora ICT tenha PnL absoluto maior ($4196), isso vem de 151 trades com WR de 80% — perfil completamente diferente e muito mais volume. REV sozinha historicamente produz melhor taxa de aprovação e \"misturar piora\" segundo a regra estabelecida. ORB está claramente em drawdown (-$378). EMAV tem WR e PnL similares a REV mas com 17 trades vs 11 de REV — não justifica adicionar complexidade. Mantenho foco em REV como estratégia principal.\""
+  },
+  "2025-06-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada historicamente (70% WR, consistente). Embora ORB e ICT mostrem PnL superior nos últimos 9 pregões, a vantagem relativa delas é recente e pode ser volátil. O range do dia anterior de 220.25pt é moderado, favorecendo a reversão no nível. REV sozinha evita diluição do limite de trades (histórico: misturar piora). Foco em manter o edge consolidado."
+  },
+  "2025-06-16": {
+    "estrategias": [
+      "REV",
+      "ICT"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém sua solidez (91% WR, $346 lucro com disciplina de 11 trades). ICT apresenta performance excepcional nos últimos 3 pregões: 79% WR e $3150 PnL positivo — um sinal claro de que está performando muito acima de REV neste recorte. Como reserva complementar (ICT tem limite de trades diferente), incluo ICT para capturar FVGs, mantendo REV como prioridade 1. ORB e EMAV descartadas: ORB com $-600 e volume excessivo (203 trades), EMAV com WR baixa (64%) e prejuízo."
+  },
+  "2025-06-18": {
+    "estrategias": [
+      "REV",
+      "ICT"
+    ],
+    "confianca": 0.72,
+    "motivo": "ICT está claramente superperformando REV nos últimos 5 pregões: 188 trades com WR 77% e PnL $3977 vs REV com 18 trades, WR 83% mas PnL apenas $487. ICT entrega ~8x mais lucro absoluto com win rate apenas 6pp abaixo. Range do dia anterior de 225.50pt oferece espaço significativo para reversão, justificando manter REV como primária (melhor taxa agregada historicamente), mas ICT como reserva tática é justificado pelos dados reais recentes. ORB (1734 em 424 trades) fica descartada por ser mais diluída e inferior a ICT em retorno absoluto."
+  },
+  "2025-06-24": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 10 pregões: 902 trades com WR 72% e PnL $6898 vs REV com apenas 28 trades, WR 68% e PnL $70. ICT também performa bem ($5582), mas ORB é mais consistente em volume e lucro. Range anterior de 354.75pt oferece potencial para breakout. EMAV descartada (PnL negativo). Preferir ORB como estratégia principal hoje, mantendo abertura para ICT como reserva se setup não se materializar para ORB."
+  },
+  "2025-07-04": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém excelente taxa de aprovação (72% WR), mas ORB está claramente dominando no desempenho recente dos últimos 15 pregões: 75% WR com PnL de $9352 vs REV $136. Range do dia anterior de 172.25pt oferece um bom setup para ORB. ORB como reserva justificada pelo volume de trades e lucro consistente, sem sacrificar o limite de trades de REV."
+  },
+  "2025-06-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação (72%) com desempenho robusto. Embora ORB e ICT mostrem PnL positivo superior nos últimos 12 pregões, REV é a estratégia em produção com consistência comprovada. O fato de que misturar estratégias historicamente PIORA o desempenho (limite de trades compartilhado) justifica manter foco em REV. Range do dia anterior de 159.75pt oferece boa amplitude para os níveis de reversão. Na dúvida, a escolha conservadora é REV solo."
+  },
+  "2025-06-27": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB com desempenho superior (WR 74%, PnL $7956 líquido em 1151 trades). REV tem WR 72% mas apenas $147 PnL em 13 pregões — taxa de conversão muito fraca. ORB e ICT ambas com WR 74%, mas ORB lidera em volume e rentabilidade absoluta. EMAV descartada (PnL negativo). Range anterior de 218pt oferece amplitude adequada para ORB. Confiança moderada porque ORB com 1151 trades pode ter mix de traços pequenos, mas o PnL acumulado é 54x superior ao REV."
+  },
+  "2025-07-01": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB com performance claramente superior nos últimos 15 pregões (WR 73%, PnL +$6422 vs REV WR 71%, PnL +$120), apesar de maior volume de trades. ORB será prioridade como reserva estratégica hoje, com REV mantido como base. EMAV descartada (PnL negativo). ICT também forte (WR 75%, PnL +$5177) mas ORB mostrou melhor relação risco-retorno recente. Range anterior 153.75pt propício para breakouts.\""
+  },
+  "2025-07-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV tem a melhor taxa de aprovação agregada historicamente (71% WR com volume controlado). Embora ORB e ICT mostrem melhor PnL absoluto nos últimos 15 pregões, isso se deve ao volume muito maior de trades (1334 e 540 vs 76 da REV). REV mantém disciplina com volume baixo e consistência. O range do dia anterior é robusto (253.75pt), oferecendo um bom nível para reversão. Mixar estratégias historicamente piora porque compartilham o mesmo limite de trades por avaliação. Sem sinais extraordinários de underperformance relativa recente de REV, mantém-se a regra: na dúvida, só REV."
+  },
+  "2025-06-30": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 14 pregões: WR 74% vs 71%, e sobretudo PnL +$7504 vs -$25. ICT também positivo (+$5022), mas ORB lidera tanto em volume de validação (1259 trades) quanto em resultado líquido. REV mantém-se como base por histórico agregado consolidado, mas ORB merece ser prioridade hoje como estratégia reserva. EMAV descartada (WR igual a REV mas PnL negativo). Range anterior de 129pt fornece bom nível para REV; domingo Globex oferece contexto para ORB breakouts."
+  },
+  "2025-07-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém 72% WR com PnL positivo ($136) e maior aprovação agregada histórica. Embora ORB, EMAV e ICT mostrem métricas nominais superiores nos últimos 15 pregões, ORB com 1336 trades e ICT com 513 trades diluem significativamente o PnL por trade comparado ao resultado de REV. EMAV com 100 trades e $798 é atraente, mas não justifica risco de mixing que piora compartilhamento do limite por avaliação. Range amplo (203.50pt) favorece REV que trabalha com níveis de dia anterior/domingo. Confiança alta em manter REV isolada como estratégia principal."
+  },
+  "2025-06-25": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB tem demonstrado desempenho claramente superior nos últimos 11 pregões: 973 trades com WR 73% e PnL $7354, enquanto REV tem apenas $70. Embora REV historicamente tenha melhor taxa de aprovação agregada, os dados recentes mostram ORB significativamente mais lucrativa. ICT também tem bom WR (75%), mas ORB apresenta melhor performance absoluta em PnL. Mantém-se a recomendação de não misturar (piora o desempenho), então ORB como estratégia prioritária para hoje."
+  },
+  "2025-07-07": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV está em drawdown recente (-238 PnL em 83 trades) apesar de WR 70%. ORB mostra desempenho claramente superior nos últimos 15 pregões: 75% WR com +8548 PnL em volume significativo (1279 trades), sugerindo consistência robusta. ICT (+1069) e EMAV (+574) também positivos, mas ORB é o destaque. Estratégia: priorizar ORB hoje como principal, REV como reserva para manter flexibilidade. Range anterior de 114pt é moderado — ambiente típico pra ORB explorar breakouts do opening range."
+  },
+  "2025-07-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.65,
+    "motivo": "REV mantém melhor taxa de aprovação (69% WR) e é a estratégia em produção com histórico consolidado. Apesar do PnL negativo nos últimos 15 pregões (-$686), misturar com outras estratégias historicamente PIORA o resultado por competição pelo mesmo limite de trades. ORB mostra PnL positivo ($7292) mas com volume massivo de 1276 trades (provável sobre-otimização em amostra). EMAV (-$61) e ICT (+$664) têm volumes muito menores e não justificam diluir a estratégia principal. Na dúvida, REV sozinha é a escolha prudente."
+  },
+  "2025-07-11": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB mostrou desempenho real superior nos últimos 15 pregões (WR 75%, PnL +$3868) enquanto REV apresentou PnL negativo (-$324). Range anterior de 188.75pt oferece amplitude adequada para ORB. REV mantém-se como estratégia de reserva pela sua taxa de aprovação histórica agregada conhecida como superior. Mistura cautelosa justificada pelo contraste claro de performance recente."
+  },
+  "2025-07-10": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 15 pregões: WR 76% (+5pp vs REV), volume robusto (1200 trades) e PnL líquido positivo $6710 vs REV -$760. EMAV também tem WR 76%, mas rentabilidade marginal ($216). Embora misturar historicamente piore a taxa de aprovação, o desempenho recente de ORB é concreto e substancial. Estratégia: priorizar ORB hoje com REV como reserva, mantendo disciplina no limite de trades por avaliação para não repetir o histórico negativo das combinações."
+  },
+  "2025-07-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.65,
+    "motivo": "REV mantém a melhor taxa de aprovação (71% WR) e é a estratégia em produção com menor drawdown recente ($-422). Apesar do PnL negativo, ORB teve muito mais trades (1188 vs 90) e lucrou $6657, mas isso indica possível sobreotimização ou curva de lucro superficial em alta frequência. EMAV quase zerou ($-23) e ICT perdeu mais ($-302). Recomenda-se REV pura hoje: o range do dia anterior é moderado (121.75pt), condição favorável para reversão. Confiança moderada porque nenhuma estratégia está com desempenho robusto, mas REV é a menos arriscada.\""
+  },
+  "2025-07-14": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões ($3379 vs $84 de PnL líquido, com WR similar 75% vs 73%). Apesar do risco histórico de misturar estratégias, o desempenho recente de ORB é tão superior que justifica incluí-la como reserva. EMAV tem ótima WR (79%) mas volume e PnL absolutamente menores. ICT está em loss. REV mantém prioridade 1 por ser a estratégia de produção consolidada, ORB vai como reserva baseada em dados concretos."
+  },
+  "2025-07-16": {
+    "estrategias": [
+      "REV",
+      "EMAV"
+    ],
+    "confianca": 0.72,
+    "motivo": "EMAV está claramente outperformando REV nos últimos 15 pregões: 81% WR vs 74%, e PnL líquido de $950 vs $434 (2.2x melhor), com mesmo volume de trades (108). Range anterior robusto (153.50pt) favorece reversão, mas a performance recente de EMAV é concreto e significativo. Estratégia: REV como principal (melhor taxa agregada histórica), EMAV como reserva complementar. ORB descartada (90 trades com baixo PnL). ICT descartada (drawdown -$652 recente)."
+  },
+  "2025-07-18": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta WR 74% (acima do REV 73%) e, mais importante, PnL líquido de $1816 em 15 pregões — significativamente superior ao REV ($308). Volume de trades alto (1112) proporciona confiabilidade estatística. Apesar do risco de misturar estratégias, a diferença de performance é concreta e justifica ORB como opção prioritária nesta sexta, especialmente com range de 214pt no dia anterior oferecendo setup relevante para breakout."
+  },
+  "2025-07-15": {
+    "estrategias": [
+      "REV",
+      "EMAV"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém base sólida (74% WR, $434 PnL em 108 trades). EMAV destaca-se nos últimos 15 pregões: 80% WR (melhor taxa) e $839 PnL líquido (quase 2x REV), com volume reduzido (111 trades) e melhor controle. EMAV como reserva justifica-se por performance superior neste recorte recente. ORB e ICT descartadas: ambas operaram volume excessivo com PnL negativo. Range anterior de 224.25pt oferece margem suficiente para REV operar com confiabilidade histórica."
+  },
+  "2025-07-17": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho superior nos últimos 15 pregões (WR 74%, PnL $1938 vs REV WR 74%, PnL $594). Embora misturar estratégias historicamente piore os resultados, o desempenho concreto recente de ORB é significativamente melhor. REV mantém prioridade como estratégia principal (nível robusto do dia anterior com range de 264.50pt), com ORB como reserva. Range anterior considerável favorece possível setup de abertura."
+  },
+  "2025-07-20": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente performando acima de REV nos últimos 15 pregões: $2351 (ORB) vs $441 (REV) com mesma WR (74%), e volume de trades 13x maior indica consistência e liquidez no opening range. Embora historicamente misturar estratégias piore a taxa aprovação, o desempenho recente de ORB é concreto. Mantém-se preferência por focar em uma única estratégia para não competir pelo mesmo limite de trades, e ORB é a escolha estatisticamente superior neste recorte."
+  },
+  "2025-07-21": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB com desempenho superior nos últimos 15 pregões: 1080 trades, WR 75%, PnL $3432 (melhor resultado absoluto e por volume de oportunidades). REV historicamente tem a melhor taxa de aprovação, mas seu resultado recente ($296 em 76 trades) está significativamente abaixo de ORB, EMAV e ICT. A robustez de ORB com alto volume de trades e PnL consistente justifica priorizá-la hoje como estratégia principal. Range de domingo à noite (73.50pt) oferece boa base para breakout."
+  },
+  "2025-07-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (74% WR) com desempenho consistente. Embora ICT mostre PnL superior ($1971) nos últimos 15 dias, isso reflete excesso de trades (464 vs 73 da REV) - viés de quantidade, não qualidade. ORB opera 14x mais trades que REV com margem de lucro por trade inferior. EMAV gerou perdas líquidas ($-109). Range anterior de 175pt é moderado (nem expansivo nem comprimido). Na dúvida, REV solo é a escolha defensiva correta, especialmente porque misturar histor historicamente piora por compartilharem o mesmo limite de trades por avaliação."
+  },
+  "2025-07-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada historicamente (70% WR, 67 trades estruturados). Embora ORB e ICT mostrem melhor PnL recente (respectivamente $1410 e $1729 em 15 pregões), misturar estratégias compartilhando o mesmo limite de trades por avaliação piora o desempenho geral. EMAV segue negativa (-$1198). A origem clara do nível (máx/mín do dia anterior RTH com range significativo de 241.75pt) favorece REV como estratégia focada. Na dúvida, REV sozinha é a escolha defensiva correta."
+  },
+  "2025-07-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Embora ORB tenha maior PnL absoluto ($3076 vs $408), REV mantém melhor taxa de aprovação (73%) com muito menor volume (60 trades vs 1054), indicando operações mais seletivas. Range anterior de 126.25pt oferece nível claro para REV. Misturar estratégias historicamente piora resultado. ORB com 1054 trades em 15 dias é excessivamente agressivo. EMAV com loss negativo é descartada. Na dúvida, seguir o que funciona em produção."
+  },
+  "2025-07-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação (79% WR) com apenas 52 trades bem selecionados e PnL positivo. Embora ICT mostre PnL superior nos últimos 15 pregões, isso veio de 492 trades com WR 77% — volume muito maior que REV, sugerindo potencial de ruído ou viés de dados em período curto. ORB também com volume excessivo (1046 trades). EMAV apresenta PnL negativo. Na dúvida e sem sinais críticos de mudança estrutural, REV sozinha é a escolha mais defensiva e com maior consistência de proporção risco/recompensa.\""
+  },
+  "2025-07-30": {
+    "estrategias": [
+      "REV",
+      "ICT"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor taxa de aprovação (83% WR) com operações limpas (58 trades), alinhada ao nível conhecido. ICT emergiu como segunda opção: 480 trades, 80% WR, PnL $4990 (3.7x superior a REV nos últimos 15 dias). ORB tem volume alto mas performance diluída. EMAV negativa, descartada. ICT como reserva aproveita evidência estatística recente sem comprometer limite de trades REV."
+  },
+  "2025-07-29": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ICT mostrou desempenho claramente superior nos últimos 15 pregões (PnL $3876 vs REV $826), com WR 79% igual a REV mas volume muito maior (481 vs 66 trades), indicando consistência. ORB tem PnL alto ($2826) mas com volume excessivo (1041 trades) e risco de degradação. EMAV está negativa. REV mantém como reserva pela excelente taxa agregada histórica e segurança de limite de trades compartilhado. Range do dia anterior de 92.25pt oferece bom suporte para níveis de reversão."
+  },
+  "2025-07-31": {
+    "estrategias": [
+      "REV",
+      "ICT"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente WR (81%) e é a base, mas ICT nos últimos 15 pregões mostrou o melhor PnL absoluto ($5318) com WR sólido (80%), apesar de mais trades. Com range anterior de 233pt e nível bem definido (max/min RTH), ICT como reserva aumenta potencial sem comprometer a estratégia principal. EMAV descartada por PnL negativo; ORB tem volume alto mas WR menor que REV+ICT.\""
+  },
+  "2025-07-24": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB e ICT ambas com desempenho claramente superior a REV nos últimos 15 pregões (ORB: +$2638, WR 74%; ICT: +$2217, WR 76% vs REV: -$150, WR 70%). ORB selecionado como estratégia primária por volume consistente (1032 trades) e lucro agregado robusto. REV mantido como reserva respeitando histórico de melhor taxa de aprovação e para não depender exclusivamente de ORB. Confiança moderada (0.72) porque: (1) ORB e ICT têm volume muito maior, o que pode indicar comportamento diferente em dias específicos; (2) REV segue com WR aceitável apesar do PnL negativo recente — pode ser questão de volatilidade ou slippage pontual. Range anterior 177pt fornece contexto para nível do dia, mas não altera a decisão baseada em desempenho.\""
+  },
+  "2025-08-01": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor taxa de aprovação (79%) com maior consistência (68 trades, PnL $1320). ORB, apesar de muito mais agressiva (1159 trades), demonstra forte performance nos últimos 15 pregões (WR 75%, PnL $8144 — 6x melhor que REV). Range anterior robusto (446.50pt) favorece breakout. ORB como reserva calculada, não por achismo. EMAV descartada (PnL negativo). ICT preterida por ser já menos eficiente que ORB em volume similar."
+  },
+  "2025-08-07": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor taxa de aprovação (79% WR) e é a estratégia base em produção. ORB, apesar de maior volume de trades, gerou PnL líquido significativamente superior ($8002 vs $1047 em 15 pregões) com WR competitiva (74%). Range amplo de 296.75pt do dia anterior oferece bom setup para ORB hoje. ORB como reserva tática."
+  },
+  "2025-08-04": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor taxa de aprovação (79% WR) com operações seletivas (67 trades), confirmando eficiência. ORB apresenta PnL líquido de $10.332 nos últimos 15 pregões — 9.3x superior ao de REV ($1.110) — apesar de maior volume de trades (1220). Esse desempenho concreto e substancial justifica incluir ORB como estratégia complementar hoje. ICT (3938) é secundário e EMAV está negativa (-495), descartadas. Range grande do dia anterior (166.75pt) favorece breakouts. Segunda-feira com origem em Globex overnight oferece estrutura clara para ORB."
+  },
+  "2025-08-05": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor taxa de aprovação (79% WR) com menor drawdown operacional (67 trades). ORB apresenta performance excepcional nos últimos 15 pregões: $9104 PnL líquido (8.2x superior ao REV) com 74% WR em volume alto (1296 trades), demonstrando consistência estatística robusta. EMAV descartada por PnL negativo (-$489). ICT performando bem ($3469) mas inferior a ORB. REV como primária (melhor taxa), ORB como reserva estratégica dada performance recente comprovada. Range anterior de 221pt oferece setup adequado para ambas."
+  },
+  "2025-08-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém melhor taxa de aprovação (78% WR) com PnL positivo. ORB, apesar de maior PnL absoluto ($7855), opera com 1370 trades vs 65 da REV — o que indica volume excessivo e histórico de mistura piora performance agregada. ICT (75% WR, $1238) e EMAV (73% WR, -$317) ficam abaixo. Range anterior de 283.75pt é moderado/normal. Executa REV pura hoje como baseline de maior confiabilidade.\""
+  },
+  "2025-08-08": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.78,
+    "motivo": "REV mantém a melhor taxa de aprovação (77% WR) e é a estratégia de produção. ORB mostra desempenho robusto nos últimos 15 pregões (74% WR, $11918 PnL líquido) — significativamente superior ao de REV no recorte recente — justificando sua inclusão como reserva. EMAV está em terreno negativo (-$154), descartada. ICT tem bom WR (76%) mas volume muito alto (525 trades) para um complemento, aumentando risco de degradação por limite compartilhado. ORB oferece equilíbrio entre performance recente e volume controlado (1462 trades, mas já validado em produção potencial)."
+  },
+  "2025-08-14": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém WR sólida (77%), mas ORB apresenta PnL absoluto significativamente superior ($9915 vs $1896 em 15 pregões), com WR comparable (74% vs 77%) e volume de trades que justifica a robustez. ICT também positivo mas com volume menor. Range anterior elevado (182.50pt) favorece breakout. ORB como reserva tática."
+  },
+  "2025-08-12": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém excelente taxa de aprovação (77%) com 100 trades e $1145 PnL. ORB apresenta desempenho superior nos últimos 15 pregões: 1582 trades com $12160 PnL (10.6x maior que REV em volume absoluto), apesar de WR ligeiramente inferior (74%). Como reserva estratégica, ORB oferece oportunidade adicional sem comprometer a confiabilidade de REV. EMAV e ICT descartadas: EMAV com PnL praticamente nulo ($97) e ICT com menor volume relativo. Range anterior (217pt) é moderado, sem extremos que desaconselhem a abordagem dual."
+  },
+  "2025-08-13": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando nos últimos 15 pregões: $10.550 vs $1.592 (REV). Apesar de REV ter melhor WR agregada historicamente (76%), ORB apresenta WR ligeiramente superior (74% vs 76% é marginal) com volume 15x maior e PnL 6,6x superior. Range anterior de 328pt oferece boa oportunidade para breakout. REV mantém como estratégia principal por ser mais confiável em geral, mas ORB como reserva justifica-se pelos dados recentes sólidos.\""
+  },
+  "2025-08-11": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém a melhor taxa de aprovação (78% WR) com menor volume de trades (89), confirming robustez. ORB mostra PnL líquido superior ($11860 vs $1194 de REV) nos últimos 15 pregões, sugerindo performance excepcional neste recorte recente — justifica inclusão como reserva. EMAV em loss (-$410) e ICT com PnL positivo mas menor que ORB. Range de 72pt oferece amplitude razoável para reversões no nível de domingo. Prioridade: REV (confiança principal); ORB como segunda opção se setup de reversão não se confirmar rapidamente."
+  },
+  "2025-08-18": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.78,
+    "motivo": "ORB apresenta PnL líquido $10.250 vs REV $1.683 nos últimos 15 pregões, com WR comparável (74% vs 76%). Volume de trades massivo em ORB (1677 vs 122 em REV) reforça confiabilidade do sinal. Segunda-feira com range de domingo bem definido (86.75pt) cria setup favorável para ORB. REV mantém prioridade 1 pela taxa de aprovação superior, mas ORB como reserva justifica-se pelo desempenho recente concreto."
+  },
+  "2025-08-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação (77% vs 74% das demais) e melhor eficiência por trade ($14,92/trade vs $5,67 ORB, $3,54 EMAV, $5,82 ICT). ORB tem maior PnL absoluto ($9340), mas em 1647 trades (13.3x mais que REV) — indica maior volume de ruído e falsos sinais. No recorte de 15 pregões, nenhuma estratégia alternativa mostrou consistência superior que justifique o risco de sobrecarga no limite de trades compartilhado. Range anterior de 166.50pt é moderado, ambiente favorável para REV pura. Mantém foco na estratégia com melhor aprovação conforme protocolo."
+  },
+  "2025-08-21": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB teve desempenho extraordinário nos últimos 15 pregões ($14515 em PnL líquido, WR 74% com 1790 trades), quase 19x superior a REV ($777). Apesar de REV ter taxa de aprovação agregada historicamente melhor, ORB está claramente em um ciclo de performance excepcional neste recorte recente e merece estar na fila como reserva. REV permanece primeira prioridade pela consistência histórica, mas ORB é um hedge concreto contra possível underperformance de REV hoje. Range anterior de 397pt oferece oportunidade adequada para ambas as estratégias.\""
+  },
+  "2025-08-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (76% WR) com volume controlado (125 trades). Embora ORB tenha gerado maior PnL absoluto ($10565), isso se deve ao volume 13x maior (1690 trades), resultando em PnL por trade inferior (~$6.25 vs ~$15.64 da REV). EMAV está em terreno negativo (-$295). ICT mostra bom WR (75%) mas volume excessivo (608 trades). Preferir REV pura: melhor eficiência, menor variância por compartilhamento de limite, e taxa de acerto superior. Range anterior de 105.25pt oferece níveis bem definidos para a estratégia de reversão."
+  },
+  "2025-08-20": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB demonstrou desempenho superior nos últimos 15 pregões (WR 74%, PnL +$11150 vs REV com +$1351), com volume de trades robusto (1695). REV mantém excelente WR (73%) e será reserva. EMAV descartada (PnL negativo). ICT com bom WR mas volume menor. Range anterior de 344.50pt favorece captura de movimento intraday. Quarta-feira com origem em nível anterior — ORB em contexto de abertura tende a ser confiável. Confiança moderada porque misturar estratégias reduz limite de trades, mas ganho comprovado de ORB justifica tentar como primeiro passo.\""
+  },
+  "2025-08-22": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões (PnL $10219 vs $544, WR 73% igual). Volume de trades (1711 vs 103) confirma robustez da estratégia. ICT também forte ($5604, WR 74%), mas ORB lidera. EMAV descartada (WR 68%, PnL negativo). Incluo ORB como prioritária e REV como reserva, pois misturar historicamente piora taxa de aprovação — a alocação separada de limite de trades permite explorar a superioridade recente de ORB sem sacrificar REV."
+  },
+  "2025-08-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (73% WR) com performance histórica comprovada. Embora ORB tenha excelente PnL recente ($12076) e ICT também performando bem ($5424), a regra consolidada é que misturar estratégias piora o resultado (compartilham limite de trades). Além disso, REV trabalha especificamente com o nível de reversão do dia anterior (444.50pt de range), que é seu domínio. Na dúvida, REV sozinha. Confiança alta mantida pela disciplina de não misturar."
+  },
+  "2025-08-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém WR sólida (73%) e é a estratégia em produção com melhor taxa agregada histórica. Apesar de ORB mostrar WR ligeiramente superior (74%) e PnL total maior ($12607), ORB gera volume excessivo de trades (1618) que compartilha o mesmo limite por avaliação com REV, degradando performance quando combinadas. ICT também mostra bom WR (75%) mas com 611 trades. EMAV com WR baixa (67%) e PnL negativo ($-702) fica descartada. Mantém-se REV como única estratégia para evitar dilução do limite de trades e preservar a qualidade histórica provada."
+  },
+  "2025-08-26": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 15 pregões (WR 74%, PnL $11.241) vs REV (WR 76%, PnL $1.110). Embora REV tenha melhor taxa de aprovação, ORB gerou 10x mais lucro com volume similar de oportunidades. Range do dia anterior (173pt) oferece base sólida para reversão, mas a performance recente de ORB justifica incluí-la como estratégia reserva. EMAV descartada (WR 66%, PnL negativo). ICT com WR 76% mas menor lucro absoluto que ORB."
+  },
+  "2025-09-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém melhor taxa de aprovação (75%) e ratio PnL/trades (9.86 $/trade) apesar do volume menor. ORB gera ruído com 1387 trades (compartilhamento de limite prejudicaria REV). EMAV está com WR 59% e PnL negativo (-$2156). ICT tem WR 74% mas adicionar como reserva causaria dilução histórica comprovada. Preferência: REV pura conforme diretriz."
+  },
+  "2025-08-28": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente WR (76%) mas com apenas 131 trades e $966 de PnL nos últimos 15 pregões. ORB, apesar do alto volume (1455 trades), apresenta WR idêntica (75%) com PnL significativamente superior ($6952) — evidência concreta de melhor performance recente. EMAV está em terreno negativo (-$1688, WR 65%). ICT tem bom WR (76%) e $4641 de PnL, mas ORB se destaca pelo volume e rentabilidade. Range do dia anterior moderado (170pt) não impede operação. Recomendação: priorizar REV como principal (histórico comprovado), adicionar ORB como reserva dados os números recentes superiores. Confiança moderada porque o mix historicamente piora, mas o desempenho recente de ORB justifica a tentativa como backup."
+  },
+  "2025-08-29": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Análise dos últimos 15 pregões: REV mantém excelente taxa de aprovação (74% WR) com eficiência de capital superior ($1362 PnL em apenas 121 trades, ~$11.25/trade). Embora ORB e ICT mostrem números absolutos maiores, isto se deve ao volume exponencialmente maior de trades (1381 e 559 respectivamente). REV preserva a máxima disciplina com limite compartilhado. ORB está em período de over-trading; EMAV com WR 66% e PnL negativo está claramente fora de forma. ICT com 559 trades demonstra volatilidade excessiva. Viés fundamental: range anterior de 231.25pt é robusto para reversal no nível, e sexta favorece consolidação. Recomendação: focar exclusivamente em REV para maximizar taxa de aprovação e evitar degradação histórica de mistura estratégica."
+  },
+  "2025-09-03": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $9252 vs $742 PnL líquido, mesma WR 74%, mas com muito maior volume e consistência de lucro. Embora misturar estratégias historicamente piore resultados, o desempenho recente concreto de ORB justifica incluí-la como secundária. REV mantém a prioridade como estratégia base (melhor taxa agregada), mas ORB merece ser reserva hoje. Range anterior de 265pt oferece oportunidade para ORB funcionar bem."
+  },
+  "2025-08-27": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho significativamente superior nos últimos 15 pregões (PnL $11094 vs REV $1444), com WR similar (74% vs 76%) e volume de trades bem maior, indicando robustez. REV mantém prioridade 1 pela consistência histórica agregada, mas ORB é reserva justificada. EMAV está em loss (-$1778, WR 65%) e será excluída. ICT, apesar de WR 76%, fica abaixo de ORB em lucro absoluto e com maior variância de trades."
+  },
+  "2025-09-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada historicamente (73% WR com 81 trades bem selecionados). ORB tem volume extremamente alto (1357 trades) sugerindo execução menos seletiva; EMAV está em drawdown ($-976); ICT teve bom desempenho (75% WR, $3806) mas ainda é menor que ORB em volume. Range do dia anterior (207pt) é saudável. Na dúvida com dados recentes, REV pura preserva a disciplina do sistema core. Confiança moderada porque ORB mostrou lucro absoluto superior, mas o volume excessivo sinaliza falta de filtros rigorosos."
+  },
+  "2025-09-05": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém excelente WR (70%) mas com volume baixo (84 trades) e PnL limitado ($324). ORB nos últimos 15 pregões mostra desempenho claramente superior: 1289 trades com WR 73% e PnL $9,368 — rentabilidade ~29x maior que REV no mesmo período. Dado o range amplo do dia anterior (270.25pt) e a sexta-feira (volatilidade esperada), incluir ORB como reserva é justificado. EMAV está negativa ($-1070), descartada. ICT tem WR similar a ORB (74%) mas volume muito menor (539) e PnL menor ($3231), menor potencial que ORB."
+  },
+  "2025-09-08": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB em clara vantagem nos últimos 15 pregões: 12003 vs 1636 de PnL, com 1287 trades vs 74 de REV. Mantém WR 73% (próxima de REV 74%) mas com volume e consistência muito superiores. Range anterior amplo (141pt) favorece ORB. EMAV descartada por WR baixa (64%) e PnL negativo. ICT (5078) é opção, mas ORB domina. REV permanece como âncora pela histórica taxa de aprovação agregada, mas ORB merece prioridade hoje como estratégia principal."
+  },
+  "2025-09-01": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 15 pregões (PnL $8590 vs REV $1410, com WR 74% vs 75%) e volume de trades muito maior, indicando consistência mesmo em escala. REV mantém-se como estratégia principal (melhor taxa agregada histórica), mas ORB merece ser reserva hoje. EMAV descartada por WR 63% e PnL negativo; ICT secundária apesar de bom resultado (menor volume de validação). Range de domingo é amplo (120.75pt), ambiente favorável para ORB em breakouts iniciais."
+  },
+  "2025-09-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém WR sólida (71%) e, mais importante, é a estratégia com melhor eficiência de capital: $1213 em apenas 77 trades (média $15,75/trade). ORB tem volume muito maior (1415 trades) e WR ligeiramente superior (73%), gerando $14080, mas com rácio de conversão inferior ($9,96/trade). EMAV está negativa (-$662). ICT tem $4763 com 537 trades ($8,86/trade) — abaixo da eficiência de REV. Range do dia anterior é moderado (397pt), ambiente normal. Mantendo foco em REV como principal, dado seu histórico comprovado de melhor rácio de aprovação agregado e eficiência. Misturar estratégias só piora por compartilharem limite de trades."
+  },
+  "2025-09-11": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho superior nos últimos 15 pregões (WR 73% vs REV 71%, PnL $3577 vs $986). Volume de trades maior valida a consistência. REV mantém posição prioritária como reserva, respeitando a regra: misturar pode piorar, mas ORB está claramente melhor neste recorte recente — justifica incluir como primary com REV como suporte. EMAV descartado (PnL negativo), ICT descartado (volume excessivo, performance não compensa o risco de congestão de trades)."
+  },
+  "2025-09-09": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho significativamente superior nos últimos 15 pregões: 73% WR com $7967 PnL líquido (vs REV 70% WR com $825). Embora misturar estratégias historicamente piore a taxa de aprovação agregada, o volume de dados de ORB (1153 trades) com WR 3pp acima de REV e PnL 9.6x maior indica outperformance real e não-aleatória nesse recorte recente. Range do dia anterior (128pt) oferece amplitude adequada. ORB priorizada com REV como reserva mantém flexibilidade sem excesso de exposição simultânea."
+  },
+  "2025-09-12": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB demonstra desempenho superior nos últimos 15 pregões: WR 74% vs REV 70%, e PnL líquido de $3302 vs $782 da REV. Embora a mistura histórica piore resultados, o desempenho recente de ORB ($27.50/trade) é materialmente melhor que REV ($6.50/trade), justificando ORB como estratégia principal hoje. REV mantém como reserva para mitigar risco de drawdown. EMAV descartada (PnL negativo); ICT secundária apesar de WR 74% (volume excessivo de trades, PnL inferior a ORB)."
+  },
+  "2025-10-03": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente taxa de aprovação (67%) com eficiência comprovada. ORB apresenta desempenho superior nos últimos 15 pregões: 970 trades com WR 72% e PnL $2875 — claramente outperformando REV ($485). Sexta-feira com range anterior de 175.25pt favorece ORB. Incluir ORB como reserva sem comprometer a prioridade de REV, mantendo disciplina no limite de trades por avaliação."
+  },
+  "2025-10-06": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB mostrou desempenho superior nos últimos 15 pregões (PnL $3504 vs REV $998, WR 73% vs 70%, e volume 10x maior). Range do dia anterior é robusto (104pt), condição favorável para opening range breakout. REV mantém prioridade 1 por ser mais consistente em mix, mas ORB é incluída como reserva estratégica dado desempenho real recente claramente superior."
+  },
+  "2025-09-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém sólida taxa de aprovação (71% WR) com PnL positivo ($1112) e melhor eficiência (11.11 $/trade). Embora ORB mostre WR ligeiramente superior (74%) e PnL bruto maior ($8004), isso vem de volume 11x maior (1151 vs 100 trades), o que historicamente piora quando misturado ao REV por competição pelos mesmos limites. EMAV está negativa (-$414). ICT tem bom PnL ($1333) mas também volume elevado (427 trades). Mantém-se a estratégia principal: REV sozinha reduz ruído, preserva qualidade de sinal e evita canibalizações de limites. Range do dia anterior de 164pt oferece nível de reversão bem definido."
+  },
+  "2025-09-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sábado com range anterior de 157.50pt (moderado). REV mantém a melhor taxa de aprovação agregada (68% WR, $454 PnL em 114 trades = 3.98$/trade). Embora ORB mostre WR 74% superior, seu PnL é inflacionado por volume massivo de 1119 trades — sugere muitos small wins com comissões acumuladas. EMAV está com drawdown ($-124). ICT tem WR 74% mas apenas $943 em 442 trades (2.13$/trade), inferior a REV. Na dúvida com múltiplas estratégias competindo pelo mesmo limite de trades, REV sozinha é a escolha mais segura. Manter foco em 1 estratégia robusta é melhor que diluir em 4."
+  },
+  "2025-10-02": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: 73% WR vs 67% de REV, e PnL líquido de $3166 vs $158 de REV. Apesar de ORB ter muito mais trades (1037 vs 112), a consistência superior e rentabilidade expressiva justificam incluí-la como estratégia principal. REV mantém-se como suporte por ter a melhor taxa histórica agregada. EMAV descartada por estar em loss (-$123). ICT tem WR excelente (73%) mas PnL muito inferior a ORB, então ORB é a escolha natural de reserva."
+  },
+  "2025-10-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.95,
+    "motivo": "REV mantém a melhor eficiência: 90 trades com WR 70% gerando $998 de lucro líquido (eficiência: $11,09/trade). ORB tem WR 72% mas com 1035 trades gera apenas $3,97/trade. EMAV e ICT estão quebradas (EMAV: $0,14/trade, ICT: -$0,16/trade). Ao contrário da intuição de \"mais trades = mais ganho\", REV concentra trades de qualidade. Misturar histórico só piora. Mantém-se a estratégia sozinha."
+  },
+  "2025-10-07": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente performando melhor que REV nos últimos 15 pregões: 3242 vs 998 de PnL líquido, com WR superior (73% vs 70%) e volume de trades robusto (903). EMAV tem WR excelente (77%) mas PnL muito baixo ($340), sugerindo baixa eficiência de risco. ICT com resultado negativo (-586) fica descartada. REV segue como primeira opção por seu histórico sólido, mas ORB como reserva é justificado pelo desempenho recente consistentemente melhor.\""
+  },
+  "2025-10-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém melhor taxa de aprovação agregada (71% WR) e PnL consistente ($1189) apesar de menos trades. ORB tem WR 74% e PnL superior ($4136), mas historicamente misturar estratégias piora o resultado devido ao compartilhamento do limite de trades. Priorizar REV como estratégia principal. Range anterior de 270.25pt oferece bom nível de reversão para hoje."
+  },
+  "2025-10-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém rentabilidade sólida ($1532 em 105 trades, WR 72%) com volume controlado. ORB, apesar de maior PnL bruto ($3744), opera com 9x mais trades (951), sugerindo saturação e limite compartilhado que historicamente piora a taxa de aprovação quando combinada. EMAV e ICT estão em loss nos últimos 15 pregões (-$846 e -$102 respectivamente). Range moderado (280pt) favorece REV com níveis bem definidos. Manter foco em REV sozinha como regra padrão."
+  },
+  "2025-10-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB tem WR e PnL superiores nos últimos 15 pregões ($8802 vs $310 da REV), mas REV mantém melhor taxa de aprovação agregada historicamente e é mais robusta isoladamente. Range do domingo (313.50pt) é amplo — condições favoráveis para reversão em nível. Evito misturar estratégias por compartilharem limite de trades. REV como estratégia principal hoje; ORB como potencial reserva se reverão não performar nos primeiros trades.\""
+  },
+  "2025-10-16": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $17,225 de PnL vs $1,356 de REV, com volume similiar de oportunidades e WR praticamente equivalente (71% vs 70%). EMAV está em negative territory (-$604), então descartada. ICT tem bom WR (73%) e PnL positivo ($5,458), mas ORB é a escolha secundária mais robusta pelo PnL absoluto superior. REV mantém a prioridade por histórico agregado, mas ORB como reserva é justificado pelo desempenho recente concreto."
+  },
+  "2025-10-17": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta PnL líquido de $20.096 nos últimos 15 pregões, significativamente superior ao de REV ($2.013). Apesar da taxa de acerto similar (69% vs 71%), o volume de operações (1486 vs 127) e resultado financeiro concreto justificam incluir ORB como estratégia de suporte hoje. EMAV descartada por resultado negativo (-$800); ICT tem bom desempenho ($7.224) mas inferior a ORB. REV mantém prioridade como estratégia principal dado seu histórico agregado, mas ORB como reserva adiciona valor sem competir pelo mesmo limite de trades."
+  },
+  "2025-10-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (73% WR, $1395 PnL em 100 trades = $13.95/trade). Apesar de ORB exibir WR 74% e PnL bruto maior ($3942), isso vem de 1015 trades — volume 10x superior — o que indica que a margem por trade é inferior (~$3.88/trade). EMAV está em PnL negativo (-$180) e ICT tem desempenho marginal ($110). O range anterior (177pt) é considerável, criando boa condição para REV explorar reversão. Não há motivo concreto para misturar estratégias hoje, pois mantém o limite de trades compartilhado e a evidência histórica aponta que REV sozinha maximiza aprovação sem degradar retorno por trade.\""
+  },
+  "2025-10-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém performance sólida (70% WR, $1240 PnL em 108 trades). Embora ORB tenha melhor PnL absoluto ($14058), opera com volume 12x maior (1280 trades), sugerindo cherry-picking de oportunidades e diluição em pregões mais fracos. REV concentra-se em setup de alta probabilidade no nível do dia. EMAV está em drawdown ($-1035). ICT tem melhor WR (72%) mas com 459 trades fragmentados. Princípio: REV sozinha historicamente supera misturas. Confiança moderada (0.75) porque ORB desafia o consenso, mas não há sinal claro de instabilidade nos parâmetros de REV que justifique risco de combinação.\""
+  },
+  "2025-10-20": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor WR (71%) e é estratégia base. ORB apresenta desempenho superior nos últimos 15 pregões: 23341$ de PnL líquido vs 2053$ de REV, com WR 68% (apenas 3pp abaixo). Apesar do volume muito alto (1514 trades), a consistência de ganho justifica incluir ORB como reserva hoje. EMAV em terreno negativo (-286$) e ICT com PnL inferior ao ORB (8160$) ficam descartadas."
+  },
+  "2025-10-19": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém WR mais alta (72% vs 68% ORB) e é a estratégia de base mais sólida. ORB apresenta PnL líquido substancialmente superior ($22.918 vs $2.216 em REV) nos últimos 15 pregões, justificando sua inclusão como reserva. O range anterior de 383.25pt oferece bom espaço para ambas. EMAV está em pequena perda (-$26) e ICT, apesar de WR aceitável, tem volume excessivo de trades (527) que dilui performance. ORB como segunda opção equilibra agressão controlada sem comprometer o limite de trades por avaliação."
+  },
+  "2025-10-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Apesar de ORB ter WR 72% e PnL impressionante ($9901 em 15 pregões), REV mantém consistência com 69% WR e não sofre degradação ao ser usada isoladamente (princípio consolidado: misturar piora o desempenho compartilhando limite de trades). ORB tem 1169 trades (5x+ que REV's 113) — alta frequência pode indicar sobre-alavancagem do volume em vez de qualidade genuína. EMAV está negativa (-$899). ICT tem bom WR (72%) mas PnL modesto ($926). Mantém-se REV como única estratégia: mais segura dado o trade-off entre WR e PnL em producção."
+  },
+  "2025-10-21": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor taxa de aprovação (71%) com PnL sólido ($2053), mas ORB nos últimos 15 pregões gerou PnL líquido significativamente superior ($23390) com WR competitiva (68%). Range anterior amplo (239.75pt) oferece boa oportunidade para breakout. ORB como reserva tática justificada pelo desempenho recente concreto, evitando mistura excessiva que historicamente piora a aprovação."
+  },
+  "2025-10-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (71%, empatada com ICT) e desempenho mais consistente em termos de eficiência (WR alta com volume controlado). Apesar de ORB ter PnL absoluto maior, opera com 15x mais trades, sugerindo retorno marginal decrescente. EMAV está com PnL negativo. ICT tem bom WR (71%) mas com 5x mais trades que REV, sinalizando menor qualidade por trade. Na dúvida e com REV performando solidamente, mantém-se a estratégia principal em produção sem mistura que historicamente piora o resultado.\""
+  },
+  "2025-10-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (69% WR) com apenas 94 trades (disciplina clara). Embora ORB mostre PnL maior em valor absoluto ($27.116), isso vem de 1716 trades — mais que 18x o volume de REV — sugerindo execução menos seletiva. O retorno por trade de REV é significativamente superior ao de ORB. Range anterior de 484.50pt oferece nível bem definido para reversão. Manter REV como estratégia principal reduz risco de diluidoComDesperdício de oportunidades. Confiança moderada (0.85) porque ORB continua mostrando lucro consistente, mas a disciplina de REV justifica prioridade hoje."
+  },
+  "2025-10-26": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém alta taxa de aprovação (69% WR) com bom PnL ($1325 em 95 trades), mas ORB apresenta desempenho significativamente superior nos últimos 15 pregões: $27760 de PnL líquido com 69% WR, apesar do alto volume (1890 trades). Dado que ORB está claramente outperformando REV neste recorte recente, inclui-se como estratégia de reserva. EMAV descartada por WR baixa (60%) e PnL negativo. ICT descartada por risco de degradação ao misturar (limite de trades compartilhado)."
+  },
+  "2025-10-28": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões (PnL $25.6k vs $1.1k, WR similar 68%). Volume de trades (1736 vs 74) e consistência de resultados justificam incluir ORB como estratégia primária. REV mantém como segunda opção pela sua taxa agregada histórica superior. EMAV descartada (PnL negativo), ICT não tem margem clara sobre REV."
+  },
+  "2025-10-24": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente taxa de aprovação (69% WR) com PnL sólido ($1325). ORB mostrou desempenho excepcional nos últimos 15 pregões: 1854 trades com mesma WR (69%) mas PnL líquido muito superior ($28406), indicando melhor qualidade de sinais e gerenciamento nesse período recente. Como ORB claramente supera REV no recorte recente, justifica incluí-la como reserva hoje. EMAV descartada por WR inferior (63%) e PnL negativo. ICT descartada apesar de bom PnL, pois gera volume excessivo (601 trades) que pode competir por limite com REV. Sexta-feira com range anterior de 289pt oferece boa oportunidade para ambas as estratégias."
+  },
+  "2025-10-29": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém 68% WR com disciplina (74 trades, $1134). ORB apresenta desempenho superior nos últimos 15 pregões ($24589 PnL, 69% WR), com volume muito maior (1706 trades) indicando consistência comprovada. Embora misturar estratégias historicamente piore, a diferença de $23455 a favor de ORB justifica incluir como reserva. EMAV em drawdown (-$816). ICT com bom WR mas PnL muito inferior a ORB ($9640 vs $24589). Range do dia anterior é amplo (225.50pt), favorável para ORB capturar breakouts. REV como primária, ORB como reserva."
+  },
+  "2025-10-31": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente superando REV nos últimos 15 pregões: $14.888 vs $861 de PnL líquido, com volume 15x maior e WR similar (67% vs 68%). Range anterior de 304pt oferece setup robusto para breakout. REV mantém prioridade como estratégia base, mas ORB como reserva é justificado pelo desempenho recente concreto. EMAV e ICT descartadas: EMAV está em loss, ICT apesar de bom WR (70%) tem PnL inferior a ORB com 5.6x menos trades."
+  },
+  "2025-11-03": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém excelente WR (71%) e é a estratégia com melhor taxa aprovada. ORB, apesar de WR menor (67%), gerou PnL líquido substancialmente superior ($14774 vs $1554 em 15 pregões), sinalizando melhor qualidade de trade neste período recente. EMAV está em loss (-$1443) e será descartada. ICT tem bom PnL ($9424) mas volume excessivo (559 trades) vs qualidade. ORB como reserva justifica-se pelo desempenho líquido robusto recente, sem comprometer limite de trades de REV."
+  },
+  "2025-10-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém seu perfil de qualidade (80 trades, WR 66%, $790 líquido) com melhor custo-benefício — alta seletividade, menor volume de trades. ORB tem WR superior e PnL impressionante ($26050), mas gera volume 22x maior (1758 trades), o que historicamente degrada performance ao compartilhar limite de trades. EMAV está negativa (-$82) e ICT, apesar de boa WR (70%), produz PnL menor ($10132) com 7x mais trades que REV. Na segunda-feira com range anterior de 73pt (moderado) e nível oriundo de Globex, o padrão de reversão no nível do dia tem alta probabilidade. Manter REV como estratégia única reduz ruído e maximiza qualidade das operações."
+  },
+  "2025-10-30": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém a melhor taxa de aprovação (68% WR) com perfil conservador (75 trades, $1055 PnL). ORB emerge como alternativa com desempenho excepcional nos últimos 15 pregões: 1639 trades, mesma WR 68% mas PnL líquido $16178 (15x superior ao REV). ICT também forte (69% WR, $6924), mas ORB comprovadamente mais robusto em volume. EMAV descartada (62% WR, PnL negativo). Nível origem sólido (máx/mín RTH), range anterior amplo (277pt) favorece breakouts. ORB como reserva tática para múltiplas oportunidades ao abrir, REV como core por confiabilidade histórica agregada.\""
+  },
+  "2025-11-04": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente WR (72%) com seletividade (83 trades). ORB está gerando PnL significativamente superior ($14296 vs $1860 de REV) nos últimos 15 pregões, com WR consistente (68%) e volume alto (1539 trades). Apesar de EMAV estar negativa e ICT performar bem, a combinação REV+ORB oferece o melhor equilíbrio: REV como núcleo (melhor taxa agregada histórica) + ORB como reserva (forte desempenho recente). Range anterior moderado (250pt) favorece estratégias com bom aproveitamento intraday como ORB."
+  },
+  "2025-11-05": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente WR (72%) e é a estratégia mais consistente isoladamente. Porém, ORB está claramente outperformando nos últimos 15 pregões: 13196 vs 1329 em PnL líquido, com WR idêntica (70% vs 72%) e volume robusto de 1477 trades. ICT também performa bem (6742 PnL, 72% WR), mas ORB é a alternativa mais atrativa. Incluir ORB como reserva é justificado pelos números concretos recentes, apesar do risco histórico de mistura diminuir slots. O range anterior de 349.50pt oferece boa volatilidade para ORB explorar gaps de abertura. Confiança moderada porque a mistura historicamente piora taxa de aprovação, mas o desempenho recente de ORB é inegável.\""
+  },
+  "2025-11-06": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém excelente WR (72%) e é a estratégia de produção com melhor taxa de aprovação agregada. ORB está claramente superperformando nos últimos 15 pregões: 70% WR com PnL $10782 (7x superior ao de REV). Range anterior de 392pt oferece bom setup para breakout. ORB como reserva é justificado pelo desempenho recente concreto. EMAV descartada por WR baixa (62%) e PnL negativo. ICT descartada apesar de bom WR porque REV+ORB já cobrem adequadamente sem dilui limite de trades."
+  },
+  "2025-11-11": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB demonstra desempenho superior nos últimos 15 pregões (PnL $14991 vs $1488 de REV, WR 69% vs 70%). Apesar de REV ter melhor taxa histórica agregada, ORB está em clara tendência de alta performance nesse recorte recente. Range anterior de 308.50pt é adequado para ORB (captura de breakout do opening range). REV mantida como primeira prioridade por robustez histórica, ORB como reserva tática. EMAV e ICT descartadas: EMAV em loss, ICT com muitos trades (risco de dilução de limite)."
+  },
+  "2025-11-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (71% WR) com operações altamente seletivas (76 trades). Embora ORB tenha maior PnL absoluto ($19065), isso vem de 1620 trades com WR inferior (68%), indicando muito mais operações e maior exposure. ICT é competitivo (70% WR, $7384 PnL) mas ainda inferior a REV. EMAV está em drawdown (-$2646). Na segunda-feira, com nível originário do range de domingo à noite (Globex), a reversão no nível do dia anterior (range 220pt) é o setup mais confiável. Manter REV como estratégia única evita diluição do limite de trades por avaliação.\""
+  },
+  "2025-11-12": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente taxa de aprovação (70% WR) e é a estratégia de referência. ORB apresenta desempenho claramente superior nos últimos 15 pregões ($16403 PnL vs $1474 de REV), com WR similar (69%) e volume expressivamente maior, indicando robustez. Embora misturar historicamente piore resultados, ORB nesse recorte recente justifica inclusão como reserva. EMAV descartada (WR baixa 62%, PnL negativo). ICT descartada apesar de boa WR (o ganho concentra-se em ORB). Range anterior de 217.75pt é moderado, mantém condições favoráveis para reversão."
+  },
+  "2025-11-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém melhor taxa de aprovação agregada (71% WR) com PnL positivo. ORB, apesar de maior volume e PnL absoluto ($20335), opera com WR menor (69%) e muitos mais trades, indicando risco de noise. ICT (73% WR) é atraente, mas com apenas 522 trades em 15 dias é ainda menor amostra que REV (89). EMAV descartada por WR baixa (62%) e PnL negativo. Origem de nível clara (máx/mín anterior) favorece REV. Mantém-se estratégia principal; misturar histórico piora resultado.\""
+  },
+  "2025-11-14": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente taxa de aprovação (71% WR) com operações seletivas (89 trades). ORB está claramente outperformando nos últimos 15 pregões: 68% WR em volume significativo (1903 trades) com PnL líquido $24474 — quase 13x superior ao de REV ($1888). Range anterior robusto (499.50pt) favorece ORB. EMAV está em loss (-$2834) e será excluída. ICT tem bom WR (72%) mas volume 6x maior que REV com PnL apenas 5.7x superior, indicando menor eficiência relativa. ORB é reserva fundamentada em performance concreta recente.\""
+  },
+  "2025-11-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (71% WR) com PnL positivo ($1526). Embora ORB mostre volume e PnL nominal superiores, isso é consequência de 22x mais trades (1671 vs 76), o que dilui efetividade por trade. A análise mostra que REV converge para melhor eficiência por operação. EMAV está com PnL negativo (-$2512), descartada. ICT tem WR sólida (71%) mas ainda menor volume eficiente que REV. Domingo com range precedente moderado (458pt) favorece foco em níveis específicos sem ruído de múltiplas estratégias. Mantém-se REV solo como padrão de maior confiabilidade estatística."
+  },
+  "2025-11-16": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém melhor taxa de aprovação (72%) com eficiência de capital comprovada ($2510 em 93 trades = $27/trade). ORB está claramente outperformando no recorte de 15 pregões ($30975 PnL líquido), apesar de WR ligeiramente menor (67%), indicando melhor razão risco/recompensa. EMAV em perd estado negativo (-$1906). ICT é reserva válida (70% WR, $11360), mas ORB tem momentum superior. Combinação REV+ORB como cobertura: REV como base confiável + ORB como acelerador em breakouts de abertura quando range anterior foi robusto (667.25pt)."
+  },
+  "2025-11-17": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor taxa de aprovação (72%) com 93 trades de alta qualidade e $2510 de lucro líquido. ORB está claramente performando melhor nos últimos 15 pregões ($32252 PnL com WR 67% em 1975 trades) — volume muito superior e lucro acumulado significativamente maior justificam incluir como reserva. EMAV está em queda (-$1697) e ICT, apesar de boa taxa (70%), tem volume intermediário e lucro menor que ORB. Segunda-feira com range significativo (262.75pt) favorece estrutura de reversão + breakout."
+  },
+  "2025-11-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (76% WR) e operação mais seletiva (80 trades vs. 1929 do ORB). Embora ORB tenha PnL bruto superior ($34241), sua taxa de acerto é significativamente menor (67%) e o volume massivo de trades (1929) indica baixa seletividade. EMAV está em loss (-$1036). ICT tem bom WR (71%) e PnL positivo, mas REV segue como a mais eficiente (taxa aprovação + seletividade). Desempenho recente de REV não justifica misturar estratégias, pois historicamente piora a aprovação pelo compartilhamento do mesmo limite de trades por avaliação. Manter REV como estratégia primária."
+  },
+  "2025-11-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém melhor taxa de aprovação agregada (67% WR, $2788 PnL em 70 trades, melhor eficiência por trade). ORB tem volume massivo (2006 trades) mas diluído; ICT performou bem mas com 540 trades ainda é menos validado que REV no histórico recente. EMAV está em loss (-$1188). Como a instrução diz que misturar piora o resultado (compartilham limite de trades por avaliação), REV solo é a escolha mais sólida. Range do dia anterior de 455pt oferece bom suporte para reversões.\""
+  },
+  "2025-11-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém WR sólida (65%) e é a estratégia com melhor taxa de aprovação agregada. Embora ORB e ICT mostrem PnL superiores nos últimos 15 pregões, historicamente misturar estratégias piora o resultado por compartilharem o mesmo limite de trades. Com range do dia anterior de 481pt (moderado) e origem bem definida, REV sozinha é a escolha mais segura e consistente. Na dúvida, prefira REV."
+  },
+  "2025-11-21": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.85,
+    "motivo": "ORB está performando significativamente melhor que REV nos últimos 15 pregões: PnL de $45.280 vs $1.574, com 62% de win rate e volume elevado (2012 trades), demonstrando consistência. ICT também forte ($12.102), mas ORB lidera claramente. Range anterior de 1212pt fornece setup sólido para breakout. REV fica como reserva mental se ORB falhar no início, mas hoje a evidência favorece ORB como estratégia primária."
+  },
+  "2025-11-23": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB com desempenho significativamente superior nos últimos 15 pregões: $46.152 (vs $2.424 de REV), WR 60% e volume de trades saudável (2086). EMAV negativa (-$971) e ICT com volume extremo (573 trades, padrão de excesso). Range anterior robusto (669pt) fornece setup ótimo para ORB. REV mantém posição primária por histórico agregado comprovado, mas ORB merece reserva hoje como hedge a desempenho recente superior."
+  },
+  "2025-11-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV continua como prioridade principal. Embora ORB tenha PnL absoluto maior ($46k vs $2.2k), isso reflete volume massivo de trades (1934 vs 61) — uma proporção incompatível com os limites operacionais compartilhados. A WR de REV (56%) é sólida e consistente para o padrão de reversão no range dominical. ORB e ICT têm WR marginalmente melhor, mas misturar estratégias historicamente degrada performance agregada devido ao mesmo limite de trades por avaliação. EMAV está negativa (-$718) e fora de consideração. Mantém-se REV solo conforme princípio estabelecido: na dúvida, REV sozinha."
+  },
+  "2025-11-26": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente superperformando REV nos últimos 15 pregões (PnL $42.567 vs $2.128, WR 61% vs 58%, com volume robusto de 1.873 trades). Range do dia anterior de 533pt fornece base sólida para levels de reversão. Mantendo REV como estratégia primária (histórico agregado comprovado), mas adicionando ORB como reserva hoje é justificado pelo desempenho recente concreto. EMAV descartada (PnL negativo), ICT menos convincente que ORB apesar de WR alta."
+  },
+  "2025-11-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (55% WR, $2085 em 60 trades bem focados). Embora ORB tenha PnL absoluto maior ($44506), isso vem de 1874 trades—volume muito alto que historicamente piora resultados quando combinado com REV pelo limite compartilhado de trades por avaliação. ORB também tem viés para scalping de volume, não para reversão de nível. EMAV está negativa (-$440). ICT tem boa WR (60%) mas ainda inferior em foco e consistência. Range anterior 476.75pt é amplo e favorável para REV buscar reversão nos extremos. Confiança 0.75 por ser terça (dia típico) com nível claro do dia anterior.\""
+  },
+  "2025-11-07": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém excelente WR (71%), mas ORB nos últimos 15 pregões mostrou desempenho PnL significativamente superior ($15406 vs $1526), apesar de WR ligeiramente inferior (69% vs 71%). Volume alto de trades em ORB (1664) fornece amostra robusta. ICT também forte (73% WR, $8780 PnL), mas ORB leva a prioridade pelo PnL absoluto em recorte recente. EMAV descartada (WR fraca 61%, PnL negativo). ORB entra como reserva/segunda prioridade para aproveitar o momento de força recente, mantendo REV como primeira opção conforme protocolo de desequilíbrio de limite de trades."
+  },
+  "2025-11-27": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém melhor taxa de aprovação agregada (58% WR, $2128 líquido em 69 trades — melhor eficiência). ORB é reserva justificada: apesar do elevado volume de trades (2006), exibe WR 61% (3pp acima de REV) e PnL líquido $42634 muito superior nos últimos 15 pregões — sinal concreto de desempenho recente robusto. EMAV descartada (WR 53%, PnL negativo). ICT descartada apesar da WR 64% porque o PnL ($14590) e volume (560) sugerem menor consistência que ORB. Range anterior 242pt favorece estrutura clara para reversão.\""
+  },
+  "2025-12-03": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho significativamente superior nos últimos 15 pregões: PnL $30.986 vs REV $1.318 (+2250%), WR 59% vs REV 52%. Volume robusto de 1592 trades valida a consistência. Apesar de misturar estratégias historicamente piorar, a margem de outperformance é tão grande que ORB como reserva justifica o risco. Range anterior de 255.50pt oferece setup típico para ORB em abertura. REV continua como núcleo principal, mas ORB merece oportunidade hoje."
+  },
+  "2025-11-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada histórica (56% WR com apenas 57 trades, 0.036 PnL/trade). Embora ORB mostre números brutos impressionantes (60% WR, $41k), a conta de 1876 trades em 15 dias revela execução muito mais agressiva e sujeita a dispersão. ICT (64% WR) é interessante, mas com 534 trades também está muito acima do padrão REV. EMAV está em loss. Range do dia anterior (32pt) é moderado, favorecendo REV. Mantém-se a regra: misturar piora por compartilhamento de limite de trades. Confiança moderada porque ORB performou bem, mas a escolha segue o protocolo comprovado.\""
+  },
+  "2025-12-04": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 15 pregões: 1487 trades com WR 60% e PnL de $23.808 (vs REV: 61 trades, WR 49%, PnL $626). ORB é incluída como estratégia primária hoje. REV mantém-se como reserva pela sua taxa de aprovação agregada histórica mais sólida e por ser a estratégia em produção. EMAV descartada (WR 60% mas PnL negativo). ICT descartada apesar de boa WR (o volume massivo de 524 trades vs 61 de REV sugere maior ruído). Range anterior significativo (255pt) favorece breakout."
+  },
+  "2025-12-02": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém solidez (54%, $1631 em 54 trades = $30.2/trade). ORB destaca-se nos últimos 15 pregões com 59% WR e $34.7k PnL em 1731 trades ($20/trade) — volume e lucro absoluto 21x maiores que REV. EMAV está em prejuízo (-$108). ICT tem WR excelente (62%) mas $11.8k PnL em 525 trades é inferior a ORB. Adiciono ORB como reserva/complemento porque o histórico recente concreto (não achismo) mostra outperformance marginal em lucro absoluto; REV segue prioritária (melhor taxa agregada). Range moderado (286.50pt) não desconforta combinação. Risco de piorar por compartilhamento de limite de trades, mas sinal recente justifica teste.\""
+  },
+  "2025-12-05": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está performando significativamente melhor que REV nos últimos 15 pregões: 60% WR vs 49%, e +$22.884 PnL vs +$626 (36x mais rentável). ICT também forte (66% WR, +$10.694), mas ORB lidera absoluto. Prioridade 1: ORB (está claramente acima). Prioridade 2: REV como reserva (produção, segura). EMAV excluída (WR 61% mas PnL negativo = slippage/custos). Range anterior 224pt é relevante para ambas (REV usa níveis, ORB aproveita breakout da abertura)."
+  },
+  "2025-12-09": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $20.690 vs $588 de PnL líquido. WR de 63% é sólido (apenas 3pp abaixo de ICT). Volume de trades (1503) garante robustez estatística. REV sozinha tem melhor taxa histórica agregada, mas essa divergência recente é concreta demais pra ignorar. ORB como estratégia principal hoje, com a ressalva de que estou reduzindo confiança em relação a misturar (conforme instrução, misturar piora limite de trades por avaliação)."
+  },
+  "2025-12-10": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está performando significativamente melhor que REV nos últimos 15 pregões (WR 64% vs 60%, PnL $20.372 vs $652). Apesar de REV ter a melhor taxa de aprovação agregada historicamente, o desempenho recente concreto de ORB justifica incluí-la como reserva. REV mantém prioridade por sua consistência comprovada, mas ORB é backup com volume alto e rentabilidade forte. Evito ICT e EMAV por enquanto, pois ambas têm volume/rentabilidade inferior ao ORB e adicionariam ruído sem benefício claro.\""
+  },
+  "2025-12-12": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: 5658 vs 1205 em PnL líquido, com WR de 71% vs 67%. Apesar do alto volume de trades (1254), a consistência da estratégia é comprovada. ICT também mostra bom desempenho, mas usar múltiplas estratégias histórico PIORA resultado pela contenção de limite de trades. ORB é a escolha mais assertiva para hoje, especialmente numa sexta onde o range do dia anterior foi robusto (332.50pt)."
+  },
+  "2026-01-02": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ICT apresenta desempenho superior nos últimos 15 pregões (WR 74%, PnL $9714) vs REV (WR 67%, PnL $1205). Apesar do aviso sobre mixagem prejudicar taxa de aprovação, o diferencial concreto de ICT justifica incluí-la como estratégia reserva. REV mantém prioridade por ser o baseline em produção com melhor taxa agregada histórica. Sexta antes de fim de ano (volatilidade/comportamento atípico possível) favorece ter alternativa preparada."
+  },
+  "2025-12-08": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB com desempenho substancialmente superior nos últimos 15 pregões: 1458 trades, WR 59%, PnL $19,984 vs REV (81 trades, WR 52%, PnL $236). ORB também gera muito mais oportunidades (volume de trades 18x maior) e lucro agregado 84x maior. ICT também forte (WR 66%, PnL $8.5k), mas ORB lidera em PnL absoluto. EMAV descartada (PnL negativo). Segunda-feira com range anterior de 103pt (modesto) favorece breakout do range de domingo. REV mantida como reserva por ser a mais confiável historicamente em agregado, mas ORB é prioridade hoje dada sua performance recente inequívoca.\""
+  },
+  "2025-12-14": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ICT mostrou desempenho claramente superior nos últimos 15 pregões: WR 73% vs 66% de REV, e PnL $9970 vs $1064 de REV. Apesar de ICT operar em volume muito maior (598 vs 71 trades), a taxa de acerto consistentemente mais alta e o lucro agregado significativamente maior justificam incluí-la como estratégia primária hoje. REV mantém-se como reserva pela sua histórica solidez agregada em períodos longos. Range anterior substancial (501.50pt) oferece bom espaço operacional para ambas.\""
+  },
+  "2025-12-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (64% WR) e é a estratégia mais estável em produção. Apesar de ORB e ICT mostrarem maior PnL absoluto nos últimos 15 pregões, isso reflete volume massivamente maior (1343 e 542 trades vs 64 trades de REV). A mistura de estratégias historicamente PIORA o resultado porque compartilham o mesmo limite de trades por avaliação. REV sozinha é a escolha prudente, especialmente com nível de reversão bem definido (máx/mín do dia anterior) e range anterior de 342pt fornecendo contexto claro."
+  },
+  "2026-01-05": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $8.192 vs $1.162 (7x melhor), com WR superior (68% vs 66%) e volume de trades consistente (1258). Embora REV historicamente tenha melhor taxa agregada, o desempenho recente de ORB é concreto e significativo. Hoje é segunda com range do domingo já definido (85.25pt) — condição ideal para ORB explorar o opening range break. Mantém ORB como prioridade, com REV implícita como fallback se ORB não executar conforme esperado."
+  },
+  "2026-01-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV é a estratégia em produção com melhor taxa de aprovação agregada. Embora ORB, EMAV e ICT mostrem métricas superiores nos últimos 15 pregões (WR e PnL maiores), o risco de degradação ao misturar estratégias que compartilham o mesmo limite de trades por avaliação historicamente piora o resultado. REV tem base mais robusta e confiável. Com range anterior de 169.50pt (moderado-alto), as condições favorecem a reversão nos níveis do dia anterior/domingo. Preferência por foco e consistência hoje."
+  },
+  "2026-01-08": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ICT apresenta WR 75% (maior entre todas) e PnL líquido de $10.188 nos últimos 15 pregões — claramente superior a REV (71% WR, $1.798). Mantém REV como secundária por ser a estratégia com melhor taxa agregada historicamente. ORB, apesar do bom PnL absoluto, tem WR menor (69%) e volume excessivo de trades pode congestionar o sistema."
+  },
+  "2026-01-07": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ICT apresentou melhor desempenho nos últimos 15 pregões (WR 75%, PnL $10362) comparado a REV (WR 66%, PnL $1210). Mantém-se REV como base dada sua taxa de aprovação histórica agregada superior, mas ICT entra como reserva com alta confiança dado desempenho recente robusto (maior win rate e PnL absoluto bem superior). Range anterior moderado (229.75pt) favorece múltiplas estratégias. ICT em prioridade 1, REV em prioridade 2."
+  },
+  "2026-01-09": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ICT mostrou desempenho superior nos últimos 15 pregões: WR 75% (vs REV 73%), volume robusto (578 trades) e PnL líquido de $9960 — significativamente à frente de REV ($1970) e ORB ($7244). Embora misturar estratégias historicamente piore o resultado agregado (compartilham limite de trades), este é um caso concreto onde o desempenho recente justifica ICT como primeira opção e REV como reserva. Range anterior de 234pt oferece amplitude razoável para ambas."
+  },
+  "2026-01-13": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente WR (74%) com $2060 líquido, mas ORB nos últimos 15 pregões apresenta PnL significativamente superior ($8785, +326% vs REV) com WR igualmente sólido (70%) e volume de execuções bem maior (1260 vs 62), indicando consistência e opportunity. Range anterior de 286.50pt oferece contexto favorável para breakouts. ORB como reserva estratégica justificada pelo desempenho recente concreto, sem comprometer o limite de trades de REV."
+  },
+  "2026-01-12": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresentou desempenho superior nos últimos 15 pregões: $9175 em PnL líquido vs $2436 da REV, com volume de trades muito maior (1195 vs 71) e WR de 69% ainda sólida. A segunda-feira com range amplo de domingo (249.75pt) é condição típica favorável para opening range breakout. REV mantém posição como estratégia principal de confiança comprovada (73% WR), mas ORB como reserva é justificada pelo desempenho recente objetivo. Risco mitigado: compartilham limite de trades, então qualidade sobre quantidade."
+  },
+  "2026-01-11": {
+    "estrategias": [
+      "ICT",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "Nos últimos 15 pregões, ICT apresentou WR 75% (superior aos 73% de REV) e PnL líquido de $9822 — o melhor absoluto entre todas as estratégias. ORB também superou REV em PnL ($8251), mas com volume desproporcionalmente alto (1214 trades vs 71 de REV), elevando risco de draw-down e degradação por saturação do limite de trades por avaliação. ICT mantém volume controlado (586 trades) com melhor taxa de acerto e resultado. REV permanece como primária (base sólida, menor variância), ICT como reserva de alto potencial. Confiança moderada porque desempenho recente não anula o histórico agregado de REV, mas o sinal de ICT é suficientemente claro para justificar suporte.\""
+  },
+  "2026-01-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém excelente taxa de aprovação (75% WR, 2º melhor) e, apesar do PnL absoluto ser o menor, possui o melhor índice trades/PnL ($32.53/trade vs ORB $6.81/trade). Embora ORB tenha PnL total maior, opera com 1237 trades (volume 20x maior), sugerindo muita dilição em trades de baixa qualidade. A recomendação é manter REV como estratégia primária: misturar historicamente PIORA o resultado agregado por compartilhar o mesmo limite de trades por avaliação. Range do dia anterior (239.50pt) é moderado — condições normais favorecem a estratégia estabelecida."
+  },
+  "2026-01-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação (75% WR) com PnL consistente ($1774 em apenas 59 trades = $30.07/trade). Embora ORB tenha superior PnL absoluto ($10338), opera 1337 trades com WR 68% (significativamente mais baixa) — índice de eficiência muito inferior. EMAV e ICT têm WR similares a ORB mas PnL menor. REV sozinha evita dilução de limite de trades por avaliação e mantém foco na estratégia com melhor aprovação relativa. Range anterior (369.50pt) é material, favore a reversão em nível estruturado."
+  },
+  "2026-01-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (81% WR) com seletividade superior (64 trades vs 1352 de ORB). Embora ORB mostre PnL absoluto maior ($12.573), isso é resultado de volume massivo de trades — sua win rate de 70% é inferior a REV. ICT (74% WR) e EMAV (71% WR) também ficam atrás. Hoje é domingo com range anterior de 299.50pt — bom setup para reversões no nível. Misturar estratégias historicamente piora por compartilharem limite de trades. REV sozinha é a escolha correta.\""
+  },
+  "2026-01-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.92,
+    "motivo": "REV mantém a melhor taxa de aprovação (79% WR) e mantém excelente eficiência com apenas 58 trades para $1184 de PnL. Embora ORB e ICT tenham maior PnL absoluto em 15 pregões, ambas operam com muito mais volume de trades (1330 e 535 respectivamente), o que historicamente piora o resultado quando combinadas com REV devido ao compartilhamento do limite de trades por avaliação. O range do dia anterior (276.25pt) fornece bom nível de referência para REV. Manter foco exclusivo em REV conforme a regra consolidada."
+  },
+  "2026-01-21": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação (83% WR) e melhor PnL por trade ($32,95) apesar de menor volume. ORB tem PnL total maior ($8632), mas com WR inferior (73%) e 1128 trades — misturar estratégias históricamente piora o desempenho ao compartilhar limite de trades. O recorte de 15 pregões não é suficiente para justificar desvio da estratégia consolidada. Nível do dia anterior (331.75pt) oferece suporte robusto para REV hoje."
+  },
+  "2026-01-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (82% WR) e o melhor PnL por trade ($20,79). Embora ORB mostre PnL total superior ($10.787), isso vem de 1213 trades com WR 72%, indicando volume excessivo e dispersão típica de mistura de estratégias. Range do dia anterior (180.75pt) é moderado e favorável para reversão no nível. REV em produção priorizada como padrão; misturar piora historicamente. Confiança alta mantida na estratégia core.\""
+  },
+  "2026-01-22": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB vem claramente superando REV nos últimos 15 pregões (PnL $12998 vs $2404, mesmo com WR 72% vs 82%). Como reserva estratégica, ORB merece espaço hoje. Range anterior de 526pt fornece bom contexto para opening range setup. REV mantém prioridade (melhor WR) mas ORB entra como tática complementar dados seus números recentes robustos."
+  },
+  "2026-01-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (83% WR) com 63 trades e $1434 PnL líquido. Embora ORB tenha PnL maior em valor absoluto ($10663), isso é resultado de 1152 trades com WR inferior (72%). EMAV mostra WR baixa (73%) e PnL mínimo ($609). ICT tem boa WR (74%) mas com 476 trades, complexidade maior. Dado que misturar estratégias historicamente piora o resultado (compartilham mesmo limite de trades por avaliação), manter REV em solo é a decisão de menor risco. Segunda-feira com nível do Globex de domingo: bom dia para padrão de reversão previsível. Confiança alta em REV.\""
+  },
+  "2026-01-23": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB mostrou desempenho superior nos últimos 15 pregões (PnL $13758 vs REV $3526, +290%), com volume de trades muito maior (1310 vs 96) e WR aceitável de 72%. Range amplo do dia anterior (195pt) cria oportunidade favorável para breakout. REV mantém como reserva pela taxa histórica de aprovação, mas ORB é a prioridade hoje. Mistura controlada para captar upside sem sacrificar qualidade de entrada."
+  },
+  "2026-01-04": {
+    "estrategias": [
+      "ICT",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "Nos últimos 15 pregões, ICT e ORB claramente superaram REV em desempenho absoluto (PnL líquido $8904 e $8259 vs $1162). ICT lidera com maior Win Rate (73%) e melhor PnL, enquanto ORB oferece suporte com volume robusto e WR 68%. REV fica como terceira opção implícita. Range anterior amplo (538.50pt) favorece breakout e estruturas de FVG. Confiança moderada porque a mistura reduz limite de trades, mas o diferencial de performance nos últimos 15 dias justifica priorizar essas duas."
+  },
+  "2025-12-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV permanece como estratégia primária. Embora ORB e ICT mostrem WR e PnL superiores nos últimos 15 pregões, REV tem a melhor taxa de aprovação agregada em histórico completo. ORB apresenta volume extremo (1750 trades vs 57 em REV) - padrão de over-trading que tipicamente resulta em drawdown quando forçado. ICT tem WR excelente (63%) e PnL positivo ($12748), mas volume ainda 9x maior (524 vs 57). O risco de misturar estratégias que compartilham limite de trades por avaliação outweighs o ganho recente. Range do dia anterior é moderado (318.75pt), ambiente favorável para REV pura. Manter disciplina."
+  },
+  "2026-02-02": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém melhor taxa de aprovação (76% WR) e eficiência (24.65 $/trade). ORB, apesar de maior volume (1658 trades), gerou PnL líquido significativamente superior ($13712 vs $2146 de REV nos últimos 15 pregões). Com range substancial do domingo ($429.50pt), ORB é reserva justificada para capturar breakouts intraday, respeitando o limite de trades compartilhado."
+  },
+  "2026-02-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (77% WR) com PnL sólido ($2284 em 91 trades). Embora ORB apresente PnL absoluto maior ($16134), isso vem de 1788 trades com WR inferior (70%), indicando volume compensatório e risco de drawdown. Com um range prévio de 371.25pt (tamanho significativo), a reversão no nível do dia anterior/domingo é o cenário mais claro. Manter REV como estratégia única preserva a melhor taxa de aprovação; misturar historicamente piora o resultado pelo compartilhamento do limite de trades."
+  },
+  "2026-01-27": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB com performance excepcional nos últimos 15 pregões: $15.731 de PnL líquido (6.8x mais que REV), com 1389 trades e WR de 73%. Apesar de misturar estratégias historicamente piorar, o desempenho real recente de ORB é tão superior que justifica incluí-la como reserva. REV mantém prioridade 1 (melhor WR 75%), ORB como reserva (prioridade 2) para capturar setup de abertura que REV não cobre. Range anterior de 232.25pt oferece bom margin para ambas operarem sem conflito severo.\""
+  },
+  "2026-01-28": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém excelente taxa de aprovação (77%) com 107 trades em 15 pregões, mas ORB está claramente outperformando no recorte recente: 1465 trades com WR 73% e PnL líquido $16340 (6,2x superior ao de REV). O range do dia anterior é robusto (197pt), fornecendo base sólida para REV. Incluir ORB como reserva é justificado pelo desempenho concreto recente, apesar do volume maior de trades compartilharem o mesmo limite por avaliação. EMAV e ICT descartadas: EMAV tem PnL bem inferior ($1624) e ICT tem WR mais baixa (71%) com volume alto (527 trades)."
+  },
+  "2026-01-29": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (76% WR) e é a estratégia em produção com performance consistente. Embora ORB mostre volume muito superior (1510 trades) e maior PnL absoluto ($15908), isso reflete diferença massiva de trades executados — o PnL por trade de REV (~$19/trade) é competitivo com ORB (~$10.5/trade). EMAV tem WR superior (78%) mas com apenas 79 trades e menor PnL absoluto. ICT tem performance inferior em WR (71%). Dado que misturar estratégias historicamente piora o resultado (competição pelo mesmo limite de trades), mantemos REV como prioridade única, que demonstra melhor custo-benefício na recente e tem a base sólida de aprovação agregada.\""
+  },
+  "2026-01-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (78% WR) e, mais importante, o melhor PnL por trade ($25,08/trade vs $10,76 de ORB, $25,87 de EMAV, $6,48 de ICT). Apesar de ORB ter PnL bruto maior, executa 1368 trades contra 116 de REV, sugerindo risco sistêmico e overhead operacional. EMAV tem WR ligeiramente superior (80%) mas com apenas 75 trades e PnL total menor. Nos últimos 15 pregões, REV continua demonstrando eficiência superior. Range amplo de domingo (303.50pt) favorece reversão disciplinada no nível do dia anterior. Misturar estratégias historicamente piora resultados pelo compartilhamento de limite de trades. Confiança alta em manter foco em REV puro."
+  },
+  "2026-01-30": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém superioridade em taxa de aprovação (75% WR) com bom PnL líquido ($1835). Embora ORB tenha maior PnL absoluto ($14730), isso decorre de volume massivamente maior (1713 vs 105 trades) — comparando eficiência por trade, REV é superior. ICT tem WR aceitável (70%) mas menor PnL. EMAV tem WR ligeiramente melhor (79%) porém PnL total menor ($1662). Histórico comprova que misturar estratégias piora aprovação por compartilharem limite de trades. Com range anterior moderado (639pt) e origem clara (máx/mín RTH), REV sozinha oferece melhor relação risco-recompensa. Confiança alta na seleção single-strategy.\""
+  },
+  "2026-02-03": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém a melhor WR (76%) e PnL/trade ($26,59), mas ORB nos últimos 15 pregões gerou $13.850 de PnL líquido total (vs $2.342 de REV), sinalizando execução consistente em volume. Range anterior de 422pt favorece ORB. Inclusão de ORB como reserva justificada pelo desempenho recente concreto, não achismo. Mantém confiança moderada por risco de dilução do limite de trades comum às estratégias."
+  },
+  "2026-02-05": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV no recorte de 15 pregões (PnL $19368 vs $1686), com a mesma WR (66%) mas volume massivamente superior de trades (1842 vs 74). Range do dia anterior é relevante (606.50pt), criando oportunidade para breakout. REV permanece na base como âncora de confiança, mas ORB merece prioridade hoje como estratégia reserva. EMAV e ICT descartadas: EMAV com PnL negativo, ICT sem ganho incremental vs ORB.\""
+  },
+  "2026-02-11": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 15 pregões: 65% WR, $13.375 PnL líquido (vs REV com 62% WR, $1.642 PnL). Apesar de maior volume de trades, ORB demonstra consistência e rentabilidade 8x superior a REV no período recente. Range do dia anterior (249pt) é adequado para ORB. Excluindo EMAV (WR 51%, PnL negativo) e mantendo ICT em reserva por segurança."
+  },
+  "2026-02-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada historicamente. Embora ORB tenha mostrado PnL superior nos últimos 15 pregões ($18162 vs $1704), ORB opera com 21.7x mais trades (1910 vs 88), resultando em menor PnL por trade e maior variância. EMAV está em drawdown ($-1256). REV sozinha reduz risco de degradação por compartilhamento de limite de trades. ICT tem bom PnL mas inferior a ORB. Manter foco em REV é a estratégia mais prudente, especialmente em sexta-feira com range anterior elevado (417.50pt)."
+  },
+  "2026-02-10": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB em performance excepcional nos últimos 15 pregões (66% WR, $18.441 líquido vs REV em 60% WR, $702). Range anterior de 473.25pt oferece setup potencial para breakout. REV mantém-se como estratégia primária (historicamente mais consistente agregada), ORB como reserva tática dado seu desempenho recente superior. EMAV descartada (WR 48%, PnL negativo). ICT descartada (performance inferior a ORB apesar de 63% WR)."
+  },
+  "2026-02-09": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente performando melhor que REV nos últimos 15 pregões: 65% WR vs 62%, e PnL líquido de $19174 vs $1848 — ganho 10x superior. Embora REV tenha melhor taxa de aprovação agregada histórica, esse desempenho recente concreto de ORB justifica incluí-la como estratégia de reserva hoje. Range do dia anterior é robusto (192.75pt), ambiente favorável para breakout. EMAV está em terreno negativo (-$1752) e ICT, apesar de lucrativo, está abaixo de ORB em PnL. Prioridade: REV (principal), ORB (reserva)."
+  },
+  "2026-02-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém performance sólida (57% WR, +$1409). Embora ORB apresente números absolutos maiores ($22156), isso se deve ao volume massivo de trades (2089 vs 61 de REV) — o que historicamente prejudica quando combinadas devido ao limite compartilhado. ICT e EMAV não justificam inclusão (EMAV com WR 49% e PnL negativo). Mantém-se foco exclusivo em REV conforme protocolo de máxima taxa de aprovação agregada. Range anterior 671pt oferece nível robusto para hoje."
+  },
+  "2026-02-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (74% WR) e o melhor PnL por trade ($33,63/trade vs $9,06 ORB, $8,20 EMAV, $3,60 ICT). Embora ORB tenha maior PnL absoluto, opera 1766 trades — incompatível com limite de trades por avaliação. EMAV e ICT estão claramente inferiores. Range do dia anterior é bom (733.25pt), favorecendo reversões. Na dúvida, REV sozinha é a escolha mais segura e com melhor histórico agregado."
+  },
+  "2026-02-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação (58% WR) com desempenho agregado sólido ($2390 PnL em 65 trades). Embora ORB tenha WR superior (64%) e PnL maior ($24170), isso é em volume 33x maior (2152 trades vs 65), o que aumenta risco de saturação do limite de trades por avaliação. EMAV está em drawdown (-$4709, 43% WR). ICT tem desempenho interessante ($7996, 63% WR) mas em 661 trades (volume 10x REV), também com risco de limite. Mantém-se com REV como estratégia principal; não há motivo concreto de mistura hoje."
+  },
+  "2026-02-17": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB demonstra desempenho superior nos últimos 15 pregões: WR 63% vs REV 58%, e PnL líquido de $23.056 vs REV $2.126 (10,8x maior). EMAV está negativa (-$4.755). ICT performou bem (WR 63%, $8.328), mas com volume de trades muito alto (657), sugerindo maior variância. REV mantém-se como estratégia principal (melhor taxa agregada histórica), porém ORB merece posição reserva hoje como complemento pelo desempenho recente consistente. Range anterior de 126.75pt oferece contexto de volatilidade normal para operação."
+  },
+  "2026-02-18": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém solidez (59% WR, $2283 PnL em 87 trades), mas ORB está claramente performando melhor nos últimos 15 pregões: 63% WR e $25010 PnL em 2047 trades. O volume massivo de trades em ORB com resultado positivo consistente justifica incluí-la como estratégia reserva hoje. EMAV descartada (43% WR, -$4322). ICT descartada apesar de 61% WR porque REV+ORB já cobrem bem o espaço de oportunidades e compartilham limite de trades por avaliação."
+  },
+  "2026-02-23": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB nos últimos 15 pregões mostrou PnL de $30.667 (7x superior a REV: $4.324) com WR similar (64% vs 63%). Essa é evidência concreta de performance superior no recorte recente. REV mantém prioridade como estratégia primária pela melhor taxa agregada histórica e menor volume de trades (mais conservadora), mas ORB merece inclusão como reserva hoje dado seu desempenho robusto. EMAV descartada (WR 47%, PnL negativo). ICT descartada (performance inferior a ORB apesar de WR decente)."
+  },
+  "2026-02-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (61% WR com 96 trades consolidados). Embora ORB mostre números impressionantes em volume (1897 trades, 64% WR, +$26708), o histórico conhecido indica que misturar estratégias piora o resultado porque compartilham o mesmo limite de trades por avaliação. ICT e EMAV não justificam inclusão: EMAV está claramente negativa (-$3874) e ICT, apesar de positiva, tem volume excessivo (644 trades) que sugere execução dispersa. Mantém-se foco em REV como estratégia principal, especialmente em sexta-feira com range anterior robusto (210.50pt) que favorece reversões bem definidas."
+  },
+  "2026-02-19": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $27.914 vs $2.848 (9,8x mais lucro), com WR superior (64% vs 61%) e volume de trades robusto (2011 vs 94). EMAV está em prejuízo (-$4.575, WR 43%) e será descartada. ICT tem resultado positivo ($7.206), mas significativamente inferior a ORB. Range anterior alto (376.25pt) e origem em máx/mín RTH favorecem breakouts. Recomendação: ORB como estratégia principal hoje, REV como reserva para backup se ORB não gerar setup claro, mantendo limite de trades do pool compartilhado."
+  },
+  "2026-02-24": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV continua sendo a base (melhor aprovação histórica), mas ORB mostra desempenho CLARAMENTE superior nos últimos 15 pregões: +$31.452 acumulados com WR 64% vs REV +$3.704 com WR 61%. O volume alto de trades de ORB (2111 vs 108 da REV) reduz ruído estatístico e valida a tendência. ICT também positivo (+$8.304) mas ORB ainda é mais consistente. EMAV descartada por estar em perda. Range do dia anterior (372pt) é moderado — ambiente favorável para breakout. ORB entra como reserva prioritária hoje.\""
+  },
+  "2026-02-25": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém sólida taxa de aprovação (65%) com 124 trades e $3081 PnL. ORB está claramente performando melhor nos últimos 15 pregões: 2039 trades, mesma WR 65%, mas PnL líquido de $29674 — quase 10x superior. Range anterior de 384.25pt oferece boa base para níveis REV. ORB como estratégia de reserva é justificada pelo desempenho concreto recente, apesar do risco de compartilhamento de limite de trades."
+  },
+  "2026-02-27": {
+    "estrategias": [
+      "REV",
+      "ICT"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV continua com melhor taxa de aprovação (70% WR), mas ICT mostrou desempenho superior nos últimos 15 pregões: PnL de $4879 (38% maior que REV) com WR de 64% em 621 trades. EMAV descartada por WR baixa (52%) e PnL negativo. ORB descartado apesar do PnL alto porque gera volume extremo (2034 trades) que historicamente piora performance quando combinado. ICT como reserva estratégica, mantendo REV como prioridade conforme protocolo estabelecido."
+  },
+  "2026-02-26": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho superior nos últimos 15 pregões (PnL $25.586 vs REV $3.645) e WR similar (67% vs 68%). Range robusto de 247.50pt favorece breakout. REV mantém alta confiabilidade (WR 68%) como âncora. EMAV descartada (WR 52%, PnL negativo). ICT descartada (menor volume de trades validador). ORB como reserva estratégica tem justificativa concreta no recorte recente."
+  },
+  "2026-03-03": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $32,570 vs $3,892 de PnL, com WR similar (67% vs 65%) e muito maior volume de trades (2070 vs 113). Embora a mistura histórica piore resultados, a diferença recente é substantiva e justifica ORB como estratégia de reserva. EMAV descartada (WR 56%, PnL negativo). ICT descartada (performance inferior a ORB)."
+  },
+  "2026-03-02": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB tem desempenho superior comprovado nos últimos 15 pregões: 2044 trades com WR 68% e PnL $32338 (9x maior que REV). Apesar do elevado volume de trades, a consistência de ganho está clara. REV mantém-se como estratégia principal (melhor taxa agregada histórica) e ORB como reserva. EMAV descartada (WR 55%, PnL negativo). ICT em terceiro lugar, mas com WR similar a REV e volume menor que ORB, justifica exclusão em favor de ORB que lidera claramente neste período recente.\""
+  },
+  "2026-03-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (62% WR com 116 trades bem controlados). Embora ORB mostre PnL superior ($33.342), isso decorre de volume massivo (2218 trades) e dilui o risco por trade. ICT é reserva interessante (624 trades, 65% WR, +$7.861), mas a tendência consolidada aponta para REV como mais robusta neste cenário. Range anterior de 498pt é moderado — condições adequadas para reversão no nível."
+  },
+  "2026-02-12": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões (PnL $14688 vs $840, WR 65% vs 59%), com volume de trades robusto (2044). ICT também é positivo ($5614) mas com WR similar (64%). EMAV descartado por WR abaixo de 50% e PnL negativo. Estratégia: ORB como prioridade principal (melhor performance recente), REV como reserva (baseline confiável). Range anterior de 407pt oferece bom setting para breakout. Confiança moderada (0.72) porque mesmo com dados reais favoráveis a ORB, REV historicamente tem taxa de aprovação agregada superior — mantém-se como segunda opção para proteção."
+  },
+  "2026-03-09": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB mostrou desempenho superior nos últimos 15 pregões (PnL $29951 vs $2152 de REV, WR 66% vs 63%, volume muito maior de trades com consistência). Segunda-feira com nível vindo do range de domingo (Globex) e range anterior de 473pt favorece breakouts do opening range. ORB como prioridade 1, REV como reserva para controles mais finos/pullbacks após breakout inicial."
+  },
+  "2026-03-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém consistência com 62% WR e $2600 de PnL em 122 trades. ORB mostra números superiores (66% WR, $26256), mas com volume massivo (2122 trades) em período de 15 dias — padrão anômalo que sugere degradação de qualidade ou overlay excessivo. EMAV está em loss ($-592). ICT comparável a REV. Mantendo REV como estratégia principal por robustez comprovada e para evitar contaminação de limite de trades. Range anterior largo (437pt) favorece reversões bem definidas.\""
+  },
+  "2026-03-05": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $32.362 vs $2.010 de PnL líquido (16x maior), com WR superior (66% vs 61%) e volume robusto de 2186 trades. ICT também positivo ($4.505), mas ORB é o destaque. REV mantém-se como estratégia principal pela taxa de aprovação agregada histórica, mas ORB como reserva é justificado pelo desempenho recente concreto. EMAV descartada (PnL negativo). Range amplo do dia anterior (391.75pt) favorece breakouts."
+  },
+  "2026-03-12": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho superior nos últimos 15 pregões (WR 65% vs 62%, PnL $33.7k vs $2.5k), apesar do elevado volume de trades. Range do dia anterior é substancial (306.50pt), ambiente favorável para breakout. REV mantém prioridade 1 por ser base sólida em taxa de aprovação, ORB como reserva tática."
+  },
+  "2026-03-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém excelente taxa de aprovação (63%) com 115 trades disciplinados e PnL sólido ($2798). ORB, apesar de WR ligeiramente superior (66%), operou 2324 trades com PnL total $33074 — distribuição muito maior compromete consistência. EMAV e ICT claramente underperformando. Range anterior amplo (325.25pt) favorece reversão no nível. Estratégia única preserva a melhor taxa de sucesso agregada conhecida."
+  },
+  "2026-04-02": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está gerando $38.656 nos últimos 15 pregões com 2.474 trades (WR 66%), significativamente acima de REV ($1.371 em 104 trades). Range do dia anterior de 454.75pt oferece amplitude para ORB. REV mantém prioridade 1 (produção + estabilidade), mas ORB como reserva é justificado pelo desempenho recente comprovado."
+  },
+  "2026-03-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém taxa de aprovação sólida (63% WR) com PnL agregado de $2708 em 119 trades disciplinados. Embora ORB mostre volume alto e WR 66%, sua métrica de PnL/trade ($15.05/trade) é questionável dado o número extremo de execuções (2282 trades em 15 dias), sugerindo possível over-trading que pode não ser sustentável. REV continua com melhor eficiência (WR 63%, $22.76/trade) e é a estratégia validada em produção. EMAV e ICT mostram desempenho inferior. Na dúvida e sem sinal claro de dominância absoluta de outra estratégia, mantém-se REV como foco único para evitar dilução do limite de trades por avaliação."
+  },
+  "2026-03-13": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está performando significativamente melhor nos últimos 15 pregões: $38.426 de PnL líquido vs $2.288 de REV (16,8x maior), com WR de 66% vs 61% e volume de trades adequado (2477). Range de 291.75pt do dia anterior oferece setup sólido para breakout. REV mantém-se como primeira prioridade (melhor taxa de aprovação agregada), mas ORB como reserva estratégica é justificado pelos dados concretos recentes. EMAV e ICT descartadas: EMAV com apenas $470 em 15 pregões é insuficiente; ICT, apesar de PnL positivo, fica substancialmente abaixo de ORB.\""
+  },
+  "2026-04-06": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 15 pregões: WR 65% (vs REV 61%), volume massivo de 2504 trades com PnL líquido $40631 ($16.22/trade). REV mantém-se como base com 61% WR e $1794 PnL. Segunda-feira com range de domingo de 345.25pt oferece oportunidade clara para ORB. Mantém REV como reserva dado seu histórico de aprovação agregada, mas ORB lidera hoje pela evidência recente objetiva."
+  },
+  "2026-04-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (60% WR) com 102 trades produtivos. Embora ORB tenha melhor WR (65%), seu volume massivo (2377 trades) e maior drawdown no período não justificam misturar — historicamente isso piora a performance. EMAV e ICT têm performance inferior. O range anterior é robusto (249.50pt), condição favorável para REV explorar inversões de nível. Confiança moderada-alta: preferir foco em REV puro."
+  },
+  "2026-04-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (61% WR) com desempenho consistente ($4246 em 131 trades, ~$32/trade). Embora ORB mostre números absolutos maiores ($38912), isso é resultado de volume muito superior (2410 trades vs 131) e eficiência real similar. O risco histórico de misturar estratégias piora performance. Range anterior de 412.75pt é moderado, favorecendo a reversão sistemática. Mantenho foco em REV como estratégia principal."
+  },
+  "2026-04-09": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está gerando PnL líquido significativamente superior ($36090 vs $4290 de REV) nos últimos 15 pregões, com WR também mais alto (64% vs 61%). Range anterior robusto (323.25pt) favorece ORB. REV permanece como estratégia principal, mas ORB merece ser incluída como segunda opção hoje dado o desempenho recente concreto."
+  },
+  "2026-04-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém consistência com WR 66% e PnL positivo ($4842). ORB aparenta performance superior ($35508), mas com 2330 trades contra 135 da REV — volume drasticamente maior sugere menor rigor de seleção, diluição de qualidade ou contaminação por múltiplas estratégias no mesmo limite de trades. O padrão histórico confirma: misturar piora o resultado agregado porque todas competem pelo mesmo pool de oportunidades diárias. Mantém-se REV como prioridade única hoje. Range anterior (309.25pt) é neutro — não justifica desvio da estratégia em produção."
+  },
+  "2026-04-15": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões (PnL $37846 vs $5327, apesar de WR ligeiramente menor 68% vs 72%). Range de 340.75pt do dia anterior é substancial e favorável a ORB. REV mantém prioridade 1 por histórico agregado superior, mas ORB como reserva justificada pelos números recentes concretos."
+  },
+  "2026-04-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação (71% WR) com 145 trades bem distribuídos. ORB tem PnL maior ($37.5k vs $5k), mas com 2200 trades e 67% WR—muito mais volume sugere diluição de edge ou múltiplos pequeninhos que não compensam o risco de comportamento. EMAV tem WR igual a REV mas PnL menor ($2.4k), indicando menor consistência por trade. ICT fica em terceiro (64% WR, $5.1k). O range anterior (387.50pt) é substancial—REV nesse contexto de máx/mín consolidado histórico é a escolha mais prudente. Não há motivo concreto (desempenho recente superior) pra adicionar reserva hoje.\""
+  },
+  "2026-04-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "REV mantém a melhor taxa de aprovação agregada (69% WR) e melhor eficiência por trade ($30,30 por operação). Embora ORB tenha PnL bruto maior ($33102), isso é resultado de 2251 trades vs 152 de REV — elevado volume mascara qualidade inferior (65% WR, $14,70 por trade). EMAV e ICT também estão abaixo de REV em taxa de acerto e retorno por operação. Hoje (segunda com range de domingo de 189.25pt) é cenário típico de REV. Premissa: misturar estratégias historicamente piora resultado. Mantenho REV como única escolha principal, confiante em sua consistência recente."
+  },
+  "2026-04-21": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB teve desempenho superior nos últimos 15 pregões (PnL $29718 vs REV $3834, WR 70% vs 72% é comparável). Range do dia anterior é robusto (259pt), favorável para breakout. REV mantém posição prioritária pela consistência histórica, mas ORB como reserva merece ativação hoje dados os números recentes."
+  },
+  "2026-04-20": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB mostrou desempenho superior nos últimos 15 pregões ($29.226 vs $3.115 de REV, com mesma WR 70%). Embora REV seja a estratégia base de produção, a performance recente de ORB justifica incluí-la como prioridade 1. REV permanece como reserva (prioridade 2) por sua comprovada taxa de aprovação agregada histórica. Range de domingo (179.75pt) fornece base sólida para reversão, mas ORB está explorando melhor o breakout do opening range atual."
+  },
+  "2026-04-22": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB claramente outperformando REV nos últimos 15 pregões: $29.759 vs $3.855 PnL (7,7x maior), volume de trades 15,6x superior com WR comparável (70% vs 72%). Range anterior 333.50pt oferece base sólida para breakout. REV sozinha está underperforming no recorte recente; ORB é a escolha fundamentada hoje."
+  },
+  "2026-04-16": {
+    "estrategias": [
+      "REV",
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $37.128 vs $4.595 (8x mais PnL) com WR similar (69% vs 72%). Range anterior alto (393.75pt) oferece setup ideal para breakout. REV segue como base (melhor WR historicamente), ORB como complemento para capturar movimento direcional forte em dias com range expandido. Mantém disciplina: compartilham limite de trades, mas ORB mostrou edge concreto recente.\""
+  },
+  "2026-04-23": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho superior nos últimos 15 pregões: $27.390 PnL (vs $4.030 de REV), mesma WR 71% mas com volume muito maior de trades (1962 vs 133), demonstrando consistência e maior lucratividade. Com range anterior robusto de 281.50pt, ORB é adequado. REV mantém como reserva por sua histórica taxa de aprovação agregada e margem de segurança comprovada."
+  },
+  "2026-04-24": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho superior nos últimos 15 pregões: $25821 PnL (vs REV $3771), WR 71% igual a REV. Com volume de trades 13,5x maior e resultado líquido 6,8x maior, ORB demonstra eficiência consistente. Incluída como primeira prioridade hoje. REV mantida como reserva por sua taxa de aprovação agregada histórica e por ser a origem base. Range anterior de 474pt oferece oportunidade típica para opening range breakout."
+  },
+  "2026-04-28": {
+    "estrategias": [
+      "REV",
+      "EMAV"
+    ],
+    "confianca": 0.72,
+    "motivo": "EMAV apresenta WR 83% (vs 71% da REV) e PnL de $4429 em apenas 116 trades nos últimos 15 pregões — isso é eficiência superior com maior taxa de acerto. Apesar de REV ter a melhor taxa de aprovação agregada historicamente, EMAV está claramente performando melhor neste recorte recente. REV segue como estratégia primária (dados longos), EMAV como reserva de alta confiança. ORB é descartada apesar do alto PnL absoluto porque opera com 1897 trades (volume excessivo que competiria com limites), e ICT não justifica inclusão.\""
+  },
+  "2026-04-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "REV mantém taxa de aprovação sólida (70%) com 145 trades e PnL de $3978. Embora ORB tenha WR ligeiramente superior (72%) e maior volume, seu PnL absoluto ($22292) é desproporcionalmente alto para 1886 trades, sugerindo possível viés de seleção na amostra. EMAV tem WR impressionante (80%) mas apenas 121 trades e PnL modesto ($3822). REV sozinha continua sendo a estratégia mais robusta e confiável. Segunda-feira com range substancial (198.25pt) favorece reversão em nível domingo. Manter foco em REV para máxima taxa de aprovação agregada."
+  },
+  "2026-04-29": {
+    "estrategias": [
+      "REV",
+      "EMAV"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém solidez com 72% WR e é a base. EMAV demonstra performance superior nos últimos 15 pregões: 83% WR (11pp acima de REV) com PnL positivo de $4098 em apenas 115 trades. Essa taxa de acerto significativamente melhor justifica incluir EMAV como reserva hoje, apesar do risco histórico de misturar estratégias. Range anterior de 242.50pt oferece bom setup potencial para ambas. Confiança moderada pelo trade-off entre a consolidação de REV e a oportunidade real de EMAV."
+  },
+  "2026-04-30": {
+    "estrategias": [
+      "REV",
+      "EMAV"
+    ],
+    "confianca": 0.72,
+    "motivo": "REV mantém WR sólida (74%), mas EMAV nos últimos 15 pregões mostrou WR superior (82%) com PnL/trade melhor ($29,77 vs $24,94 em REV). Range anterior moderado (216pt) permite boa volatilidade para ambas. EMAV como reserva tática justificada pelo desempenho recente concreto, não achismo. Mantém foco em REV mas abre janela para EMAV se condições do pregão favorecerem entrada rápida de confiança."
+  },
+  "2026-05-01": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões (PnL $20268 vs $1788, WR 73% vs 69%, com volume muito maior de trades). Embora misturar estratégias historicamente piore a aprovação por compartilharem limite de trades, o desempenho recente concreto de ORB justifica incluí-la como prioritária. REV mantém-se como reserva dada sua melhor taxa agregada histórica e como segurança. Range anterior de 458.75pt oferece bom suporte para reversão, mas o momentum recente de ORB é notável."
+  },
+  "2026-05-04": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Nos últimos 15 pregões, ORB demonstrou desempenho superior à REV: 73% WR (vs 66% REV), PnL $23011 (vs $1744 REV) com volume robusto de 1844 trades. Embora REV seja a estratégia-base em produção, ORB está claramente performando melhor neste recorte recente e justifica inclusão como estratégia primária hoje. Segunda-feira com range domingo de 144.75pt oferece setup ORB potencialmente forte na abertura."
+  },
+  "2026-05-05": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: 18822 vs 1816 em PnL líquido (+10.3x), com volume de operações muito superior (1880 vs 87 trades) e WR sólida de 72%. Embora REV historicamente tenha melhor taxa de aprovação agregada, o desempenho recente de ORB é concreto e significativo. Porém, dado o risco conhecido de misturar estratégias (compartilham mesmo limite de trades), mantém-se ORB como prioridade única hoje. Range anterior robusto (328pt) favorece breakout.\""
+  },
+  "2026-05-07": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB apresenta desempenho significativamente superior nos últimos 15 pregões: $16.986 de PnL líquido (8.7x REV), 1859 trades com WR 71%. Embora historicamente misturar estratégias piore os resultados pela limitação de trades/avaliação, a performance recente de ORB é tão superior ($16.986 vs $1.956 da REV) que justifica priorizar ORB hoje. Range anterior de 383.25pt é adequado para ORB. REV permanece como reserva mental se condições mudarem durante o pregão."
+  },
+  "2026-05-06": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB está claramente dominando nos últimos 15 pregões: 1881 trades com WR 71% e PnL $17129 (9.4x melhor que REV's $1816). Embora misturar estratégias seja historicamente prejudicial por compartilharem limite de trades, o desempenho recente de ORB é tão superior que justifica incluí-la como reserva. REV mantém prioridade por ser a base (WR 67%, estável), mas hoje com range anterior amplo (217.25pt) e contexto de quarta-feira, ORB pode capturar bem mais volume. EMAV (WR 79%) e ICT (WR 70%) são boas, mas ORB traz maior volume de oportunidades com consistência comprovada.\""
+  },
+  "2026-04-17": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB tem desempenho superior nos últimos 15 pregões ($32260 vs $3558 da REV), apesar de compartilharem a mesma WR 69%. O volume de trades de ORB (2083 vs 127) reforça a robustez do resultado. REV mantém-se como estratégia principal por ser a mais consolidada, mas ORB é clara reserva hoje. ICT também acima de REV ($8416) mas com volume menor (642 trades); EMAV tem excelente WR 75% mas PnL absoluto limitado ($2946). Range anterior de 288.50pt favorece breakouts."
+  },
+  "2026-05-11": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $21550 vs $2246 (9,6x mais PnL), com WR superior (72% vs 67%) e volume muito maior de trades validados. Domingo à noite tem bom setup para breakout do range. REV mantém-se como primeira opção por histórico agregado, mas ORB merece prioridade 2 hoje como reserva tática."
+  },
+  "2026-05-08": {
+    "estrategias": [
+      "ORB"
+    ],
+    "confianca": 0.75,
+    "motivo": "ORB está claramente outperformando REV nos últimos 15 pregões: $20.082 vs $2.388 de PnL líquido (+742%), apesar de REV manter melhor taxa de aprovação (68% vs 71% é marginal). ORB gerou volume massivo de trades de qualidade (1941 trades com WR 71%) enquanto REV ficou restrita a 85 trades. Como única estratégia principal, ORB tem espaço para desenvolver seu potencial sem competir pelo limite de trades por avaliação. Intervalo da sexta com máx/mín do dia anterior (RTH) de 392.75pt oferece boas oportunidades para breakout do opening range."
+  },
+  "2026-05-13": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 15 pregões: 1947 trades com WR 71% e PnL $19093 — quase 15x o resultado de REV ($1249). Embora REV tenha melhor taxa de aprovação agregada historicamente, o recorte recente mostra ORB em trajetória dominante. REV mantida como reserva (melhor WR de 66% é sólida) para casos onde ORB não gere sinais claros. Range de 554pt do dia anterior oferece espaço adequado para ambas as estratégias operarem dentro do limite de trades por avaliação."
+  },
+  "2026-05-12": {
+    "estrategias": [
+      "ORB",
+      "REV"
+    ],
+    "confianca": 0.72,
+    "motivo": "ORB apresenta desempenho claramente superior nos últimos 15 pregões: 1877 trades com WR 71% e PnL $19306, enquanto REV tem 97 trades com WR 66% e PnL $1433. Apesar do risco de misturar estratégias, a evidência concreta de performance recente de ORB (especialmente o lucro agregado 13,5x maior) justifica incluí-la como primeira prioridade hoje. REV mantém-se como reserva por sua taxa de aprovação consolidada. Range anterior de 233.25pt oferece espaço para breakouts.\""
+  }
+}

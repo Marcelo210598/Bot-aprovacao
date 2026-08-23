@@ -1,5 +1,30 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
+## Última atualização: 2026-08-23 (forward test de julho + 4 testes de IA, todos rejeitados)
+
+## 🎯 23/08 — Forward test de julho registrado (02 a 20/07) + 4 tentativas de IA testadas e REJEITADAS
+
+**Forward test (Market Replay):** dias 01-20/07 registrados em
+`forward-test-replay-25k/2026-07-saidaparcial/`. Acumulado até 20/07: **-$522,5** (mês começou
+mal: -$698,5 até 13/07, depois 3 dias positivos seguidos 15-16-20/07 recuperaram parte). Achado
+aberto e **NÃO investigado ainda**: dia 13/07 teve 2 trades (`NIV_L5`, `NIV_L7`) com stop cheio
+tendo favor máximo <1pt — registrado como item #17 em `docs/melhorias-sugeridas.md`.
+
+**⚠️ BUG ENCONTRADO, NÃO CORRIGIDO (item #18):** `pdHigh`/`pdLow` (nível do dia anterior, usado
+todo dia que não é segunda) zeram toda vez que a estratégia reinicia no gráfico (comum ao mexer
+no Market Replay) — sem persistência nem recálculo do histórico. Enquanto fica zerado, **o bot
+não consegue dar entrada nenhuma no dia inteiro, silenciosamente**. Detalhe completo no item #18.
+Isso significa que dias já registrados como "sem entradas" podem, na verdade, ter sido afetados
+por esse bug — não dá pra saber sem ter visto a tela na hora.
+
+**Testamos integrar IA (Claude) no bot — 4 formas, todas rejeitadas por backtest** (item #19 em
+`docs/melhorias-sugeridas.md`, scripts em `backtest/ia_*.py`): filtro de entrada (-19,2pp),
+seletor diário de estratégia com contexto simples (neutro) e rico (-45,7pp — caiu na armadilha de
+"achado de curto prazo não é regra"), e gestão de risco por trade (-4,5pp). **Nenhum bateu os 50%
+do baseline.** Decisão: parar de tentar IA por cima da REV — o teto parece estrutural (instrumento/
+timeframe/formato de avaliação), não falta de inteligência na decisão. Nada disso tocou o
+NinjaScript nem produção — tudo em backtest Python.
+
 ## Última atualização: 2026-08-20 (tarde/noite — sessão de pesquisa: taxa de aprovação REAL medida em 50%, nenhuma estratégia nova bate a reversão, recomendação final dada)
 
 ## 🎯 20/08 (noite) — TAXA DE APROVAÇÃO REAL: 50%. Nenhuma alternativa testada supera. Recomendação: BOT 2 com saída parcial DESLIGADA.

@@ -1,0 +1,1654 @@
+{
+  "2026-05-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira, range anterior grande (463.50pt) indica boa volatilidade para REV; nível vem do RTH normal; sem indicadores atípicos que justifiquem adicionar outra estratégia."
+  },
+  "2026-05-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (323.50pt) — REV tem historicamente melhor performance. Sem fatores extraordinários que justifiquem habilitar outras estratégias como reserva."
+  },
+  "2026-05-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira, range anterior grande (490.5pt), nível vem de RTH anterior (não é carryover de domingo). REV tem histórico comprovado superior; nenhum indicador externo justifica arriscá-la com reservas."
+  },
+  "2026-05-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com nível do Globex e range grande (357.75pt) sugere boa amplitude; REV é o padrão confiável, sem sinais concretos para adicionar reserva."
+  },
+  "2026-05-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior robusto (544.25pt). REV segue sendo a única validada; misturar estratégias historicamente piora o resultado agregado ao competir pelos 12 trades/dia."
+  },
+  "2026-05-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira após fim de semana, range Globex de 311.75pt (amplo). REV é a melhor estratégia validada; não há razão concreta para adicionar outra estratégia que historicamente piora o resultado agregado."
+  },
+  "2026-05-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior normal (~427pt). Sem contexto de gap do fim de semana, nível é do RTH anterior. REV sozinha é a base confiável; misturar outra estratégia só roubaria espaço dos 12 trades diários."
+  },
+  "2026-05-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior moderado (83.75pt). REV já validada; sem sinais específicos para habilitar reserva."
+  },
+  "2026-05-29": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior grande (424.25pt indica volatilidade elevada). REV é a única com taxa de aprovação consistente; não há contexto de domingo à noite ou compressão extrema que justifique habilitar outra estratégia como reserva."
+  },
+  "2026-06-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça com range anterior de 401pt (moderado a normal). REV tem histórico superior; sem evento específico que justifique misturar outras estratégias."
+  },
+  "2026-05-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira, range anterior de 292pt (moderado), nível do dia anterior RTH. REV pura é a opção mais segura; sem evidência de alta volatilidade esperada ou padrão específico que justifique ativar reservas."
+  },
+  "2026-05-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (320.5pt), nível RTH bem definido. REV sozinha tem melhor taxa agregada; misturar estratégias reduz espaço útil. Sem condição anormal que justifique reserva."
+  },
+  "2026-06-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira com range anterior de 295.50pt (acima da média típica), nível vem do RTH anterior — perfil clássico para REV. Sem informações que sugiram volatilidade atípica ou padrão específico que favoreça ORB/EMAV/ICT. Manter só REV para maximizar taxa de aprovação."
+  },
+  "2026-06-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex de domingo; REV validada de forma consistente, e 234pt não é volatilidade extrema que justifique adicionar reserva."
+  },
+  "2026-06-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior de 311.75pt (moderado-alto), nível vem do RTH anterior. REV é a estratégia validada; sem sinais específicos para ativar reserva."
+  },
+  "2026-06-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range de domingo à noite; 465.25pt é tamanho modesto que não justifica interferência. REV em produção é suficiente."
+  },
+  "2026-06-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira, range anterior normal (757pt), nível vem do RTH do dia anterior. REV tem histórico comprovado; não há sinal contextual que justifique habilitar outra estratégia como reserva."
+  },
+  "2026-06-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça normal com range anterior saudável (411.50pt). Sem triggers específicos que justifiquem ativar reserva. REV sozinha segue como melhor opção."
+  },
+  "2026-06-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior grande (1620.50pt) oferece bom suporte para REV. Nível é do dia anterior direto (RTH), sem complicação de Globex — sem motivo para adicionar ruído com outras estratégias."
+  },
+  "2026-05-21": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior grande (387pt) favorece REV. Nível é do RTH anterior, não há feriado/segunda pós-fim de semana. Manter REV em exclusividade."
+  },
+  "2025-06-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range anterior normal (257pt). REV é mais confiável; misturar outras estratégias historicamente piora o resultado."
+  },
+  "2025-06-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (215.50pt) garante níveis REV bem definidos. Sem fatores que justifiquem misturar outras estratégias."
+  },
+  "2025-06-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta com range anterior moderado (158.25pt); REV é a mais consistente. Sem sinais de volatilidade extrema ou condições anômalas que justifiquem adicionar outras estratégias como reserva."
+  },
+  "2025-06-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Primeiro dia sem histórico de range anterior; REV com nível claro (máx/mín do dia anterior); sem indicadores de volatilidade anormal que justifiquem misturar estratégias."
+  },
+  "2025-06-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range Globex (212pt) - tamanho moderado. REV é melhor sozinha; sem motivo concreto para misturar outras estratégias."
+  },
+  "2025-06-17": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça típica com range anterior moderado (210pt); nível vem do RTH do dia anterior. Sem sinais anômalos. REV sozinha tem melhor taxa historicamente; manter foco."
+  },
+  "2025-06-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira com range anterior bem-definido (225.50pt) e nível do dia anterior (RTH). REV tem melhor taxa aprovada; risco de misturar outra estratégia supera benefício."
+  },
+  "2025-06-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior saudável (136.5pt). REV já validada; nenhum catalisador específico sugere habilitar outras estratégias."
+  },
+  "2025-06-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com nível Globex e range anterior moderado (220pt). REV é mais confiável; sem contexto que justifique adicionar outras estratégias neste momento."
+  },
+  "2025-06-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (159.75pt). REV tem histórico melhor; sem sinais de contexto excepcional para habilitar alternativas."
+  },
+  "2025-06-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça normal com range anterior grande (354.75pt), bom para REV. Nível vem do RTH anterior — contexto estável. Sem razão para adicionar reserva."
+  },
+  "2025-06-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range anterior robusto (365.5pt); REV sozinha é a mais consistente e confiável. Sem sinais específicos para ORB/EMAV/ICT; manter foco em REV evita \"roubo\" de slots."
+  },
+  "2025-06-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior grande (218pt) e nível de referência simples (RTH). REV tem taxa superior; não há indicador de volatilidade extrema ou padrão específico que justifique habilitar outra estratégia."
+  },
+  "2025-06-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior (188.25pt) é moderado, nível de referência do RTH anterior é padrão. REV mantém melhor taxa de aprovação; sem contexto anômalo que justifique diluir no limite de 12 trades com outra estratégia."
+  },
+  "2025-06-30": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range de domingo/Globex; REV tem máxima confiança histórica. Range de 129pt é moderado — sem volatilidade extrema que justificasse ORB/EMAV/ICT. Manter só REV para não roubar slot."
+  },
+  "2025-07-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior de 153.75pt (tamanho normal), nível vem de RTH anterior (não carrega incerteza de Globex). REV é a estratégia validada; misturar outras só piora. Mantém concentração."
+  },
+  "2025-07-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior normal (253.75pt), nível RTH padrão. REV é a mais consistente; não há padrão semanal anômalo que justifique misturar outras estratégias."
+  },
+  "2025-07-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta com range anterior amplo (203.50pt) indica volatilidade mantida; REV é a única com consistência validada. Sem sinal especial para habilitar alternativa que dividiria slots."
+  },
+  "2025-07-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira pós-feriado (4 de julho) com range anterior de 172.25pt (moderado-baixo). REV é a estratégia validada; sem sinais de volatilidade anômala ou padrão semanal que justifique arrisco espaço com secundárias."
+  },
+  "2025-07-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça normal, range anterior ~198pt (moderado). Nível vem de RTH simples. REV sozinha já tem maior taxa de aprovação; não há contexto anômalo que justifique habilitar reserva."
+  },
+  "2025-07-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira comum com nível do dia RTH anterior (não vindo de fim de semana). Range anterior de 121.75pt é moderado. REV sozinha tem melhor taxa aprovada; sem sinal específico para habilitar outra estratégia."
+  },
+  "2025-07-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (192.25pt). REV é a única estratégia validada; nenhum indicador de condição especial que justifique reserva."
+  },
+  "2025-07-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex de 114pt (moderado). REV é suficiente; nenhum fator anômalo que justifique habilitar outra estratégia e perder espaço no limite de 12 trades/dia."
+  },
+  "2025-07-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior moderado (188.75pt). REV é consistente; nenhum fator contextual justifica arriscar espaço com segunda estratégia."
+  },
+  "2025-07-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex moderado (87.5pt). REV em produção é a estratégia validada. Sem sinais concretos de volatilidade extrema ou padrão específico que justifique misturar estratégias (histórico mostra que isto piora o resultado agregado roubando oportunidades de REV)."
+  },
+  "2025-07-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior robusto (153.50pt) fornece níveis claros para REV operar. Sem indicadores de volatilidade extrema ou padrões atípicos; manter REV em solo."
+  },
+  "2025-07-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça-feira, range anterior normal (224.25pt), nível vindo do RTH anterior. REV tem comprovada superioridade; sem anomalia que justifique misturar outra estratégia."
+  },
+  "2025-07-17": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior saudável (264.50pt). REV é a estratégia validada; sem sinais de volatilidade extrema ou padrões especiais que justifiquem ativar reservas."
+  },
+  "2025-07-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range anterior moderado (140.50pt). REV sozinha é a estratégia validada; nível vem do dia anterior RTH (não é Globex noturna). Sem fatores que justifiquem adicionar outra estratégia — manter foco em REV."
+  },
+  "2025-07-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (214pt), nível simples do dia anterior. REV é suficiente; misturar outras estratégias historicamente piora resultado."
+  },
+  "2025-07-21": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex de 73.50pt (moderado). REV é suficiente; misturar outras estratégias historicamente piora taxa de aprovação. Sem indicadores que justifiquem exceção."
+  },
+  "2025-07-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior moderado (175pt). REV é validada; sem sinais de movimentação atípica que justifique habilitar ORB/EMAV/ICT como reserva."
+  },
+  "2025-07-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior de 126.25pt (moderado/baixo). REV é a baseline; sem sinais de volatilidade extrema ou padrão especial que justifique ativar reserva."
+  },
+  "2025-07-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira, range anterior moderado (177pt) e nível de referência claro (máx/mín RTH anterior). REV é consistentemente superior; sem motivo concreto para misturar outras estratégias."
+  },
+  "2025-07-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira com range anterior moderado (241.75pt). REV é a estratégia validada; nenhum indicador específico do dia justifica adicionar reserva."
+  },
+  "2025-07-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex (62.50pt moderado); REV é a estratégia validada. Sem evidência de volatilidade anormalmente alta ou contexto específico que justifique misturar outra estratégia — mantém só REV para não \"roubar\" espaço do limite de 12 trades."
+  },
+  "2025-07-29": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça-feira, range anterior de 92.25pt (volatilidade moderada), nível vem do RTH do dia anterior. REV tem melhor taxa de aprovação; nenhum fator específico do dia justifica habilitar estratégias auxiliares."
+  },
+  "2025-07-30": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior de 231.25pt (moderado), nível vem do RTH anterior. REV tem melhor taxa aprovada. Sem indicadores que justifiquem habilitar ORB/EMAV/ICT como reserva."
+  },
+  "2025-08-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (446.5pt) — REV sozinha é suficiente; volatilidade presente reduz necessidade de reserva."
+  },
+  "2025-08-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex de 166.75pt (moderado). REV sozinha tem melhor taxa histórica; sem sinais concretos de instabilidade extrema que justifiquem adicionar outra estratégia."
+  },
+  "2025-08-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior moderado-alto (283.75pt), nível vem do RTH do dia anterior. REV tem melhor taxa de aprovação; não há indicador concreto para ativar reserva."
+  },
+  "2025-08-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça normal, range anterior de 221pt (moderado-alto), nível vem do pregão anterior em RTH. REV é consistentemente superior; sem fatores específicos que justifiquem ativar secundárias."
+  },
+  "2025-08-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior de 342pt (volatilidade normal/alta). REV é consistentemente superior; sem fatores excepcionais que justifiquem adicionar outra estratégia como reserva."
+  },
+  "2025-08-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça com range anterior grande (217pt). REV sozinha tem melhor taxa de aprovação; não há sinal contexto para habilitar outras estratégias sem prejudicar a quota diária."
+  },
+  "2025-08-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (296.75pt), nível vem de RTH direto. REV sozinha é a estratégia validada; misturar reduziria sua taxa de acerto."
+  },
+  "2025-08-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range de Globex (domingo). Range anterior de 72pt é moderado; sem sinais de volatilidade extrema ou padrão anômalo que justifique habilitar outra estratégia. REV sozinha é a aposta mais consistente."
+  },
+  "2025-07-31": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira, range anterior de 233pt (volatilidade moderada-boa), nível vem do RTH anterior. REV é a estratégia com melhor taxa agregada; sem contexto anômalo que justifique habilitar reserva."
+  },
+  "2025-08-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior significativo (166.50pt). REV validada e consistente; nenhum gatilho concreto para adicionar outra estratégia hoje."
+  },
+  "2025-08-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira, range anterior de 328pt (moderado), nível do dia anterior (RTH). REV sozinha historicamente é a melhor. Sem sinais concretos de volatilidade anormal ou condições que favoreçam ORB/EMAV/ICT — manter foco em REV."
+  },
+  "2025-08-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (182.5pt), nível RTH limpo. REV é a estratégia validada; não há sinal de volatilidade extrema ou padrão especial que justifique habilitar reserva."
+  },
+  "2025-08-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça com range anterior moderado (105.25pt). REV é a mais consistente; sem sinais específicos de volatilidade extrema ou padrão especial que justifique habilitar reservas."
+  },
+  "2025-08-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com nível do Globex (domingo à noite) e range anterior moderado (86.75pt). REV é a estratégia validada; sem motivo concreto para dilatar com outras estratégias."
+  },
+  "2025-08-21": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior normal (397pt). Nível vem de máx/mín RTH, estrutura clara para REV. Sem catalisador específico que justifique abrir espaço para outra estratégia — mantém só REV."
+  },
+  "2025-08-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, nível vem do RTH anterior (puro), range de 344.50pt é bem robusto. REV tem melhor taxa agregada; misturar outras estratégias historicamente piora. Manter foco."
+  },
+  "2025-08-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior robusto (229.25pt). REV é a estratégia validada; sem fatores específicos que justifiquem adicionar outra estratégia hoje."
+  },
+  "2025-08-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range anterior de 444.50pt (moderado). REV é o padrão mais confiável; sem sinais de volatilidade extrema ou mudança estrutural que justifique adicionar reserva."
+  },
+  "2025-08-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça normal com range anterior moderado (173pt). REV é consistentemente superior; sem fatores específicos que justifiquem adicionar estratégias concorrentes."
+  },
+  "2025-08-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range de domingo/Globex; range anterior 87pt é moderado. REV é mais confiável; sem sinais de volatilidade extrema que justifiquem adicionar reserva."
+  },
+  "2025-08-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira, range anterior de 170pt (moderado), nível vem de RTH do dia anterior. REV em máxima eficiência; sem razão técnica para adicionar outra estratégia que historicamente piora resultado agregado."
+  },
+  "2025-08-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior moderado (173pt), nível padrão RTH. REV é a estratégia validada; sem condições excepcionais que justifiquem adicionar reserva."
+  },
+  "2025-08-29": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (231.25pt). REV é validada; sem sinais de volatilidade anômala que justifiquem adicionar outra estratégia e fragmentar os 12 trades/dia."
+  },
+  "2025-09-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex de 120.75pt (moderado). REV sozinha é o padrão validado; sem sinais concretos de mudança de regime, mantém-se apenas REV para máxima eficiência."
+  },
+  "2025-09-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça comum, range anterior moderado (65pt), nível do dia anterior (RTH). REV é suficiente sem necessidade de reserva."
+  },
+  "2025-09-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira, range anterior de 265pt (tamanho razoável), nível do RTH anterior. REV é a estratégia validada; misturar outras historicamente piora. Manter só REV."
+  },
+  "2025-09-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior saudável (207pt). Nível vem do RTH do dia anterior — cenário clássico e conhecido para REV. Sem indicadores que justifiquem ativar outra estratégia hoje."
+  },
+  "2025-09-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range anterior de 397pt (moderado). REV é a estratégia validada; sem sinais específicos para ORB/EMAV/ICT, manter só REV evita competição pelo limite de 12 trades."
+  },
+  "2025-09-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range de domingo à noite (volatilidade esperada). Range anterior de 141pt é moderado — REV em sua melhor configuração; sem sinal concreto para habilitar reserva."
+  },
+  "2025-09-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior robusto (270.25pt); REV tem melhor taxa agregada. Sem indicadores que justifiquem misturar outras estratégias — manter foco."
+  },
+  "2025-09-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.8,
+    "motivo": "Quinta-feira, range anterior normal (219.5pt). REV é sólida em dias de semana com volatilidade moderada. Sem razão para habilitar outras estratégias que historicamente pioram o resultado agregado."
+  },
+  "2025-09-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça com range anterior moderado (128pt). REV é validada e suficiente; sem fatores que justifiquem habilitar reserva."
+  },
+  "2025-09-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira com range anterior considerável (164pt) garante níveis bem definidos para REV. Sem feriado ou evento específico que justifique ativar estratégias complementares; REV já tem máxima taxa de aprovação comprovada."
+  },
+  "2025-09-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (136.25pt), nível vem do dia anterior RTH. REV é a melhor opção; sem sinais que justifiquem habilitar outras estratégias."
+  },
+  "2025-10-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Primeiro dia do mês, sem histórico de range anterior. REV é a mais robusta; sem contexto de volatilidade anormal, manter só REV é a escolha mais segura."
+  },
+  "2025-10-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range RTH de 244.75pt (moderado). REV sozinha tem melhor taxa de aprovação; sem sinais concretos de condições extremas, manter só REV evita roubo de slots das 12 trades/dia."
+  },
+  "2025-09-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sábado com range anterior moderado (157.50pt). REV é a única validada em alta taxa de acerto; sem contexto de abertura Globex ou setup específico que sugira ORB/EMAV/ICT, manter só REV para maximizar espaço de trades."
+  },
+  "2025-10-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range moderado (175.25pt) e nível vindo do RTH anterior. REV historicamente é a melhor opção; misturar com outras estratégias piora o resultado. Manter foco."
+  },
+  "2025-10-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior moderado (144.25pt). REV validada; sem sinais concretos para habilitar ORB/EMAV/ICT como reserva hoje."
+  },
+  "2025-10-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.8,
+    "motivo": "Quinta-feira com range anterior normal (270.25pt) e nível padrão (RTH). REV é a única validada; risco de ativar segunda estratégia não compensa."
+  },
+  "2025-10-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range do Globex; REV é validada. Range de 104pt é moderado, sem sinais de extrema volatilidade que justifique misturar estratégias. Manter foco em REV."
+  },
+  "2025-10-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior 280pt (moderado), nível vem de RTH do dia anterior. REV é consistentemente superior em mix; sem indício específico para quebrar o padrão de manter só REV."
+  },
+  "2025-10-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior grande (177pt) favorece REV pura. Sem indicadores de volatilidade extrema ou padrão especial que justifique habilitar reserva."
+  },
+  "2025-10-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior robusto (240.5pt), nível RTH claro. REV é a melhor — sem motivo concreto para adicionar outras estratégias."
+  },
+  "2025-10-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex amplo (313.50pt); REV é validada e confiável. Sem evidências de cenário anômalo que justifique misturar outra estratégia."
+  },
+  "2025-10-17": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior moderado (536pt). REV é a estratégia validada e consistente. Sem razão concreta para ativar reservas hoje."
+  },
+  "2025-10-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Domingo com range anterior de 383.25pt (volatilidade moderada). REV é a mais consistente; sem fatores que justifiquem habilitar outra estratégia como reserva hoje."
+  },
+  "2025-10-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior de 451.75pt (moderado-alto). REV validada consistentemente; misturar outras estratégias historicamente piora o resultado mesmo com volatilidade elevada."
+  },
+  "2025-10-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.92,
+    "motivo": "Quarta-feira, range anterior de 526.50pt (acima da média), nível de RTH bem definido. REV tem validação consistente. Sem fatores que justifiquem quebrar a regra de manter só REV."
+  },
+  "2025-10-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range Globex de referência (143.50pt é moderado). REV sozinha tem melhor taxa agregada; sem sinais concretos de volatilidade extrema ou comportamento atípico, mantém-se a estratégia validada."
+  },
+  "2025-10-21": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça normal, range anterior grande (239.75pt) oferece bom suporte a REV; nível de referência simples (máx/mín RTH anterior). Sem indícios de breakout ou gaps significativos que justifiquem habilitar ORB/EMAV/ICT."
+  },
+  "2025-10-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior moderado (145.25pt), nível vem de RTH do dia anterior. REV sozinha é a estratégia mais consistente; sem sinais específicos de volatilidade extrema ou padrão atípico que justifique misturar outras estratégias."
+  },
+  "2025-10-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range moderado (73pt) do Globex. REV é a única consistentemente validada; misturar outras estratégias historicamente piora o resultado. Mantém apenas REV como principal."
+  },
+  "2025-10-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior moderado (289pt). REV é mais consistente; sem gatilho específico para habilitar alternativas que dividiriam o limite de 12 trades/dia."
+  },
+  "2025-10-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Domingo com range RTH médio (141pt) — manter REV como core. Sem sinais específicos para habilitar alternativas; risco de diluição com limite 12 trades/dia."
+  },
+  "2025-10-29": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior normal (225.50pt), nível simples do dia anterior RTH. REV consolidado é suficiente — não há padrão semanal que justifique misturar outras estratégias."
+  },
+  "2025-10-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior robusto (484.5pt) — REV é suficiente e em produção; misturar outra estratégia historicamente piora resultado."
+  },
+  "2025-10-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça-feira, range anterior normal (184.75pt), nível de referência limpo (máx/mín RTH). REV é a estratégia validada; sem contexto anômalo que justifique dividir o limite de 12 trades/dia com outra estratégia."
+  },
+  "2025-10-31": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior robusto (304.25pt); REV é validada. Sem razão concreta para ativar outra estratégia — mantém foco e espaço nos 12 trades/dia."
+  },
+  "2025-10-30": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior grande (277.25pt) indica volatilidade significativa; REV tem taxa de aprovação comprovadamente superior. Nível vem de RTH do dia anterior (padrão), sem anomalias. Manter só REV é a escolha validada pelo histórico."
+  },
+  "2025-11-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior robusto (250pt) e nível simples do dia anterior. REV em seu melhor cenário; sem indicadores que justifiquem habilitar reserva."
+  },
+  "2025-11-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range do Globex (domingo à noite) como referência; range anterior de 110.25pt é moderado. REV é a estratégia validada e não há contexto que justifique misturar outras estratégias que historicamente roubam espaço dela no limite de 12 trades/dia."
+  },
+  "2025-11-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira com range anterior moderado (349.50pt) e nível de referência simples (máx/mín RTH anterior). REV é consistente; nenhuma evidência concreta para habilitar alternativas."
+  },
+  "2025-11-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior grande (488pt) e nível vindo do RTH anterior. REV com bom potencial; sem sinais para adicionar secundária."
+  },
+  "2025-11-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range RTH anterior moderado (392pt). REV sozinha tem melhor taxa agregada; sem indício de breakout ou gap relevante que justifique habilitar ORB/EMAV/ICT como reserva."
+  },
+  "2025-11-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range de domingo à noite (220pt moderado); REV é a única validada. Misturar outras estratégias reduz performance histórica."
+  },
+  "2025-11-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range anterior de 458.25pt (tamanho moderado). REV é a única validada; nível vem de RTH do sábado (não há overlap de Globex). Sem sinais específicos para habilitar outras estratégias."
+  },
+  "2025-11-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior robusto (217.75pt), nível vem de RTH anterior. REV sozinha tem melhor taxa de aprovação; não há contexto que justifique adicionar outra estratégia como reserva."
+  },
+  "2025-11-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior normal (293pt). REV é a estratégia mais consistente e não há contexto atípico que justifique habilitar alternativas que historicamente reduzem o win rate agregado."
+  },
+  "2025-11-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior grande (308.50pt) indica volatilidade persistente; REV sozinha tem melhor taxa histórica. Nível vem de RTH (máx/mín do dia anterior), cenário padrão onde REV já está otimizada. Sem indício concreto para habilitar outra estratégia."
+  },
+  "2025-11-17": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex (262.75pt). REV validada; outras estratégias historicamente reduzem taxa de aprovação. Sem sinais concretos para habilitar reserva."
+  },
+  "2025-11-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior acima de 400pt (499.50pt indica volatilidade bem estabelecida). REV é suficiente — não há indício que justifique habilitar reserva."
+  },
+  "2025-11-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Domingo com range anterior moderado (667pt); REV é a estratégia consistentemente melhor. Nenhum fator concreto justifica adicionar outras estratégias hoje."
+  },
+  "2025-11-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior moderado-alto (455.75pt), nível de máx/mín RTH padrão. REV sozinha continua sendo a melhor opção; sem volatilidade extrema ou condição anômala que justifique habilitar reserva."
+  },
+  "2025-11-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior robusto (522.25pt). REV validada historicamente; nenhum padrão semanal ou volatilidade anômala justifica dilatar com outra estratégia."
+  },
+  "2025-11-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior de 481pt (moderado). REV é a estratégia validada. Sem condições especiais que justifiquem habilitar reserva."
+  },
+  "2025-11-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range anterior de 669pt (moderado). REV é a estratégia validada. Nível vem do RTH (não Globex), sem sinais específicos que justifiquem adicionar ORB/EMAV/ICT como reserva."
+  },
+  "2025-11-21": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior considerável (1212pt), nível vem do RTH da quinta. REV em produção, validada. Sem sinais que justifiquem adicionar outra estratégia."
+  },
+  "2025-11-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range de domingo à noite bem definido (151.25pt). REV é mais confiável neste cenário; volatilidade moderada não justifica adicionar outras estratégias que competem pelo mesmo limite de 12 trades."
+  },
+  "2025-11-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira com range anterior sólido (533.25pt) e nível limpo do RTH anterior. REV tem histórico comprovado; sem sinais concretos para ativar reserva."
+  },
+  "2025-12-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range de domingo/Globex (padrão esperado). Range anterior de 318.75pt é moderado, sem extremos. REV sozinha é mais segura; não há justificativa concreta para adicionar outra estratégia hoje."
+  },
+  "2025-11-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça normal, range anterior de 476.75pt (moderado), nível vem de máx/mín RTH do dia anterior. REV sozinha é a mais consistente; sem fatores específicos que justifiquem ativar reserva hoje."
+  },
+  "2025-11-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior acima da média (242.25pt). REV tem máxima taxa de aprovação agregada; misturar outras estratégias historicamente piora resultado. Range sólido garante níveis claros para REV."
+  },
+  "2025-11-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior moderado (32pt). REV é a única validada consistentemente; sem contexto específico que justifique habilitar outra estratégia. Manter foco."
+  },
+  "2025-12-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior grande (255.50pt) indica volatilidade estruturada; REV sozinha é a única validada consistentemente. Sem contexto que justifique misturar outras estratégias."
+  },
+  "2025-12-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça-feira com range anterior grande (286.50pt) indica volatilidade, REV é mais robusta em dias assim. Nível vem de RTH padrão, sem fatores anômalos. Manter só REV."
+  },
+  "2025-12-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira, range anterior grande (224.25pt) favorece REV clássica. Nível vem do RTH anterior (previsível). Sem informação que justifique misturar outras estratégias — manter foco na melhor taxa."
+  },
+  "2025-12-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior moderado (175.75pt), nível vem de RTH do dia anterior. Condições normais para REV. Sem indicadores anormais que justifiquem ativar reserva."
+  },
+  "2025-12-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça-feira com range anterior normal (296pt), nível vem de RTH regular. REV sozinha historicamente melhor; não há contexto excepcional que justifique ativar outras estratégias."
+  },
+  "2025-12-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior moderado (342pt); REV tem histórico de melhor aprovação. Sem sinais específicos que justifiquem adicionar outra estratégia que comprometeria espaço de trades."
+  },
+  "2025-12-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo com range anterior grande (501.5pt); REV é a única validada. Sem contexto de gap de domingo-Globex, mantém-se o nível RTH. Melhor não arriscar com secundárias."
+  },
+  "2025-12-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (332.50pt). REV é a estratégia validada; sem indicadores de volatilidade anormal ou padrão específico que justifique ativar reserva. Manter foco na REV."
+  },
+  "2026-01-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Primeira sexta do ano, sem dados de range anterior. REV é a única validada; misturar outras estratégias historicamente piora resultado. Manter apenas REV como padrão."
+  },
+  "2026-01-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Domingo com range anterior médio (538.50pt); REV é mais confiável. Sem sinais que justifiquem misturar outras estratégias hoje."
+  },
+  "2026-01-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range anterior moderado (85.25pt) e nível vindo de Globex de domingo. REV é suficiente; sem sinais de volatilidade extrema ou padrão específico que justifique adicionar reserva."
+  },
+  "2026-01-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça com range anterior moderado (169.5pt). Sem contexto de gap/domingo ou condições anômalas. REV validada é a melhor opção; adicionar outra estratégia historicamente piora o resultado."
+  },
+  "2026-01-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira com range anterior robusto (229.75pt). REV em produção com melhor taxa de aprovação; sem sinais específicos de ineficiência que justifiquem habilitar ORB/EMAV/ICT como reserva."
+  },
+  "2026-01-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior de 225.25pt (moderado); nível de referência é RTH limpo (não há transição Sunday-Globex); REV sozinha tem taxa de aprovação consistentemente superior, e não há contexto anômalo que justifique risco de reserva."
+  },
+  "2026-01-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior moderado (234pt). REV é consistentemente superior; sem sinal de volatilidade anormal ou padrão semanal específico que justifique adicionar outra estratégia."
+  },
+  "2026-01-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça com range anterior de 286.50pt (moderado). REV sozinha é a melhor opção — nenhuma condição hoje justifica habilitar ORB/EMAV/ICT como reserva."
+  },
+  "2026-01-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range Globex de 249.75pt (moderado). REV é suficiente e historicamente mais confiável; sem sinais de volatilidade anômala que justifiquem adicionar outra estratégia como reserva."
+  },
+  "2026-01-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Domingo à noite com range RTH moderado (370pt). REV é a única validada; sem indicadores de volatilidade extrema ou padrão anômalo que justifique arriscar espaço de trades com outras estratégias."
+  },
+  "2026-01-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (276.25pt) fornece níveis de reverência bem definidos. REV sozinha tem melhor taxa aprovação; mantê-la exclusiva preserva os 12 trades/dia para a estratégia validada."
+  },
+  "2026-01-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta normal, range anterior robusto (369.50pt) fornece bons níveis para REV; sem anomalias que justifiquem mesclar outras estratégias."
+  },
+  "2026-01-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.82,
+    "motivo": "Domingo com range anterior moderado (299.50pt). REV já validada; sem sinais de volatilidade extrema ou padrão especial que justifique habilitar reserva."
+  },
+  "2025-12-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range de domingo/Globex (nível bem definido) e volatilidade moderada (103pt). REV é ideal para explorar rejeições em máximas/mínimas. Sem razão concreta para misturar outras estratégias e prejudicar o espaço dos 12 trades diários."
+  },
+  "2026-01-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça com range anterior robusto (180.75pt). REV tem melhor taxa agregada; sem indicativos de condição especial que justifique adicionar outra estratégia como reserva."
+  },
+  "2026-01-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range de domingo à noite (Globex) bem definido (109pt). REV é consistente nesse cenário; sem sinais de volatilidade extrema ou padrão atípico, manter só REV maximiza probabilidade de sucesso."
+  },
+  "2026-01-21": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira com range anterior de 331.75pt (moderado a bom). REV sozinha tem histórico comprovado; misturar outras estratégias piora o resultado agregado. Sem sinal específico que justifique reserva."
+  },
+  "2026-01-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior normal (526pt). Nível vem de RTH anterior, sem complexidade de gap de fim de semana. REV já validada como mais consistente; sem motivo concreto para adicionar outra estratégia que histórica compartilha limite e piora resultado."
+  },
+  "2025-12-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior grande (255.25pt) indica volatilidade confirmada; REV aproveita bem esses níveis consolidados. Sem contexto extraordinário (segunda pós-fim de semana, evento econômico maior, etc), mantém-se a estratégia validada."
+  },
+  "2026-01-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range grande (303.50pt) do Globex; REV é consistente em segundas com níveis claros. Sem razão concreta para adicionar outras estratégias que apenas competem pelos mesmos 12 slots."
+  },
+  "2026-01-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior moderado (195pt). REV é a estratégia validada; sem evento/condição extrema que justifique adicionar reserva."
+  },
+  "2026-01-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça com range anterior de 232pt (moderado). REV é a única validada; misturar piora historicamente. Manter foco."
+  },
+  "2026-01-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira com range anterior moderado (197pt). REV é a estratégia validada. Sem fatores especiais que justifiquem ativar alternativa (não é segunda pós-gap, range não é extremo). Manter foco em REV para maximizar aprovação."
+  },
+  "2026-02-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Domingo com range anterior moderado (371pt). REV sozinha é suficiente; misturar outra estratégia historicamente piora o resultado."
+  },
+  "2026-01-30": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior grande (639pt) sugere volatilidade alta. REV é a estratégia validada; não há sinais específicos que justifiquem ativar reservas e roubar espaço de trades."
+  },
+  "2026-02-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range de domingo à noite (429.50pt é moderado). REV é a mais confiável; sem razão específica para adicionar ruído."
+  },
+  "2026-02-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira, range anterior grande (733pt) garante níveis bem definidos para REV. Sem sinais de mudança estrutural que justifiquem ORB/EMAV/ICT como reserva."
+  },
+  "2026-01-29": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira, range anterior moderado (200.25pt), nível do dia anterior em RTH (padrão). REV sozinha é a mais consistente; sem motivo concreto para misturar outras estratégias."
+  },
+  "2026-02-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior moderado (606.50pt). REV é a estratégia validada; nenhum sinal específico (não é segunda, não é range extremo) justifica ativar reserva."
+  },
+  "2026-02-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça-feira com range anterior moderado (422pt); nível REV vem de RTH padrão; sem sinais de volatilidade extrema ou contexto especial que justifique misturar outras estratégias. REV sozinha é a mais consistente."
+  },
+  "2026-02-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (417.50pt). REV validada historicamente; nenhum gatilho especial para habilitar reserva. Manter foco."
+  },
+  "2026-02-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior de 473.25pt (grande), nível vem do RTH do dia anterior. REV tem melhor taxa agregada; não há contexto especial (não é segunda pós-domingo) que justifique habilitar outra estratégia como reserva."
+  },
+  "2026-02-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range do Globex (domingo à noite) como referência. Range anterior de 192.75pt é normal. REV sozinha tem melhor taxa de aprovação; misturar com outras estratégias historicamente piora resultado. Sem sinais específicos que justifiquem ativar ORB/EMAV/ICT como reserva."
+  },
+  "2026-02-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior moderado (249pt), nível do dia anterior (RTH) — condições estáveis. REV em seu melhor; nenhum gatilho concreto para habilitar reserva."
+  },
+  "2026-02-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (671pt). REV é validada e sozinha maximiza aprovação. Sem indicativos para habilitar alternativas."
+  },
+  "2026-02-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range Globex de 118pt (moderado). REV é validada; ORB/EMAV/ICT historicamente reduzem taxa de aprovação ao dividir os 12 trades diários."
+  },
+  "2026-02-18": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira, range anterior de 440.50pt (moderado), nível vem do RTH anterior. REV é suficiente; nenhum indicador de volatilidade extrema ou padrão semanal que justifique ativar reserva."
+  },
+  "2026-02-17": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça comum, range anterior moderado (126.75pt), nível do dia anterior só. REV sozinha é o padrão de melhor taxa de aprovação; sem contexto anômalo, não vale arriscar diluição com outra estratégia."
+  },
+  "2026-02-19": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior grande (376.25pt) oferece bom espaço para REV. Sem motivo especial para adicionar ruído — REV pura é o padrão validado."
+  },
+  "2026-02-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta com range anterior grande (210.50pt). REV tem histórico comprovado; sem contexto excepcional que justifique adicionar outra estratégia e competir pelo limite de 12 trades/dia."
+  },
+  "2026-02-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça-feira com range anterior moderado (372pt). REV em produção com melhor taxa aprovada. Sem sinais de volatilidade extrema ou condições que justifiquem ativar secundária."
+  },
+  "2026-02-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex (251.75pt) — volatilidade moderada. REV é suficiente; misturar outra estratégia historicamente piora. Manter foco."
+  },
+  "2026-02-26": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta normal, range anterior moderado (247.50pt), nível vem de RTH do dia anterior. REV é a estratégia validada; não há motivo concreto para adicionar ruído com outras estratégias. Manter só REV."
+  },
+  "2026-02-25": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior de 384.25pt (moderado), nível do dia anterior RTH. REV é a estratégia validada; sem sinais concretos de volatilidade extrema ou padrão intraday excepcional que justifique habilitar reserva. Manter foco em REV."
+  },
+  "2026-02-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta com range anterior grande (494pt) favorece REV; nível vem do RTH anterior. Sem sinal de quebra estrutural que justifique misturar outra estratégia."
+  },
+  "2026-03-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range Globex grande (265.75pt). REV sozinha já tem a melhor performance. Range grande oferece bom espaço para REV tocar máxima/mínima e gerar sinais de reversão sem ruído. Não há motivo concreto para adicionar outra estratégia como reserva."
+  },
+  "2026-02-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior grande (407pt) garante níveis bem definidos para REV. Sem contexto excepcional que justifique misturar outras estratégias."
+  },
+  "2026-01-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira com range anterior grande (239.50pt) e nível vindo de RTH anterior — ambiente volatilidade acentuada favorece REV, a estratégia mais testada e consistente. Sem indicador específico de anomalia, mantém-se só REV para evitar competição pelos 12 trades/dia."
+  },
+  "2026-03-03": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior moderado (496pt); REV é a estratégia comprovada. Sem indicadores que justifiquem dilui-la com outras."
+  },
+  "2026-03-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira com range anterior de 498pt (moderado). Nível de referência padrão (máx/mín RTH anterior). REV em produção tem melhor taxa; misturar outra estratégia historicamente piora. Sem sinais concretos para segunda estratégia, manter disciplina com REV única."
+  },
+  "2026-03-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range do Globex (domingo) é cenário clássico de REV. Range de 473pt é moderado, sem volatilidade anormal que justificasse ativar reserva."
+  },
+  "2026-03-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior considerável (437pt) oferece bons alvos para REV. Sem indicativos de condição especial que justifique adicionar outra estratégia."
+  },
+  "2026-03-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior grande (391.75pt indica volatilidade), nível padrão RTH. REV já consolidada; risco de misturar estratégias piora taxa de aprovação."
+  },
+  "2026-03-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça-feira comum, nível do dia anterior (RTH), range de 745pt é moderado. REV é a estratégia validada; sem razão concreta para adicionar ruído com outras estratégias."
+  },
+  "2026-03-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira com range anterior moderado (325pt). Nível vem de RTH dia anterior (não domingo à noite), cenário típico para REV. Sem sinais anômalos que justifiquem ativar reserva."
+  },
+  "2026-03-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior moderado (306.50pt) e nível de referência claro (máx/mín RTH). REV é a estratégia com melhor taxa de aprovação; sem informação de volatilidade anormal ou condição especial que justifique habilitar outras estratégias."
+  },
+  "2026-03-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior bem definido (291.75pt) e nível vindo de RTH do dia anterior. REV sozinha é o histórico mais consistente; sem contexto excepcional que justifique misturar outras estratégias."
+  },
+  "2026-04-02": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (454.75pt) e nível de referência vindo do RTH anterior. REV tem a melhor taxa aprovada; não há condição anômala que justifique dilatar a cota de trades com outras estratégias."
+  },
+  "2026-04-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range de 249.50pt (volatilidade moderada) e nível do dia anterior RTH. REV é a estratégia validada; sem sinais de que outras estratégias agreguem valor hoje."
+  },
+  "2026-04-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range Globex de 345pt (moderado). REV é suficiente; adicionar outra estratégia só \"rouba\" slots. Manter foco."
+  },
+  "2026-04-09": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (323.25pt). REV validada consistentemente; nenhum fator que justifique diluar espaço com outra estratégia."
+  },
+  "2026-04-10": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta com range anterior grande (309.25pt) fornece níveis REV claros. Sem contexto excepcional para habilitar estratégias auxiliares — mantém foco na mais consistente."
+  },
+  "2026-04-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira com range anterior robusto (412.75pt indica volatilidade presente). REV já validada e consistente; nível vem do RTH anterior (sem feriados/fins de semana), reduzindo risco de gap falso. Sem contexto que sugira alta qualidade de breakout ou reversão em médias — manter só REV."
+  },
+  "2026-04-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com nível do range de domingo (Globex) e volatilidade moderada (189.25pt). REV é a estratégia validada; sem sinais específicos de gap ou volatilidade extrema que justifiquem habilitar reservas."
+  },
+  "2026-04-16": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quinta-feira com range anterior robusto (393.75pt). REV em sua melhor forma; sem sinais de volatilidade anormal que justifiquem habilitar alternativas."
+  },
+  "2026-04-15": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira, range anterior de 340.75pt (moderado), nível limpo do dia anterior. REV consolidada; sem sinais que justifiquem adicionar reserva e competir pelo limite de 12 trades."
+  },
+  "2026-04-20": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda-feira com range do domingo (179.75pt) — moderado. REV já validada; sem razão concreta para ativar reserva em contexto normal de segunda."
+  },
+  "2026-04-17": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira, range anterior grande (288.50pt indica volatilidade elevada), nível simples (max/min RTH anterior). REV isolada mantém melhor aprovação; misturar outras estratégias historicamente piora o resultado. Mantenha só REV."
+  },
+  "2026-04-21": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça comum, range anterior moderado (259pt), nível de referência limpo (máx/mín RTH do dia anterior). REV é a estratégia validada; nenhum indicador especial sugere habilitar reserva hoje."
+  },
+  "2026-04-22": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira, range anterior grande (333.50pt = volatilidade) e nível vem de máx/mín RTH do dia anterior. REV é a mais consistente; sem indicadores anormais que justifiquem misturar outras estratégias."
+  },
+  "2026-04-24": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta-feira com range anterior robusto (474pt). REV tem melhor taxa comprovada; sem contexto que justifique misturar outras estratégias."
+  },
+  "2026-04-27": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Segunda com range Globex (198.25pt). REV é validada; sem sinais concretos de vantagem em ORB/EMAV/ICT. Mantém foco em REV para maximizar taxa de aprovação."
+  },
+  "2026-04-28": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Terça normal, range anterior moderado (156.25pt), nível vem de RTH simples. REV é a mais confiável; sem razão forte para adicionar outra."
+  },
+  "2026-04-23": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (281.5pt) e nível de referência simples (máx/mín RTH anterior). REV é a estratégia validada; sem contexto anômalo que justifique misturar outras estratégias que historicamente prejudicam o resultado agregado."
+  },
+  "2026-04-14": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça com range anterior de 387.5pt (moderado). REV é validada; misturar estratégias historicamente piora resultado. Manter só REV."
+  },
+  "2026-04-29": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira, range anterior de 242.50pt (moderado), nível vem de RTH anterior. Sem contexto anômalo que justifique habilitar outra estratégia — REV sozinha mantém melhor taxa de aprovação."
+  },
+  "2026-04-30": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (216pt) e nível vindo do RTH anterior. REV é melhor sozinha; sem catalyst específico que indique volatilidade extrema ou mudança de regime."
+  },
+  "2026-05-04": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com nível do Globex (domingo à noite), range anterior robusto (144.75pt). REV é validada; sem sinais específicos de ORB/EMAV/ICT, manter foco."
+  },
+  "2026-05-01": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Sexta com range anterior grande (458.75pt) garante níveis robustos para REV. Nenhum indicativo de condição especial que justifique misturar estratégias."
+  },
+  "2026-05-08": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Sexta-feira com range anterior bem definido (392.75pt) e nível claro do RTH anterior. REV é a estratégia validada; sem sinais anormais, mantém-se só REV."
+  },
+  "2026-05-05": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça normal com range anterior de 328pt (moderado). REV sozinha é o padrão validado; sem catalisador específico que sugira ORB/EMAV/ICT, mantém-se foco máximo em REV."
+  },
+  "2026-05-11": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Segunda-feira com range Globex (174pt) — moderado. REV é a única com taxa de aprovação consistente; misturar outras estratégias historicamente piora o resultado. Sem sinais concretos que justifiquem segunda estratégia, mantenho só REV em produção."
+  },
+  "2026-05-06": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.75,
+    "motivo": "Quarta-feira comum, range anterior robusto (217.25pt) indica boa volatilidade para REV. Sem sinais de estrutura anômala — mantém-se só REV para máxima taxa de aprovação."
+  },
+  "2026-05-07": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quinta-feira com range anterior robusto (383.25pt) e nível de referência limpo do dia anterior RTH. REV está em seu contexto ideal — confiança alta em rejeição nas máximas/mínimas com volatilidade confirmada."
+  },
+  "2026-05-13": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Quarta-feira com range anterior grande (554pt) garante bom nível de referência para REV; sem fatores anómalos que justifiquem reserva."
+  },
+  "2026-05-12": {
+    "estrategias": [
+      "REV"
+    ],
+    "confianca": 0.85,
+    "motivo": "Terça-feira, range anterior de 233.25pt (moderado), nível vindo do RTH anterior. REV é robusta em contextos normais; sem sinais específicos que justifiquem ORB/EMAV/ICT, evitar \"roubo\" de slot que historicamente piora resultado agregado."
+  }
+}
