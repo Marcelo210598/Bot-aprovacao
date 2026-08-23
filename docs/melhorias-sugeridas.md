@@ -615,6 +615,20 @@ foram tocados**. Próximo passo: Marcelo testa no Market Replay antes de cogitar
 
 **#5 (log de PnL do trade) — ainda não implementado**, sem risco, fica pra quando for conveniente.
 
+### Atualização 23/08 (mesmo dia) — forward test dos 4 primeiros dias mostrou piora, mecanismo investigado
+
+Marcelo rodou `BotAprovacao_BETrigger25.cs` nos dias 01-04/06/2026 e viu piora clara (+$45,0
+contra +$432,5 da config atual, -$387,5). Investigação trade a trade (dataset inteiro, 1.422
+trades pareados, `backtest/compara_be_trigger.py`): 1.290 trades idênticos, **46 trades
+melhoraram** (loss cheio virou pequeno, Δ médio +$147,1 — raro mas grande), **86 trades
+pioraram** (ganho cortado cedo, Δ médio -$50,0 — comum mas pequeno). Líquido ano inteiro: +$2.462
+(bate com os +9,1pp do backtest formal). **Achado extra: quebra mês a mês mostra 9 de 13 meses
+melhorando, só 4 piorando — e os DOIS junhos do dataset (2025 e 2026) estão entre os que
+pioram.** Ou seja, Marcelo testou justamente no mês historicamente pior pra esse achado (junho é
+mais "trendy", favorece o custo do gatilho baixo mais que o benefício). Recomendação: continuar o
+forward test passando de junho, sem abandonar — ver `forward-test-replay-25k/2026-06-betrigger25/
+placar-mes.md` pra detalhe completo.
+
 ---
 
 ## ⚖️ Risco jurídico (não é melhoria de código, mas decisão de negócio)
