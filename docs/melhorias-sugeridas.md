@@ -536,6 +536,46 @@ uma tentativa diferente (ex.: contexto de qualidade de sinal mais rico que só d
 
 ---
 
+## 🔎 Item #20 — Investigação do "teto de 50%" (23/08) — sem resposta estatística nova, mas conclusão por convergência
+
+**Tentativa:** depois dos 4 testes de IA (item #19) não moverem o número, tentei um bootstrap de
+ORDEM — embaralhar cronologicamente a sequência real de trades (REV + BE-lock 0,75, 13 meses) e
+ver se a taxa de aprovação mudava muito, pra separar "problema é o payoff em si" de "problema é
+como perdas se agrupam no tempo". Script: `backtest/investiga_teto_50.py`.
+
+**Esbarrou numa parede técnica, não só bug:** pra manter fidelidade de drawdown intradiário é
+preciso o motor bar-a-bar oficial — mas não dá pra embaralhar barras de preço reais e continuar
+fazendo sentido (o preço de amanhã depende do de hoje). A aproximação por PnL-por-dia que tentei
+esconde o drawdown intradiário (mesmo tipo de erro do item #19 corrigido, agora na versão "por
+dia") e deu um resultado absurdo (100% de aprovação). **Script marcado como abandonado, não usar
+os números dele.**
+
+**Conclusão tirada de outra forma — por CONVERGÊNCIA, não por um teste novo:** contando os testes
+já feitos com o motor oficial bar-a-bar ao longo do projeto — SL 15pt (pior), 6 tamanhos de saída
+parcial (piores), corte de perda antecipado (pior), BE-lock em várias frações (só 0,75 ajuda, e
+pouco), filtro/sizing por `dist_nivel`/sexta (neutro a fraco), ORB/EMAV/ICT sozinhas ou mescladas
+(nenhuma supera), e os 4 testes de IA de hoje (item #19, todos neutros ou piores) — são **~15
+ângulos de ataque independentes, todos convergindo pro mesmo teto de ~50%.** Essa convergência é
+a evidência disponível: não é "ainda não achamos o parâmetro certo", é o formato dessa estratégia
+nesse instrumento (MNQ) nesse timeframe (1min) sob essas regras de avaliação (Apex 30d/$1500/
+$1000 DD).
+
+## 🧭 DECISÃO ESTRATÉGICA EM ABERTO (23/08) — Marcelo decide numa próxima sessão
+
+Duas direções, sem escolha feita ainda:
+
+1. **Aceitar ~50% e escalar operação** — tratar como taxa de conversão de um funil de negócio,
+   rodar várias avaliações em paralelo. Não precisa de mais código/pesquisa, precisa de
+   capital/estrutura operacional.
+2. **Repensar do zero** — outro instrumento (ex.: ES/MES em vez de NQ/MNQ), outro timeframe, ou
+   uma hipótese de estratégia genuinamente diferente (não uma variação da reversão atual). Isso é
+   um projeto novo: nova coleta de dados, nova hipótese, toda a validação de novo — semanas, não
+   uma sessão.
+
+Nenhuma ação de código pendente até essa decisão ser tomada.
+
+---
+
 ## ⚖️ Risco jurídico (não é melhoria de código, mas decisão de negócio)
 
 A Apex proíbe automação OFICIALMENTE em toda fase (ver pesquisa). Eval tolera na

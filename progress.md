@@ -21,9 +21,20 @@ por esse bug — não dá pra saber sem ter visto a tela na hora.
 `docs/melhorias-sugeridas.md`, scripts em `backtest/ia_*.py`): filtro de entrada (-19,2pp),
 seletor diário de estratégia com contexto simples (neutro) e rico (-45,7pp — caiu na armadilha de
 "achado de curto prazo não é regra"), e gestão de risco por trade (-4,5pp). **Nenhum bateu os 50%
-do baseline.** Decisão: parar de tentar IA por cima da REV — o teto parece estrutural (instrumento/
-timeframe/formato de avaliação), não falta de inteligência na decisão. Nada disso tocou o
-NinjaScript nem produção — tudo em backtest Python.
+do baseline.** Nada disso tocou o NinjaScript nem produção — tudo em backtest Python.
+
+**Investigação do teto de 50% (item #20):** tentativa de bootstrap estatístico esbarrou em parede
+técnica (não dá pra embaralhar barras de preço reais preservando fidelidade de drawdown — script
+`backtest/investiga_teto_50.py` marcado como abandonado, resultado não confiável). Conclusão
+tirada por CONVERGÊNCIA: ~15 ângulos já testados com o motor oficial (SL, saída parcial, BE-lock,
+filtros de entrada, estratégias alternativas, os 4 testes de IA) convergem pro mesmo teto de
+~50% — evidência de que é estrutural (instrumento/timeframe/formato de avaliação), não falta de
+parâmetro certo.
+
+**🧭 DECISÃO ESTRATÉGICA EM ABERTO, pendente pra próxima sessão:** (1) aceitar ~50% e escalar
+operação (rodar várias avaliações em paralelo), ou (2) repensar estratégia/instrumento do zero
+(projeto novo, semanas de trabalho). Ver item #20 em `docs/melhorias-sugeridas.md`. Nenhuma ação
+de código pendente até essa decisão.
 
 ## Última atualização: 2026-08-20 (tarde/noite — sessão de pesquisa: taxa de aprovação REAL medida em 50%, nenhuma estratégia nova bate a reversão, recomendação final dada)
 

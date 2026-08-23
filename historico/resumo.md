@@ -9,7 +9,17 @@ Bot de automação (NinjaScript/NT8) pra passar avaliações Apex Trader Funding
 meta $1.500 em até 30 dias corridos, drawdown real $1.000. Estratégia: reversão na máxima/mínima
 do dia anterior ("Níveis 94"), 5 MNQ, timeframe 1min.
 
-## ⚠️ PENDÊNCIAS ABERTAS (23/08)
+## 🧭 DECISÃO ESTRATÉGICA EM ABERTO (23/08) — a mais importante, decidir antes do resto
+
+Depois de ~15 ângulos testados (gestão de saída, filtros de entrada, estratégias alternativas, 4
+testes de IA — ver item #20 em `docs/melhorias-sugeridas.md`) convergirem pro mesmo teto de ~50%
+de aprovação, falta decidir:
+1. **Aceitar ~50% e escalar operação** (várias avaliações em paralelo, funil de negócio), ou
+2. **Repensar estratégia/instrumento do zero** (projeto novo, semanas de trabalho).
+
+Nenhuma ação de código pendente até essa decisão.
+
+## ⚠️ OUTRAS PENDÊNCIAS ABERTAS (23/08)
 
 - **Bug não corrigido (item #18):** `pdHigh`/`pdLow` zeram quando a estratégia reinicia no
   gráfico, deixando o bot mudo o dia inteiro sem aviso. Aconteceu em 21/07. Precisa decisão do
