@@ -576,6 +576,47 @@ Nenhuma ação de código pendente até essa decisão ser tomada.
 
 ---
 
+## ✅ Item #21 — Gatilho de breakeven mais baixo (2,5pt) — VALIDADO, indo pro Replay (23/08)
+
+**Contexto:** Marcelo pediu uma análise externa das melhorias possíveis pro `BotAprovacao.cs`
+(cooldown, filtro de gap de abertura, mitigação de gap de entrada, BE trigger configurável, log de
+PnL, kill switch). #1/#2/#6 (cooldown, filtro de gap, kill switch) são a mesma família já rejeitada
+no item #12 — não retestados, ficam fora até surgir evidência nova. #3 (gap de entrada) e #4 (BE
+trigger) foram testados em backtest Python (`backtest/testa_gap_e_be_trigger.py`).
+
+**#3 — Mitigação do gap de entrada: REJEITADO.** Precisou de um motor próprio (fill na abertura da
+barra seguinte, já que o motor oficial preenche no close da própria barra do sinal e não representa
+gap nenhum). Achados: (a) gap adverso >3pt de barra-a-barra em 1min é raríssimo (0-1 trade/ano) —
+o filtro de rejeição não tem o que filtrar nesse timeframe; (b) ordem Limit no nível piora (47,8%
+vs. 54,5% baseline) — 31 trades/ano não enchem, perda de frequência de novo esbarra no prazo de 30
+dias. Números dessa seção não comparáveis aos 50% oficiais (baseline diferente, ver aviso no topo
+do script).
+
+**#4 — Gatilho de breakeven mais baixo: VALIDADO.** Testado no motor OFICIAL
+(`run_janela_30d.py`, comparável direto aos 50% documentados), com BE-lock proporcional 0,75
+mantido (só muda QUANDO o breakeven aciona, não a fração travada):
+
+| Gatilho BE | Ano inteiro | 1ª metade (jun-dez/25) | 2ª metade (dez/25-jun/26) |
+|---|---|---|---|
+| 3,75pt (atual) | 50,0% | 60,0% | 42,9% |
+| 3,0pt | 57,1% | 66,7% | 50,0% |
+| **2,5pt** | **59,1%** | **70,0%** | 50,0% |
+
+Melhora nas duas metades do ano — **não é achado de período único**, confirmado OOS. É o maior
+ganho isolado encontrado no projeto até agora (mais que qualquer variação de saída parcial,
+sizing, filtro de entrada, ou os 4 testes de IA de hoje, item #19).
+
+**Ação tomada:** criada cópia experimental `src/BotAprovacao_BETrigger25.cs` (derivada de
+`BotAprovacao_SaidaParcial.cs`, só muda `BreakevenTrigPontos` de 3,75 pra 2,5 — resto idêntico:
+BE-lock proporcional 0,75 ligado, saída parcial desligada). Arquivo de PnL diário próprio
+(`BotAprovacao_BETrigger25_pnl_diario.txt`), não colide com os outros experimentais. Produção
+(`BotAprovacao.cs`) e o `BotAprovacao_SaidaParcial.cs` que já roda o forward test de julho **não
+foram tocados**. Próximo passo: Marcelo testa no Market Replay antes de cogitar produção.
+
+**#5 (log de PnL do trade) — ainda não implementado**, sem risco, fica pra quando for conveniente.
+
+---
+
 ## ⚖️ Risco jurídico (não é melhoria de código, mas decisão de negócio)
 
 A Apex proíbe automação OFICIALMENTE em toda fase (ver pesquisa). Eval tolera na
