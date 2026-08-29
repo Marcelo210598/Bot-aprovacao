@@ -282,7 +282,9 @@ def bt(bars, dom_map, fontes, ind=None, meta=META, dd=DD, stop_dia=STOP_DIA,
         if ts: por_fonte[f] = {'n': len(ts), 'net': sum(ts), 'wr': 100*len([t for t in ts if t>0])/len(ts)}
     return {'n': n, 'wr': 100*len(w)/n if n else 0, 'pf': gw/gl if gl > 0 else 99,
             'net': sum(trades), 'aprov': aprov, 'reprov': reprov, 'tot': tot,
-            'taxa': 100*aprov/tot if tot else 0, 'dmediana': med, 'por_fonte': por_fonte}
+            'taxa': 100*aprov/tot if tot else 0, 'dmediana': med, 'por_fonte': por_fonte,
+            'trades': trades}  # [29/08] lista crua de PnL por trade, p/ analise de qualidade
+            # (ganho medio/perda media/ratio) sem quebrar nenhum consumidor existente (chave nova)
 
 
 def linha(label, r):
