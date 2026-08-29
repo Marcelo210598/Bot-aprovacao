@@ -9,6 +9,15 @@ Bot de automação (NinjaScript/NT8) pra passar avaliações Apex Trader Funding
 meta $1.500 em até 30 dias corridos, drawdown real $1.000. Estratégia: reversão na máxima/mínima
 do dia anterior ("Níveis 94"), 5 MNQ, timeframe 1min.
 
+## 🔴 29/08 — Marcelo insatisfeito, forward test pausado
+
+Forward test do `BETrigger25+MaxDist20` (dias 05-11/06) fechou em +$38,0/40 trades (~$0,95/trade,
+loss grandes de -$105/-$118). Testado SL menor no backtest de 13 meses pra atacar isso: piora WR e
+PnL total (Net/mês $1.796→$128 com SL 6pt) — o loss grande é o desenho do risco, não um bug.
+Marcelo: "já sabemos que não terá aprovação de conta", "não estou feliz com o que temos" — parou
+por hoje. **Isso reforça a decisão estratégica em aberto abaixo, que segue sem resposta.** Começar
+a próxima sessão por aí, sem forçar otimismo.
+
 ## 🧭 DECISÃO ESTRATÉGICA EM ABERTO (23/08) — a mais importante, decidir antes do resto
 
 Depois de ~15 ângulos testados (gestão de saída, filtros de entrada, estratégias alternativas, 4

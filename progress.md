@@ -1,6 +1,34 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-08-23 (forward test de julho + 4 testes de IA, todos rejeitados)
+## Última atualização: 2026-08-29 (forward test BETrigger25+MaxDist20 dias 05-11/06 + análise de qualidade de trade — Marcelo insatisfeito, parou por hoje)
+
+## 🎯 29/08 — Forward test BETrigger25+MaxDist20 (5 dias) + análise ganho/perda — Marcelo não ficou satisfeito
+
+**Forward test (Market Replay):** dias 05, 08, 09, 10, 11/06 registrados em
+`forward-test-replay-25k/2026-06-betrigger25-maxdist20/` (bot: `src/BotAprovacao_BETrigger25.cs`,
+BE trig 2,5pt + MaxDistPontos 20). 05/06 e 10/06 sem entradas. 08/06: -$9,5 (stop cheio -$118,5
+apagou 2 ganhos). 09/06: +$80,0 (3G/0L). 11/06: -$76,0 (stop cheio -$105 no último trade comeu o
+saldo do dia). **Acumulado 9 dias (01-11/06): +$38,0, 40 trades (~$0,95/trade).**
+
+**Análise de qualidade do trade** (`backtest/analise_qualidade_trades_rev.py`, motor oficial de 13
+meses): testado SL menor (10/8/6pt) pra atacar o tamanho dos stops cheios (-$105/-$118, que são
+~o teto teórico do SL 12,5pt×5 contratos). Resultado: **diminuir o SL melhora o ratio ganho/perda
+(0,67→1,31) mas destrói o win rate (68%→44%) e o PnL total (Net/mês $1.796→$128)**. Nenhuma
+redução de SL testada supera o SL 12,5 atual — o loss grande não é bug, é o desenho do risco por
+trade. `bt()` em `run_estrategias_comparativo.py` ganhou 1 chave nova (`'trades'`, lista crua de
+PnL) pra viabilizar essa análise, mudança aditiva.
+
+**🔴 Marcelo decidiu parar o forward test por hoje, insatisfeito:** "já sabemos que não terá
+aprovação de conta" e "não estou feliz com o que temos". O backtest de 13 meses (1166+ trades)
+segue mostrando edge real (WR 68%, ~$1.800/mês) que não bate com a sensação dos últimos dias de
+forward test (amostra de 9 dias/40 trades é pequena) — **essa reconciliação, e a decisão
+estratégica em aberto desde 23/08 (aceitar ~50% e escalar vs. repensar do zero), ficam pendentes
+pra próxima sessão.** Nenhuma mudança em `.cs` ou produção hoje.
+
+**Trabalho paralelo (projeto separado, mesmos dados NQ):** implementado e rodado
+`backtest/backtest_rsi_reversion.py` (estratégia RSI Deep Mean Reversion, não relacionada ao
+BotAprovacao) — melhor config achada é lucrativa mas com PnL/mês e DD piores que o bot atual, não
+é upgrade óbvio. Ver `historico/2026-08-29.md` pro detalhe completo.
 
 ## 🎯 23/08 — Forward test de julho registrado (02 a 20/07) + 4 tentativas de IA testadas e REJEITADAS
 
