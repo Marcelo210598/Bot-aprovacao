@@ -15,14 +15,15 @@
 | 03/07 | 0 | — | $0,00 | −$118,0 | sem entradas |
 | 06/07 | 5 | 1/4 | **−$245,5** | −$363,5 | 2 facadas (S4 −$148, S5 −$122) + 2 scratches de trailing |
 | 07/07 | 0 | — | $0,00 | −$363,5 | sem entradas |
-| 08/07 | 5 | 2/3 | **−$270,0** | **−$633,5** | NIV_L14 −$158 (gap de entrada +10pt); L15 −$139 (fav <2pt) |
+| 08/07 | 5 | 2/3 | **−$270,0** | −$633,5 | NIV_L14 −$158 (gap de entrada +10pt); L15 −$139 |
+| 09/07 | 0 | — | $0,00 | −$633,5 | sem entradas |
+| 10/07 | 4 | 3/1 | **−$62,5** | **−$696,0** | +$94 nos 3 primeiros, aí NIV_S20 −$156,5 (facada) devolveu tudo |
 
-**Acumulado (01→08/07, 6 pregões, 3 operados): −$633,5.**
-A trava real do produto é: **$1.500 em 30 dias corridos** (o mínimo de 7 dias operados da Apex
-não é gargalo, e firmas de DD estático em geral nem têm mínimo). Faltam ~22 pregões, precisa de
-+$2.133 do ponto atual.
-Pico acumulado: +$51 (após NIV_L9 em 02/07). Drawdown atual: **$684,5** (Apex trailing, 68% do
-limite $1.000) / **$633,5** do saldo inicial (DD estático, 63%).
+**Acumulado (01→10/07, 8 pregões, 4 operados): −$696,0.**
+A trava real: **$1.500 em 30 dias corridos**. Faltam ~20 pregões, precisa de +$2.196 do ponto
+atual.
+Pico acumulado: +$51 (02/07). Drawdown atual: **$747,0** (Apex trailing, **75% do limite $1.000**)
+/ **$696,0** do saldo inicial (DD estático, 70%).
 
 ## 🔴 Os 5 losses grandes de julho (−$736) — 2 causas
 
@@ -33,9 +34,10 @@ limite $1.000) / **$633,5** do saldo inicial (DD estático, 63%).
 | 06/07 NIV_S5 | −$122 | **facada** — fav +0,85pt |
 | 08/07 NIV_L14 | −$158 | **gap de entrada** — sinal @ 29211,75, fill real 29221,90 (+10pt); o favor "sumiu" no fill |
 | 08/07 NIV_L15 | −$139 | fav +1,85pt (facada-borderline) |
+| 10/07 NIV_S20 | −$156,5 | **facada** — entrada em cima da linha, fav +1pt, reversão em V |
 
-Os 12 trades restantes somaram **+$102**. Ou seja: **o resultado do mês inteiro (−$633,5) são
-esses 5 trades.**
+Os 16 trades restantes somaram **+$196**. **O resultado do mês inteiro (−$696) são esses 6
+trades** (−$892). 4 são facada, 1 é gap de entrada, 1 borderline.
 
 ### Facada (item #17) — sem filtro, já investigado
 
