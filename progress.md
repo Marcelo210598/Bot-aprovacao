@@ -1,6 +1,58 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-09-01 (AUDITORIA do forward test de julho — PF 0,44 vs backtest PF 1,50; achado: gestão OnBarClose × OnMarketData; forward test PAUSADO)
+## Última atualização: 2026-09-01 (noite) — Strategy Analyzer virou o ground truth; SHORT-ONLY é a única config com edge; OOS 2022-2026 baixado (Databento), aguardando confirmação no NT8
+
+## 🎯 01/09 (noite) — TESTES NO STRATEGY ANALYZER + descoberta do SHORT-ONLY
+
+O motor Python do projeto estava **~40% otimista no PF e pegava ~6x mais trades** que o
+Analisador de Estratégia do NT8 (que roda o `.cs` compilado de verdade). **O Analisador
+passou a ser a fonte da verdade.** Rodadas no `BotAprovacao_BETrigger25` / MNQ SEP26 / 1min,
+~7 meses (jan-ago 2026, único período com dado nesse contrato):
+
+| Config | Comissão | PF | Líquido | Max DD |
+|---|---|---|---|---|
+| Baseline (alvo 60, trail 1,75, BE 2,5) | não | 1,23 | +$1.965 | −$1.192 |
+| Baseline | **sim** | **0,96** | **−$690** | −$3.167 |
+| Teste A (alvo 12, BE off, trail 0) | não | 0,90 | — | — |
+| Teste B (alvo 40, BE 4, trail 8) + parcial ON | não | 1,24 | +$2.020 | −$1.187 |
+| Teste B | **sim** | **0,96** | **−$746** | −$3.287 |
+| Teste C (BE gat. 6, trail 1,75, alvo 60) | não | 0,97 | — | — |
+
+**Com comissão real, NENHUMA variação de saída passa de PF ~0,96.** A comissão (~$6,50/RT ×
+251 trades = $1.631) come o ganho bruto. A saída parcial **não dá pra testar no Analisador**
+(está no `OnMarketData`, que não roda em backtest) — só no Market Replay.
+
+**ACHADO GRANDE: o LONG está morto, o SHORT carrega tudo.** Em TODOS os testes:
+Long PF 0,85 (net −$1.136) · Short PF 1,04 (net +$389). Rodando **`So operar SHORT` isolado**
+(novo parâmetro no `.cs`, commit 4a6ad83): **PF 1,44 · +$1.516 · Max DD −$716 · Sortino 6,88**
+em ~7 meses, com comissão. Curva robusta de verdade — mas **lenta**: ~$216/mês com 5 contratos,
+não bate $1.500/30 dias na Apex. Serve pra **firma de DD estático sem prazo**.
+
+## 🔬 01/09 (noite) — OPÇÃO D: OOS longo (Databento 2022-2026)
+
+Baixado MNQ OHLCV-1m 2022-06 → 2026-08 do Databento ($9,02 / crédito grátis; total gasto $16,62).
+`backtest/oos_short_only_4anos.py` — reversão SHORT-ONLY por ano (motor Python, otimista):
+
+| Ano | PF | Líquido |
+|---|---|---|
+| 2022 (jun+) | 1,26 | +$5.386 |
+| 2023 | **1,12** | +$4.426 |
+| 2024 | 1,42 | +$15.169 |
+| 2025 | 1,42 | +$15.684 |
+| 2026 | 1,54 | +$15.404 |
+
+**Não é fluke de 2026** — PF > 1,1 todo ano, melhorando com o tempo. **2023 é o ano fraco**
+(PF 1,12 otimista → provável ~breakeven real). Python 2026 short-only (1,54) ≈ NT8 2026 (1,44)
+→ o motor track bem PRA SHORT-ONLY (não pro both-sides).
+
+**PENDENTE (Marcelo no NT8):** importar `dados_databento/MNQ_NT8_import_2022_2026.zip`
+(→ `MNQ 12-25`, front-month contínuo, timestamp já em horário de Chicago) via Ferramentas →
+Dados históricos → Importar. Rodar o Analisador short-only em 2022-01 → 2025-12.
+- PF > 1,2 e 2023 > 1,0 → edge real, ir pra firma de DD estático (opção C).
+- 2023 < 1,0 → sem robustez, encerrar a reversão.
+
+Produção intacta. `.cs` alterado só o BETrigger25 (item #18 + `SoOperarShort`), não produção.
+
 
 ## 🔬 01/09 — AUDITORIA COMPLETA do forward test de julho (`docs/auditoria-julho-2026.md`)
 
