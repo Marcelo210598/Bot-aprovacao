@@ -477,16 +477,24 @@ o 06/07 desde que não vá −$1.000 do saldo inicial). Mais um motivo pra firma
    pior. Em replay 500x é pior que ao vivo. Se persistir na velocidade real, o trailing de 1,75pt
    (calibrado no NQ do NT8) pode estar apertado demais pro atrito.
 
-2. **🆕 Gap de entrada** (08/07 NIV_L14): sinal disparou LONG @ 29211,75, fill real **29221,90 —
-   10,15pt pior**. Nos segundos entre o close da vela de sinal e o `OnMarketData` mandar a ordem,
-   o preço correu 10pt. O favor "sumiu" no fill (só +2,1pt a partir do preço real → não bateu BE
-   → stop cheio −$158). No preço do sinal o trade teria dado +12pt. Aconteceu depois de uma vela
-   de sinal violenta (spike de 17pt abaixo da linha + fechamento longe do fundo). É a 2ª hipótese
-   deste item ("o fill vem tarde"). **Antes era considerado raríssimo** (item #21 #3: "gap adverso
-   >3pt barra-a-barra em 1min = 0-1 trade/ano" no backtest) — mas o backtest preenche no close da
-   vela e não modela o gap do `OnMarketData`. **Watch:** se repetir, checar a lógica de entrada do
-   `OnMarketData` (pode estar perseguindo o preço em vez de entrar a mercado no 1º tick após o
-   sinal).
+2. **🔴 Gap de entrada — CONFIRMADO como padrão recorrente** (08/07 NIV_L14 e 13/07 NIV_L6):
+   - NIV_L14: sinal LONG @ 29211,75, fill real **29221,90** (+10,15pt). Vela de sinal: spike de
+     17pt abaixo da linha.
+   - NIV_L6: sinal LONG @ 29558,00, fill real **29569,45** (+11,45pt). Vela de sinal: spike de
+     **53pt** abaixo da linha.
+   - Nos 2 casos: vela de sinal violenta (spike grande + fechamento longe do fundo), o bot manda a
+     ordem no close da vela, o `OnMarketData` preenche ~11pt pior porque o preço já correu nos
+     segundos seguintes. O favor "some" no fill (só +0,5 a +2pt a partir do preço real) → não bate
+     o BE → stop cheio (−$158 e −$153). No preço do sinal os 2 trades teriam pegado o movimento.
+   - **Antes era considerado raríssimo** (item #21 #3: "gap adverso >3pt barra-a-barra em 1min =
+     0-1 trade/ano" no backtest) — mas o backtest preenche no close da vela e **não modela o gap
+     do `OnMarketData` ao vivo**. 2 casos em 5 dias operados NÃO é raro.
+   - **AÇÃO RECOMENDADA:** investigar a lógica de entrada do `OnMarketData` no `.cs`. Hipótese: ele
+     está esperando confirmação / perseguindo o "melhor" tick em vez de entrar **a mercado no 1º
+     tick após o sinal**. Numa vela de reversão violenta, cada segundo de espera custa pontos. Um
+     entry a mercado imediato (ou uma ordem limite no preço do sinal com timeout) provavelmente
+     resolve. Precisa validar em backtest com motor que modele o fill do próximo tick antes de
+     mexer em produção.
 
 ---
 

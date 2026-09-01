@@ -18,11 +18,14 @@
 | 08/07 | 5 | 2/3 | **−$270,0** | −$633,5 | NIV_L14 −$158 (gap de entrada +10pt); L15 −$139 |
 | 09/07 | 0 | — | $0,00 | −$633,5 | sem entradas |
 | 10/07 | 4 | 3/1 | **−$62,5** | **−$696,0** | +$94 nos 3 primeiros, aí NIV_S20 −$156,5 (facada) devolveu tudo |
-| 11-12/07 | — | — | — | −$696,0 | **fim de semana — mercado fechado** |
+| 11-12/07 | — | — | — | −$696,0 | fim de semana — mercado fechado |
+| 13/07 | 5 | 3/2 | **−$0,5** | **−$696,5** | +$225 nos 3 verdes (L5/L7 correram +$100 cada); L6 −$153 (gap +11pt), L8 −$121 (facada) |
 
 > **Calendário julho/2026:** 03/07 = feriado (Independence Day observado). 04-05, 11-12, 18-19,
-> 25-26 = fins de semana. **Próximo pregão depois de 10/07 (sex) = 13/07 (seg)** — e a segunda
-> usa o range do Globex de domingo à noite, igual foi no 06/07.
+> 25-26 = fins de semana. Segundas usam o range do Globex de domingo à noite.
+
+**Acumulado (01→13/07, 9 pregões, 5 operados): −$696,5.** Faltam ~19 pregões e +$2.196,5.
+Drawdown: **$747,5** (Apex trailing, 75%) / **$696,5** (DD estático, 70%).
 
 **Acumulado (01→10/07, 8 pregões, 4 operados): −$696,0.**
 A trava real: **$1.500 em 30 dias corridos**. Faltam ~20 pregões, precisa de +$2.196 do ponto
@@ -40,9 +43,20 @@ Pico acumulado: +$51 (02/07). Drawdown atual: **$747,0** (Apex trailing, **75% d
 | 08/07 NIV_L14 | −$158 | **gap de entrada** — sinal @ 29211,75, fill real 29221,90 (+10pt); o favor "sumiu" no fill |
 | 08/07 NIV_L15 | −$139 | fav +1,85pt (facada-borderline) |
 | 10/07 NIV_S20 | −$156,5 | **facada** — entrada em cima da linha, fav +1pt, reversão em V |
+| 13/07 NIV_L6 | −$153,0 | **gap de entrada** — sinal @ 29558, fill 29569,45 (+11,45pt); vela de sinal foi spike de 53pt |
+| 13/07 NIV_L8 | −$121,0 | **facada** — fav +0,75pt |
 
-Os 16 trades restantes somaram **+$196**. **O resultado do mês inteiro (−$696) são esses 6
-trades** (−$892). 4 são facada, 1 é gap de entrada, 1 borderline.
+**8 losses grandes = −$1.166.** Os 21 trades restantes somaram **+$470**. 5 facadas, 2 gaps de
+entrada, 1 borderline. **O resultado do mês (−$696,5) É esses 8 trades.**
+
+### 🔴 Gap de entrada — agora é padrão CONFIRMADO (2x: 08/07 NIV_L14, 13/07 NIV_L6)
+
+Nos 2 casos: vela de sinal foi um **spike violento** (17pt e 53pt abaixo da linha) seguido de
+fechamento longe do fundo. O bot manda a ordem no close da vela e o `OnMarketData` preenche
+**~11pt pior**, porque o preço já correu nos segundos seguintes. O favor "some" no fill → stop
+cheio. **Recomendação: investigar a lógica de entrada do `OnMarketData` no `.cs`** — parece estar
+perseguindo o preço em vez de entrar a mercado no 1º tick. Numa reversão violenta, esperar = pagar
+10pt. Isso o backtest NÃO modela (preenche no close da vela). Ver item #17.
 
 ### Facada (item #17) — sem filtro, já investigado
 
