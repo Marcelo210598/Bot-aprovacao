@@ -1,6 +1,95 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-08-29 (forward test BETrigger25+MaxDist20 dias 05-11/06 + análise de qualidade de trade — Marcelo insatisfeito, parou por hoje)
+## Última atualização: 2026-09-01 (direção B destrinchada — só o DD estático vale; forward test do BETrigger25 muda de junho pra JULHO)
+
+## 🆕 01/09 (fim do dia) — Bot novo: `src/BotAprovacaoDow_MYM.cs` (MYM + DD estático)
+
+Marcelo decidiu perseguir as 2 alavancas da direção B **juntas**, em cima do "3º bot" da linhagem
+(`BotAprovacao_BETrigger25.cs`):
+1. **MYM** (Micro Dow, $0,50/pt, tick 1pt) em vez de MNQ
+2. **Firma de DD estático** (Tradeify/MFFU/TPT) em vez do DD trailing intradiário da Apex
+
+**`src/BotAprovacaoDow_MYM.cs`** = cópia do BETrigger25 com **só** o instrumento + params trocados
+(mesma lógica de entrada/gestão/recovery/stop servidor/fuso, byte-idêntica). Mudanças: nome da
+classe, defaults escalados pro Dow (SL 29 / TP 117 / BE +9→+6 / trail 2 / tol 12 ticks / maxdist
+35 / 5 contratos), `UsarBELockProporcional=false`, $/pt nos logs (2,0→0,5), nome do arquivo de
+PnL. `MetaLucroDolar` / `StopDiarioDolar` / `MinDiasOperados` ficam como campos ⚠️ a ajustar
+conforme a firma. Ficha completa + firmas a levantar + passo a passo do forward test:
+**`docs/bot-mym-dd-estatico.md`**.
+
+⚠️ **NÃO validado ao vivo.** Produção (`BotAprovacao.cs`) e os outros `.cs` **não foram tocados.**
+
+### 🔴 REVISÃO (mesmo dia) — as 2 alavancas são separáveis, só uma vale (`run_mnq_mym_junto.py`)
+
+Marcelo perguntou se dá pra agregar o MYM ao BETrigger25 e testar junto. Testado (MNQ + MYM na
+mesma conta, P&L/DD/meta compartilhados):
+
+| DD estático, 5c cada | Taxa | OOS |
+|---|---|---|
+| **MNQ sozinho (params BETrigger25)** | **75%** | 62%/69% |
+| MYM sozinho | 23% | 0%/33% |
+| MNQ + MYM juntos | 73% | 56%/91% (mais estouros) |
+
+- **Juntar MYM não ajuda** — MNQ e MYM são ~0,9 correlacionados (Nasdaq × Dow), é dobrar a mesma
+  aposta.
+- **Lever 1 (DD estático) NÃO é código** — aplica ao BETrigger25 direto, só trocar de firma. E
+  ajuda MUITO: params do BETrigger25 no dado do Databento vão de 43% → **62% (Apex) / 75%
+  (estático)**. Confirmação forte do edge do BETrigger25 num dado independente do NT8.
+- **Caminho recomendado:** `BotAprovacao_BETrigger25.cs` (MNQ) numa firma de DD estático. Sem
+  código novo. `BotAprovacaoDow_MYM.cs` fica como experimento opcional.
+
+**Próximo:**
+1. Marcelo levanta termos de 1 firma de DD estático (automação + DD estático de verdade + preço +
+   consistência) → seta `Meta`/`StopDiario`/`MinDias` no BETrigger25.
+2. **🔀 Forward test do BETrigger25 muda de JUNHO pra JULHO/2026** (junho é o pior mês pro achado
+   do BE trig 2,5; 9 de 13 meses melhoram). Retomar do dia 01/07. Pasta criada:
+   `forward-test-replay-25k/2026-07-betrigger25/` (placar-mes.md com o scaffold pronto).
+
+## 🧪 01/09 — Direção B: Renko + modelos de DD + MES/M2K/MYM (dado real Databento)
+
+Sessão inteira na **decisão estratégica em aberto desde 23/08** (aceitar ~50% e escalar vs.
+repensar do zero). Marcelo pediu pra testar Renko + MA no motor de aprovação de 30 dias e varrer
+as outras possibilidades da direção B. **Nada tocado em produção nem nos `.cs`.** Detalhe completo:
+`docs/melhorias-sugeridas.md` #22 + `historico/2026-09-01.md`.
+
+- **Renko + MA:** sem edge. Gestão de tendência = **0% de aprovação em toda config, PF 0,77–0,97**
+  (perde no bruto). Mesclado com a REV, nos dias que a REV fica muda o Renko opera 400–640×/ano e
+  perde $5k–$23k. Scripts: `backtest/renko.py`, `run_renko_30d.py`, `run_renko_fair.py`. **Fechado.**
+- **Modelo de drawdown = a maior alavanca estrutural achada** (`run_direcaoB_scan.py`, NQ NT8):
+  DD trailing intradiário (Apex) 55% → **DD estático 60% com ZERO estouros**. O trailing é o que
+  fabrica o risco de explodir. Firmas com DD estático + bot: Tradeify, MyFundedFutures (Expert),
+  TPT. **Confirmar termos (automação + DD estático + preço conta ~25K + regra de consistência).**
+- **Conta Apex maior NÃO resolve:** 50K/14MNQ ≈ 59% (OOS frágil), 100K+ ≈ 0% (alvo grande demais
+  pro prazo de 30d). O relógio de 30 dias corridos é a trava.
+- **2º sinal — fade do range overnight (Globex) durante o RTH:** sozinho 52% (empata a REV, mesma
+  família). Mesclado REV+ON sob DD estático: **75%, OOS 82%/69%** — 1ª coisa do projeto acima de
+  ~55% com OOS não-miragem (mas o ganho vem do DD estático, não do sinal). Nunca forward-testado.
+- **Databento configurado** (conta do Marcelo, US$ 7,60 de US$ 125 de crédito grátis): dado real
+  OHLCV-1m de MES/MNQ/M2K/MYM, mesmo período do `NQ_dados/`. `backtest/carrega_databento.py`
+  monta front-month contínuo → `dados_databento/{...}_1min.txt`. CSV bruto no `.gitignore`.
+- **A reversão em outros instrumentos** (`run_instrumento_scan.py`, ~108 configs de gestão por
+  instrumento, tick REAL por instrumento — crítico pro slippage):
+
+  | Instrumento | PF máx | Taxa | Leitura |
+  |---|---|---|---|
+  | MES (Micro S&P) | 0,80 | 8% | ❌ sem edge — o S&P atravessa os níveis do dia anterior |
+  | M2K (Micro Russell) | 0,85 | 5% | ❌ sem edge — small caps rompem o nível (momentum) |
+  | **MYM (Micro Dow)** | **1,44** (fill 1 tick) / 1,18 (2 ticks) | 62% / 43% | 🟡 único com edge, frágil a slippage |
+
+  MYM: mesmo edge do NQ com fill bom (PF 1,44 ≈ NQ 1,41), WR 76% (> NQ 68%), quase não estoura
+  (o Dow não dá spike contra) — mas depende de fill de ~1 pt Dow. Só forward test ao vivo resolve.
+  ⚠️ Bug meu: 1º run com tick 0,25 pra todos deu MYM 72% (falso); MYM tick real = 1,0 pt Dow.
+
+- **Rompimento (breakout) nos 4 instrumentos + como complemento da reversão** (`run_break_instr.py`,
+  pergunta do Marcelo): edge FRACO só no Nasdaq (PF ~1,1 = 1/3 da força da reversão), morto no
+  resto (MES/M2K PF <0,9; MYM PF 1,00 — o Dow reverte, não rompe). **Juntar fade + break PIORA**
+  (NQ 52%/PF1,13 vs FADE sozinho 59%/PF1,43 — dilui o edge forte). **ORB morto em TODOS os 5
+  instrumentos.** M2K mata a hipótese "se não faz fade, faz break" — no Russell nem um nem outro.
+- **Veredito da direção B:** trocar de instrumento OU de tipo de estratégia é quase um beco. A
+  alavanca real é o **FORMATO** — firma de DD estático — que se aplica ao NQ atual e ao MYM.
+  Renko, rompimento, ORB: fechados.
+
+## 🎯 29/08 — Forward test BETrigger25+MaxDist20 (5 dias) + análise ganho/perda — Marcelo não ficou satisfeito
 
 ## 🎯 29/08 — Forward test BETrigger25+MaxDist20 (5 dias) + análise ganho/perda — Marcelo não ficou satisfeito
 

@@ -655,6 +655,169 @@ test no Replay pra confirmar fora do backtest.
 
 ---
 
+## 🧪 Item #22 — Direção B destrinchada: Renko, modelos de DD, outros instrumentos (01/09/2026)
+
+**Contexto:** decisão estratégica em aberto desde 23/08 (aceitar ~50% e escalar vs. repensar do
+zero). Marcelo pediu (1) testar Renko + MA "do mesmo jeito que testamos hoje" (avaliação de 30
+dias), (2) varrer as outras possibilidades da direção B. Scripts: `backtest/renko.py`,
+`backtest/run_renko_30d.py`, `backtest/run_renko_fair.py`, `backtest/run_direcaoB_scan.py`,
+`backtest/carrega_databento.py`, `backtest/run_instrumento_scan.py`. Dado novo: Databento
+GLBX.MDP3 OHLCV-1m de MES/MNQ/M2K/MYM, front-month contínuo, mesmo período do `NQ_dados/`
+(jun/25→jun/26). Custo Databento: **US$ 7,60** dos US$ 125 de crédito grátis. Motor de aprovação
+idêntico ao resto do projeto (janela 30d corridos, DD $1000, Max12/dia, slippage 2 ticks).
+
+### 22a — RENKO + Média Móvel — ❌ SEM EDGE
+
+Tijolo de Renko reconstruído das barras de 1min (não temos tick de 13 meses — modelo de caminho
+intrabar pessimista, conservador pra estratégia de tendência). Varrido: brick 10–30pt, MA 5–20,
+gate de 3 tijolos, saída no cruzamento contrário da MA, gestão de tendência (stop 1–3 tijolos,
+trailing por tijolo, alvo fixo).
+
+| Renko + MA | Melhor resultado |
+|---|---|
+| Gestão da reversão (SL 12,5/trail 1,75) | 48% (brick20/ma10), pior que REV 55%, 16 estouros vs 6 |
+| Gestão de tendência (stop N tijolos, saída nativa) | **0% em TODA config** — PF 0,77–0,97 (perde no bruto) |
+| Mesclado com a REV, nos dias em que a REV fica muda | Renko opera 400–640×/ano e **perde $5k–$23k** nesses dias |
+| OOS mescla (gestão reversão) | 67% / 42% — miragem de 1 metade |
+
+MA-cross em tijolo de Renko no NQ é isca de chop. Os dias que a REV não pega não têm tendência
+sobrando — têm ausência de estrutura, exatamente onde um sistema de MA em Renko sangra mais.
+**Não implementar. Não retestar sem dado de tick E uma hipótese diferente de MA-cross.**
+
+### 22b — MODELOS DE DRAWDOWN — 🟡 a maior alavanca estrutural achada
+
+Mesma reversão, mesma conta, só mudando COMO o DD funciona (`run_direcaoB_scan.py`, NQ NT8):
+
+| Modelo de DD | Taxa | Estouros |
+|---|---|---|
+| Apex trailing intradiário (conta lucro aberto) | 55% | 6/20 |
+| EOD trailing (pico só no fim do dia) | 55% | 5/20 |
+| **Static (limite fixo desde o início, nunca sobe)** | **60%** | **0/15** |
+
+O DD trailing intradiário é o que fabrica o risco de estouro. Com DD estático de $1.000 a
+estratégia **nunca estoura** — ou aprova (60%) ou só expira o prazo. Você para de pagar reset fee.
+Firmas com opção de DD estático **e que permitem bot**: Tradeify, MyFundedFutures (Expert), Take
+Profit Trader. **Ação: confirmar termos (automação + DD estático + preço de conta ~25K).**
+Conta Apex MAIOR (50K/100K) NÃO resolve — o relógio de 30 dias trava (50K/14MNQ ≈ 59%, OOS
+frágil; 100K+ ≈ 0%, alvo inalcançável no prazo).
+
+### 22c — 2º SINAL: fade do range overnight (Globex) durante o RTH — 🟡 empata sozinho, ajuda no merge
+
+Mesma mecânica da reversão, mas usando o extremo do range do Globex em vez da máx/mín RTH de
+ontem. Sozinho: 52% (WR 67%, PF 1,37) — empata a REV. Mesclado (REV+ON): opera ~40% mais dias,
+menos expirações. **REV+ON sob DD estático (NQ NT8): 75%, OOS 82%/69%** — 1ª coisa no projeto que
+passa dos ~55% com OOS que não é miragem de uma metade (mas o ganho vem quase todo do DD
+estático, não do sinal). Nunca foi forward-testado.
+
+### 22d — OUTROS INSTRUMENTOS (dado real Databento) — MES/M2K ❌, MYM 🟡 frágil
+
+`run_instrumento_scan.py`, sweep de ~108 configs de gestão proporcional ao range de cada
+instrumento, tick REAL por instrumento (crítico pro slippage: MYM tick = 1pt Dow, não 0,25).
+Validação: MNQ-databento reproduz o edge da REV (WR 67%, PF 1,28 ≈ NT8).
+
+| Instrumento | PF máx no grid | Melhor taxa | Leitura |
+|---|---|---|---|
+| **MES** (Micro S&P) | **0,80** | 8% | ❌ sem edge — o S&P atravessa os níveis do dia anterior, não rejeita. WR 63% mas ganhos minúsculos |
+| **M2K** (Micro Russell) | **0,85** | 5% | ❌ sem edge — small caps rompem o nível (momentum), não fazem fade. WR 69% mas PF <1 |
+| **MYM** (Micro Dow) | **1,19** (slip 2t) | 33–43% | 🟡 único com edge, mas frágil a slippage |
+
+MYM detalhado (sensibilidade a slippage, o teste que matou noturna/SL15):
+
+| Slippage/fill | Taxa (8c static) | PF | OOS |
+|---|---|---|---|
+| 1 tick (1pt Dow, spread típico) | 62% | **1,44** | 38%/56% |
+| 2 ticks (2pt, conservador) | 43% | 1,18 | 12%/36% |
+| 3 ticks (3pt) | 18% | 0,94 | 0%/10% |
+
+MYM tem o MESMO edge do NQ com fill bom (PF 1,44 ≈ NQ 1,41), fica marginal com fill conservador,
+morre com fill ruim. WR 76% (> NQ 68%) e **quase não estoura** (o Dow não dá spike contra você
+como o Nasdaq) — a propriedade que a direção B procurava. Mas só um forward test ao vivo resolve
+se o fill real do MYM aguenta. `REV+ON` no MYM sob DD estático: ~41% (slip 2t) / melhor com fill
+bom.
+
+### 22e — ROMPIMENTO (breakout) — nos 4 instrumentos + como complemento da reversão (01/09, 2ª rodada)
+
+Pergunta do Marcelo: só testei a reversão nos outros instrumentos. E rompimento? E se o preço
+NÃO reverte e ROMPE — vale um breakout pra completar? `backtest/run_break_instr.py`: rompimento
+da máx/mín do dia anterior (o inverso da atual) + ORB + os dois juntos (fade quando rejeita,
+break quando rompe), com gestão de TENDÊNCIA (stop largo, deixa correr), motor de 30d, tick real.
+
+| | NQ | MNQ | MES | M2K | MYM |
+|---|---|---|---|---|---|
+| BREAK (PF, gestão tendência) | **1,12** | **1,06** | 0,81 ❌ | 0,88 ❌ | 1,00 ❌ |
+| BREAK taxa (5c, DD estático) | 40% | 42% | 7% | 0% | 34% |
+| **FADE sozinho (ref, 5c estático)** | **59%/PF1,43** | **68%/PF1,36** | 0% | 0% | ~40% (fill 2t) |
+| FADE+BREAK juntos (5c estático) | 52%/PF1,13 | 47%/PF1,07 | 7% | 5% | 29% |
+| ORB (opening range breakout) | 14% | 9% | 2% | 3% | 4% |
+
+**Achados:**
+- **Rompimento tem edge FRACO só no Nasdaq** (PF ~1,1 — cerca de 1/3 da força da reversão, PF
+  ~1,4). Nos outros instrumentos: morto (MES/M2K PF <0,9; MYM PF exatamente 1,00 — o Dow reverte,
+  não rompe).
+- **M2K/Russell mata a hipótese "se não faz fade, faz break":** nem fade (PF 0,60) nem break (PF
+  0,88) funcionam no Russell no nível do dia anterior — o preço só pica em volta e as duas
+  direções perdem.
+- **Juntar fade + break NÃO ajuda — PIORA.** FADE+BREAK (NQ 52%/PF1,13) fica ABAIXO do FADE
+  sozinho (NQ 59%/PF1,43). Os trades de rompimento diluem o edge forte da reversão com o edge
+  fraco deles. É a MESMA parede do item #19/#20: não dá pra saber no setup se vai reverter ou
+  romper — adicionar o sinal de break só adiciona ruído. (Bater contratos piora tudo, igual à
+  reversão.)
+- **ORB: morto em TODOS os 5 instrumentos** (PF 0,75–1,29, quase todos <1) — confirma o achado do
+  NQ (revisão de 12/08) e estende pros outros índices.
+- Detalhe: rompimento sob DD trailing (Apex) estoura MUITO (60–90 busts/ano) — só o DD estático
+  o torna operável, e mesmo assim fica em ~40%.
+
+**Veredito 22e:** rompimento não é o complemento que faltava. Sozinho é fraco (Nasdaq) ou morto
+(resto). Combinado com a reversão, atrapalha. ORB confirmado morto em todo lugar.
+
+### 22g — MNQ + MYM na MESMA CONTA (agregar o MYM ao BETrigger25) — ❌ não ajuda (01/09, 3ª rodada)
+
+Pergunta do Marcelo: dá pra agregar o MYM ao BETrigger25 (MNQ) e testar junto?
+`backtest/run_mnq_mym_junto.py` — dois bots de reversão (um MNQ, um MYM), MESMA conta (P&L / DD /
+stop diário / dias / meta compartilhados), motor de aprovação de 30d.
+
+| Config (5c cada, DD estático) | Taxa | ap/es/ex | OOS 1ª/2ª | net |
+|---|---|---|---|---|
+| **MNQ sozinho** (params BETrigger25: BE 2,5 + MaxDist 20) | **75%** | 15a/1e/4x | **62%/69%** | +$28k |
+| MYM sozinho | 23% | 3a/2e/8x | 0%/33% | +$3k |
+| MNQ + MYM juntos | 73% | 16a/3e/3x | 56%/91% | +$25k |
+
+- **Juntar MYM NÃO ajuda.** Empata a taxa (73% vs 75%), mais estouros (3 vs 1), menos PnL, e OOS
+  mais instável (56/91 vs 62/69). O MYM dilui em vez de somar.
+- **Causa:** MNQ e MYM são ~0,85–0,9 correlacionados (Nasdaq × Dow). Quando o Nasdaq reverte
+  limpo no nível, o Dow geralmente também (trade redundante); quando o Nasdaq rompe e estoura o
+  stop, o Dow geralmente também (perda em dobro). É **dobrar a mesma aposta**, não diversificar.
+  Mesma parede do item #22e (fade + break) e #19/#20.
+- **Achado colateral RELEVANTE:** os params do BETrigger25 (BE trig 2,5 + MaxDist 20) no dado
+  INDEPENDENTE do Databento levam o MNQ de 43% → **62% (intradiário) / 75% (estático)** — 
+  confirmação forte do edge do BETrigger25 num dado que não é o do NT8, apesar do forward test
+  curto ter deixado o Marcelo insatisfeito.
+
+**Veredito 22g:** as 2 alavancas da direção B **são separáveis**, e só uma vale:
+- **Lever 1 (firma de DD estático):** NÃO é código — aplica ao BETrigger25 (MNQ) como está, só
+  trocar de conta. E AJUDA muito (62% → 75%).
+- **Lever 2 (MYM):** não soma nada em cima do MNQ. O bot `BotAprovacaoDow_MYM.cs` fica como
+  experimento standalone opcional, não como prioridade.
+- **Caminho recomendado:** `BotAprovacao_BETrigger25.cs` (que o Marcelo já tem e já forward-testou
+  parcialmente) numa firma de DD estático. Simples, e é o número mais alto.
+
+### 22f — VEREDITO DA DIREÇÃO B
+
+- **Trocar de instrumento é quase um beco:** MES e M2K não têm edge (nem fade nem breakout — a
+  reversão em nível é fenômeno de Nasdaq/Dow, não de S&P/Russell). MYM é o único com pulso e não é
+  claramente melhor que o NQ — "edge parecido, menos risco de explodir, mas depende de fill bom".
+- **Rompimento não completa a reversão** (22e): fraco sozinho (só Nasdaq, PF ~1,1), morto no
+  resto, e combinado com a reversão PIORA (dilui o edge forte). ORB morto em todo instrumento.
+- **A alavanca real da direção B é o FORMATO, não a estratégia nem o instrumento:** firma com DD
+  estático (para de estourar) + o merge com o fade overnight. Aplica ao NQ atual E ao MYM.
+- Renko: fechado. Rompimento/ORB: fechados.
+- **Próximos passos concretos:** (1) Marcelo levanta termos de Tradeify/MFFU (automação + DD
+  estático + preço); (2) se quiser perseguir o MYM, forward test no Market Replay (mesmo processo
+  da diurna) medindo o fill real; (3) o merge REV+fade-overnight precisa de `.cs` + forward test
+  antes de qualquer coisa. Nada foi mexido em produção nem nos `.cs`.
+
+---
+
 ## ⚖️ Risco jurídico (não é melhoria de código, mas decisão de negócio)
 
 A Apex proíbe automação OFICIALMENTE em toda fase (ver pesquisa). Eval tolera na

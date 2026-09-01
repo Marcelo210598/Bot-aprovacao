@@ -3,3 +3,6 @@
 __pycache__/
 *.pyc
 .env
+
+# dado bruto do Databento (133MB) — regenera os _1min.txt com backtest/carrega_databento.py
+dados_databento/*.csv

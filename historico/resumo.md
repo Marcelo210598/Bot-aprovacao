@@ -9,6 +9,40 @@ Bot de automação (NinjaScript/NT8) pra passar avaliações Apex Trader Funding
 meta $1.500 em até 30 dias corridos, drawdown real $1.000. Estratégia: reversão na máxima/mínima
 do dia anterior ("Níveis 94"), 5 MNQ, timeframe 1min.
 
+## 🧪 01/09 — Direção B destrinchada (Renko + DD + outros instrumentos via Databento)
+
+Sessão inteira na decisão estratégica de 23/08. Detalhe: `historico/2026-09-01.md` +
+`docs/melhorias-sugeridas.md` #22. Resumo:
+- **Renko + MA (motor de 30d):** sem edge. Gestão de tendência = 0% aprovação, PF 0,77–0,97.
+  Fechado.
+- **Modelo de drawdown = a maior alavanca:** DD trailing (Apex) 55% → **DD estático 60%, zero
+  estouros**. Firmas c/ DD estático + bot: Tradeify, MyFundedFutures, TPT. Confirmar termos.
+- **Conta Apex maior não resolve** (relógio de 30d trava; 50K/14MNQ ≈ 59% frágil, 100K ≈ 0%).
+- **2º sinal — fade do range overnight (Globex) no RTH:** empata a REV sozinho; mesclado
+  (REV+ON) sob DD estático dá **75%, OOS 82%/69%** (mas o ganho vem do DD, não do sinal).
+- **Databento (US$ 7,60 de US$ 125):** dado real MES/MNQ/M2K/MYM, jun/25→jun/26.
+  `backtest/carrega_databento.py` → front-month contínuo.
+- **A reversão em outros instrumentos:** MES (S&P) PF máx 0,80, M2K (Russell) 0,85 — **sem edge**
+  (a reversão em nível é fenômeno de Nasdaq/Dow). **MYM (Dow) PF 1,44 com fill de 1 tick / 1,18
+  com 2 ticks** — único glimmer, edge parecido com o NQ + menos risco de estouro, mas frágil a
+  slippage. Só forward test resolve.
+- **Rompimento (breakout) nos 4 instrumentos + como complemento** (`run_break_instr.py`): edge
+  fraco só no Nasdaq (PF ~1,1), morto no resto. **Juntar fade + break PIORA** (dilui o edge forte
+  da reversão). ORB morto em todos os 5 instrumentos. Rompimento não é o complemento que faltava.
+- **Veredito:** trocar de instrumento OU de tipo de estratégia é quase um beco. A alavanca real
+  da direção B é o FORMATO (firma de DD estático).
+- **Bot novo `src/BotAprovacaoDow_MYM.cs`** criado (cópia do BETrigger25, só troca instrumento +
+  params) — mas ver revisão abaixo, virou experimento opcional.
+- **REVISÃO (mesmo dia, `run_mnq_mym_junto.py`):** Marcelo perguntou se dá pra agregar o MYM ao
+  BETrigger25. Testado MNQ+MYM na mesma conta: **não ajuda** (MNQ sozinho 75% sob DD estático /
+  OOS 62-69; juntos 73% / OOS 56-91, mais estouros — MNQ e MYM ~0,9 correlacionados). **As 2
+  alavancas são separáveis e só uma vale:** lever 1 (DD estático) NÃO é código, aplica ao
+  BETrigger25 direto e leva ele de 43%→75% no dado do Databento; lever 2 (MYM) não soma nada.
+  **Caminho recomendado: BETrigger25 (MNQ) numa firma de DD estático, sem código novo.** Produção
+  e os `.cs` de produção intactos (só criei `BotAprovacaoDow_MYM.cs`, experimento opcional).
+- **🔀 Forward test do BETrigger25 muda de JUNHO pra JULHO/2026** (junho é o pior mês pro achado
+  do BE trig 2,5; 9 de 13 meses melhoram). Pasta nova: `forward-test-replay-25k/2026-07-betrigger25/`.
+
 ## 🔴 29/08 — Marcelo insatisfeito, forward test pausado
 
 Forward test do `BETrigger25+MaxDist20` (dias 05-11/06) fechou em +$38,0/40 trades (~$0,95/trade,
