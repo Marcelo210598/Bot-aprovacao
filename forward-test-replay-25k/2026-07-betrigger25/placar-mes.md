@@ -19,13 +19,15 @@
 | 09/07 | 0 | — | $0,00 | −$633,5 | sem entradas |
 | 10/07 | 4 | 3/1 | **−$62,5** | **−$696,0** | +$94 nos 3 primeiros, aí NIV_S20 −$156,5 (facada) devolveu tudo |
 | 11-12/07 | — | — | — | −$696,0 | fim de semana — mercado fechado |
-| 13/07 | 5 | 3/2 | **−$0,5** | **−$696,5** | +$225 nos 3 verdes (L5/L7 correram +$100 cada); L6 −$153 (gap +11pt), L8 −$121 (facada) |
+| 13/07 | 5 | 3/2 | **−$0,5** | −$696,5 | +$225 nos 3 verdes (L5/L7 correram +$100 cada); L6 −$153 (gap +11pt), L8 −$121 (facada) |
+| 14/07 | 6 | 1/5 | **−$140,0** | **−$836,5** | 5 de 6 trades = trailing quebrado (deviam ganhar pequeno, saíram no BE); S16 −$119,5 (facada) |
 
 > **Calendário julho/2026:** 03/07 = feriado (Independence Day observado). 04-05, 11-12, 18-19,
 > 25-26 = fins de semana. Segundas usam o range do Globex de domingo à noite.
 
-**Acumulado (01→13/07, 9 pregões, 5 operados): −$696,5.** Faltam ~19 pregões e +$2.196,5.
-Drawdown: **$747,5** (Apex trailing, 75%) / **$696,5** (DD estático, 70%).
+**Acumulado (01→14/07, 10 pregões, 6 operados): −$836,5.** Faltam ~18 pregões e +$2.336,5.
+Drawdown: **$887,5** (Apex trailing, **89% do limite $1.000 — a 1 trade ruim de estourar**) /
+**$836,5** (DD estático, 84%).
 
 **Acumulado (01→10/07, 8 pregões, 4 operados): −$696,0.**
 A trava real: **$1.500 em 30 dias corridos**. Faltam ~20 pregões, precisa de +$2.196 do ponto
@@ -87,13 +89,20 @@ entrar a mercado no 1º tick).
   facada de estourar a conta é o **DD estático** (você absorve 2-3 facadas num dia ruim como o
   06/07 desde que não vá −$1.000 do saldo inicial). É mais um motivo pra firma de DD estático.
 
-## 🟡 Segundo problema (06/07 NIV_S1, NIV_S3): trailing sai pior que o gerenciado no replay
+## 🔴 Trailing quebrado no replay 500x — CONFIRMADO em escala (14/07)
 
-"A vela desceu e mesmo assim deu loss" — o preço foi a favor, o BE ativou, mas o trailing 1,75pt
-+ o fill tick a tick (replay 500x) saíram ~2-3pt piores que o nível gerenciado no log → +$20/+$25
-esperado virou −$6/−$5,5. É a diferença conhecida motor bar-based × execução real (`progress.md`).
-**Watch:** medir ao vivo (velocidade real) se o fill do `TrailingTick` sai consistentemente pior
-que o gerenciado — se sim, o trailing pode estar apertado demais pro atrito real.
+Começou como "sai 2-3pt pior" (06/07 S1/S3, 08/07 L13). No **14/07 foi o dia inteiro**: 5 de 6
+trades ativaram o BE, favor de +2,5 a +15pt, trailing gerenciado travando +2 a +13pt de lucro —
+e o **PnL real de cada um foi ~$0** (−$11, −$7, −$2,5, −$4, +$4).
+
+**Hipótese: a 500x o `OnMarketData` não acompanha os ticks.** O trailing é gerido tick a tick;
+com os ticks chegando em lote, o gerente exita no preço atual (breakeven) em vez do nível
+trilhado. O `<<< SAIDA ~saida X` do log mostra um nível que **nunca executou**.
+
+**AÇÃO (Marcelo, próximo dia): rodar o replay a 1x ou 5x.** Se os trailing exits passarem a sair
+nos +$18-30 esperados, boa parte da perda de julho (~$200-400 nos ~10-15 trailing scratches) é
+**artefato de velocidade de replay**, não da estratégia. Se continuar saindo no BE mesmo a 1x, aí
+o trailing de 1,75pt é apertado demais pra valer.
 
 ## Métrica que decide
 
