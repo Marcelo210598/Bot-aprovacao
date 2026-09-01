@@ -1,6 +1,33 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-09-01 (noite) — Strategy Analyzer virou o ground truth; SHORT-ONLY é a única config com edge; OOS 2022-2026 baixado (Databento), aguardando confirmação no NT8
+## Última atualização: 2026-09-01 (noite) — OOS MATOU a reversão (short-only 2022-2025 PF 0,91). Marcelo escolheu: ESTRATÉGIA NOVA DO ZERO, começando por B (event-driven 8h30 ET). Início 02/09. Ver `docs/estrategia-nova-2026-09.md`.
+
+## 🔴 01/09 (noite, fim) — OOS: a reversão morreu. Pivot pra estratégia nova.
+
+Short-only importado 2022-2025 no NT8 (`MNQ 12-25`, dado do Databento):
+**PF 0,91 · −$894 · 201 trades · avg −$4,45/trade · Max DD −$2.372.** Perdedor nos 4 anos.
+O PF 1,44 de 2026 era sorte de regime (2026 teve ~3× mais setups e funcionaram). O motor
+Python do projeto estava errado no OOS também (dizia lucro todo ano).
+
+**A reversão PDH/PDL no MNQ não tem edge fora da amostra — nem both-sides, nem short.**
+Firma de DD estático não conserta PF < 1. Já morreram no projeto: ORB, EMA/VWAP, ICT, Renko,
+rompimento, squeeze, RSI-reversion, e agora a reversão fora de 2026.
+
+**Marcelo escolheu opção 2: estratégia nova do zero (não variação da reversão).**
+- **B (escolhida) — event-driven: spike das 8h30 ET** (CPI/PPI/NFP/claims/retail/GDP/PCE).
+  Segue o 1º fechamento de 1-min pós-release, bracket fixo apertado, flat em 15-30min. Melhor
+  encaixe no DD trailing (exposição de minutos, perda travada). Mecanismo distinto de tudo já
+  testado.
+- A — seguir tendência intradiária (momentum continuation). Conceitualmente a mais correta
+  (o MNQ tende), mas risco de perdas em cluster no DD.
+- C — gap de abertura (Globex→RTH). Nunca testado direito. Rápido de testar.
+
+Detalhe completo das 3 + regras do jogo (NT8 é o motor, OOS 2022-2025 / holdout 2026, slippage
+agressivo, bracket fixo sem trailing tick, corte PF > 1,3): **`docs/estrategia-nova-2026-09.md`**.
+
+**Começar 02/09:** montar lista de releases 8h30 ET 2022-2026, teste tosco no Analisador.
+Produção intacta.
+
 
 ## 🎯 01/09 (noite) — TESTES NO STRATEGY ANALYZER + descoberta do SHORT-ONLY
 

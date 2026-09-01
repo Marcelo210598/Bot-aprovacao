@@ -6,8 +6,14 @@
 ## O que é o projeto
 
 Bot de automação (NinjaScript/NT8) pra passar avaliações Apex Trader Funding — conta $25K,
-meta $1.500 em até 30 dias corridos, drawdown real $1.000. Estratégia: reversão na máxima/mínima
-do dia anterior ("Níveis 94"), 5 MNQ, timeframe 1min.
+meta $1.500 em até 30 dias corridos, drawdown real $1.000. 5 MNQ, timeframe 1min.
+
+**🔴 01/09/2026 — a estratégia de reversão PDH/PDL foi ABANDONADA.** Testada fora da amostra
+no NT8 Strategy Analyzer (2022-2025): PF 0,91, perdedora nos 4 anos. O bom resultado de 2026
+era sorte de regime. **Projeto pivotou pra estratégia NOVA do zero**, começando 02/09 pela
+candidata B (event-driven, spike das 8h30 ET). Ver `docs/estrategia-nova-2026-09.md` e
+`progress.md` (topo). O bot de produção `BotAprovacao.cs` continua intacto mas sem edge
+comprovado fora de amostra.
 
 ## 🧪 01/09 — Direção B destrinchada (Renko + DD + outros instrumentos via Databento)
 
