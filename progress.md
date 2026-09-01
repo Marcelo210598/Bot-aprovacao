@@ -1,6 +1,33 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-09-01 (direção B destrinchada — só o DD estático vale; forward test do BETrigger25 muda de junho pra JULHO)
+## Última atualização: 2026-09-01 (AUDITORIA do forward test de julho — PF 0,44 vs backtest PF 1,50; achado: gestão OnBarClose × OnMarketData; forward test PAUSADO)
+
+## 🔬 01/09 — AUDITORIA COMPLETA do forward test de julho (`docs/auditoria-julho-2026.md`)
+
+Forward test do BETrigger25 rodado 01-20/07 (Market Replay ao vivo): **acumulado −$771, PF 0,44,
+WR 45%, E −$17,5/trade** em 44 trades. Pausado em 22/07 pelo bug do item #18 (níveis zerados no
+restart — 21 e 22/07 mortos). Auditoria nos 4 papéis (quant / trader / price action / eng. NT8).
+
+**ACHADO CENTRAL:** o backtest de 13 meses dá **PF 1,50, WR 73%, ZERO meses vermelhos em 13**. O
+forward test está em PF 0,44. A causa é estrutural: `Calculate = OnBarClose` → o **backtest** gere
+a saída 1× por barra (segura o trade através de repiques intrabar); **ao vivo**, `OnMarketData`
+gere tick a tick e sai no 1º repique. Resultado: **avgW $80 → $31, WR 73% → 45%** — ~28 trades a
+cada 100 que o backtest conta como ganho pequeno saem no breakeven ao vivo. **O edge de "100% de
+aprovação" pode ser artefato de `OnBarClose`** (Tick Replay não estava ligado no gráfico).
+
+**Problemas (classificados A-G):** #1 gestão intrabar estrangula os ganhos [F+C] — o principal,
+~−$1.100/mês; #2 facada [E] — 7 dos 9 grandes losses de julho (−$975), sem filtro possível; #3 gap
+de entrada [F+B] — 2 casos, fill +10-11pt após vela de spike, −$300; #4 pdHigh/pdLow zeram no
+restart [A] — BLOQUEANTE, matou 21-22/07; #5 custos = 63% do prejuízo [D]; #6 overfit do backtest
+original [G].
+
+**PLANO — Fase 0 (destravar e medir a verdade):** (1) corrigir o item #18; (2) **LIGAR TICK
+REPLAY** no gráfico e re-rodar o backtest de 13 meses do BETrigger25 — se der PF 0,4-0,8, o edge
+histórico era artefato de `OnBarClose` e a estratégia precisa ser repensada, não ajustada; se der
+PF > 1,3, ir pra Fase 1 (revisar entrada `OnMarketData`, sweep de trailing com Tick Replay,
+reduzir pra 2-3 MNQ). Nada mexido em produção nem nos `.cs`.
+
+
 
 ## 🆕 01/09 (fim do dia) — Bot novo: `src/BotAprovacaoDow_MYM.cs` (MYM + DD estático)
 
