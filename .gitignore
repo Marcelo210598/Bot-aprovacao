@@ -4,5 +4,9 @@ __pycache__/
 *.pyc
 .env
 
-# dado bruto do Databento (133MB) — regenera os _1min.txt com backtest/carrega_databento.py
+# dado bruto do Databento — regenera os _1min.txt com backtest/carrega_databento.py
 dados_databento/*.csv
+# séries longas descompactadas (~85MB) — versionamos só o .zip; regenera com
+# backtest/oos_short_only_4anos.py e backtest/gera_import_nt8.py
+dados_databento/MNQ_1min_2022_2026.txt
+dados_databento/MNQ_NT8_import_2022_2026.txt
