@@ -442,9 +442,37 @@ aprovação real antes de mexer em produção):
   que o próprio SL de 12,5pt existe pra limitar). Precisa de mais amostra pra distinguir "só
   aconteceu 2x" de "padrão real".
 
-**Próximo passo:** continuar registrando o forward test e watch se esse padrão (favor <1pt antes
-do stop cheio) se repete; se aparecer com frequência, rodar backtest dedicado antes de propor
-qualquer mudança de gestão.
+### ✅ INVESTIGADO (01/09) — é padrão real, mas SEM FILTRO possível
+
+**Gatilho:** o forward test de JULHO/2026 (agora com o BETrigger25, pasta
+`forward-test-replay-25k/2026-07-betrigger25/`) mostrou o padrão de novo, 3 vezes em 2 dias:
+02/07 `NIV_L10` (fav +0,75pt, −$169), 06/07 `NIV_S4` (fav +0,8pt, −$148) e `NIV_S5` (fav +0,85pt,
+−$122). Juntos = −$439 dos −$363,5 do mês até 06/07. **Sem esses 3, o mês estaria +$75.**
+
+**Análise no backtest de 13 meses** (`backtest/diagnostico_mfe_mae_trades.csv`, 1.091 trades):
+- **70 trades "facada"** (SL, BE nunca ativou, MFE < 1pt) em 13 meses = **~5-6/mês**, **−$131 de
+  média**, **−$9.170 no total**. Sumir com todos → PnL de 13 meses $33k → $42k.
+- **Não há NENHUM sinal pré-entrada que os distinga dos trades bons:**
+  - `dist_nivel` mediano: 5,2pt (facada) vs 5,0pt (resto) — idêntico
+  - `gap_entrada`: 0,00 vs 0,00 — idêntico
+  - hora, dia da semana: mesma distribuição
+  - espalhados por TODAS as faixas de `dist_nivel` (0-3 / 3-6 / 6-10 / 10-15pt), proporcional ao
+    volume — nenhuma faixa é "segura"
+  - **duração mediana = 0 barras** → o trade morre na própria vela de entrada (reversão em V
+    instantânea, o bot não tem como ver vindo)
+- **Loss-cut já foi testado e rejeitado (item #16):** 10,7% dos VENCEDORES também tocam −12,5pt
+  de MAE antes de virar pra lucro — cortar cedo mata esses junto (WR 68%→47-61%).
+
+**Veredito:** a facada é característica do mercado (reversão em V), não bug nem parâmetro errado.
+O SL de 12,5pt EXISTE pra capar exatamente isso — o edge da estratégia (PF 1,3-1,4, WR 68%) já
+conta com ~6% dos trades sendo facada. **Não tem filtro.** O que impede a facada de ESTOURAR a
+conta não é gestão de entrada/saída — é o **DD estático** (absorve 2-3 facadas num dia ruim como
+o 06/07 desde que não vá −$1.000 do saldo inicial). Mais um motivo pra firma de DD estático.
+
+**Fica no watch** só uma variação: se ao vivo (velocidade real, não replay 500x) o fill do
+`TrailingTick` sair consistentemente 2-3pt pior que o nível gerenciado (visto em 06/07 NIV_S1 e
+NIV_S3 — "a vela desceu e mesmo assim deu loss"), o trailing de 1,75pt pode estar apertado demais
+pro atrito real. Medir trade a trade: fav vs. PnL real dos `TrailingTick`.
 
 ---
 
