@@ -11,21 +11,49 @@
 | Dia | Trades | G/L | PnL dia | Acumulado | Obs |
 |---|---|---|---|---|---|
 | 01/07 | 0 | — | $0,00 | $0,00 | sem entradas |
-| 02/07 | 2 | 1/1 | **−$118,0** | −$118,0 | NIV_L9 +$51; NIV_L10 −$169 (facada, favor +0,75pt) |
+| 02/07 | 2 | 1/1 | **−$118,0** | −$118,0 | NIV_L9 +$51; NIV_L10 −$169 (facada, fav +0,75pt) |
 | 03/07 | 0 | — | $0,00 | −$118,0 | sem entradas |
-| 06/07 | 5* | 1/4 | **−$245,5** | **−$363,5** | 2 facadas (S4 −$148, S5 −$122) + 2 scratches de trailing (S1, S3) |
+| 06/07 | 5 | 1/4 | **−$245,5** | −$363,5 | 2 facadas (S4 −$148, S5 −$122) + 2 scratches de trailing |
+| 07/07 | 0 | — | $0,00 | −$363,5 | sem entradas |
+| 08/07 | 5 | 2/3 | **−$270,0** | **−$633,5** | NIV_L14 −$158 (gap de entrada +10pt); L15 −$139 (fav <2pt) |
 
-\* prints de 06/07 até ~11:33 — pode não ser o dia completo.
+**Acumulado (01→08/07, 6 pregões, 3 operados): −$633,5.**
+A trava real do produto é: **$1.500 em 30 dias corridos** (o mínimo de 7 dias operados da Apex
+não é gargalo, e firmas de DD estático em geral nem têm mínimo). Faltam ~22 pregões, precisa de
++$2.133 do ponto atual.
+Pico acumulado: +$51 (após NIV_L9 em 02/07). Drawdown atual: **$684,5** (Apex trailing, 68% do
+limite $1.000) / **$633,5** do saldo inicial (DD estático, 63%).
 
-**Acumulado (01→06/07, 4 pregões, 2 operados de 7 mínimos): −$363,5**
-Pico: +$51 (após NIV_L9 em 02/07). Drawdown atual: **$414,5** (Apex trailing) / **$363,5** do
-saldo inicial (DD estático).
+## 🔴 Os 5 losses grandes de julho (−$736) — 2 causas
 
-## 🔴 Padrão que apareceu já nos 2 primeiros dias operados: "facada" (item #17)
+| Trade | PnL | Causa |
+|---|---|---|
+| 02/07 NIV_L10 | −$169 | **facada** — fav +0,75pt, vela reverte na hora |
+| 06/07 NIV_S4 | −$148 | **facada** — fav +0,8pt |
+| 06/07 NIV_S5 | −$122 | **facada** — fav +0,85pt |
+| 08/07 NIV_L14 | −$158 | **gap de entrada** — sinal @ 29211,75, fill real 29221,90 (+10pt); o favor "sumiu" no fill |
+| 08/07 NIV_L15 | −$139 | fav +1,85pt (facada-borderline) |
 
-3 de 7 trades (02/07 NIV_L10, 06/07 NIV_S4 e NIV_S5) foram **stop cheio com favor máximo < 1pt** —
-a vela de entrada já reverte, sem dar tempo do breakeven agir. Juntos: **−$439** dos −$363,5 do
-mês. Sem esses 3, o mês estaria **+$75**.
+Os 12 trades restantes somaram **+$102**. Ou seja: **o resultado do mês inteiro (−$633,5) são
+esses 5 trades.**
+
+### Facada (item #17) — sem filtro, já investigado
+
+02/07 NIV_L10, 06/07 NIV_S4 e S5: **stop cheio com favor < 1pt**, a vela de entrada já reverte.
+Backtest de 13 meses (`backtest/analise_facada.py`): 70 casos (~5-6/mês, −$131/trade). **Nenhum
+sinal pré-entrada os distingue.** Loss-cut já rejeitado (item #16). O SL de 12,5pt existe pra
+capar isso — e o DD estático é o que impede de estourar a conta num dia como o 06/07.
+
+### 🆕 Gap de entrada — NIV_L14 (08/07)
+
+O sinal disparou LONG @ 29211,75 (vela de rejeição limpa, L=29194,50, C=29211,75). Mas o fill
+real foi **29221,90 — 10,15pt pior**. Nos segundos entre o close da vela e o `OnMarketData`
+mandar a ordem, o preço já correu 10pt. Aí o favor a partir do fill real foi só +2,1pt (não bateu
+BE), reverteu, stop cheio. **No preço do sinal esse trade teria dado +12pt de favor.**
+Conecta com a 2ª hipótese do item #17 ("fill de entrada vem tarde"). Aqui veio 10pt tarde depois
+de uma vela de sinal violenta (spike + fechamento longe do fundo). **Watch:** ver se se repete e,
+se sim, checar a lógica de entrada do `OnMarketData` (pode estar perseguindo o preço em vez de
+entrar a mercado no 1º tick).
 
 **Análise no backtest de 13 meses (01/09, `backtest/diagnostico_mfe_mae_trades.csv`):**
 - 70 trades assim / 13 meses (~5-6/mês, **−$131/trade**, **−$9,2k total**).

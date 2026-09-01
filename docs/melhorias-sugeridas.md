@@ -469,10 +469,24 @@ conta com ~6% dos trades sendo facada. **Não tem filtro.** O que impede a facad
 conta não é gestão de entrada/saída — é o **DD estático** (absorve 2-3 facadas num dia ruim como
 o 06/07 desde que não vá −$1.000 do saldo inicial). Mais um motivo pra firma de DD estático.
 
-**Fica no watch** só uma variação: se ao vivo (velocidade real, não replay 500x) o fill do
-`TrailingTick` sair consistentemente 2-3pt pior que o nível gerenciado (visto em 06/07 NIV_S1 e
-NIV_S3 — "a vela desceu e mesmo assim deu loss"), o trailing de 1,75pt pode estar apertado demais
-pro atrito real. Medir trade a trade: fav vs. PnL real dos `TrailingTick`.
+**Ficam no watch 2 variações de EXECUÇÃO (não da estratégia), vistas no forward test de julho:**
+
+1. **Fill do `TrailingTick` sai 2-3pt pior que o gerenciado** (06/07 NIV_S1/S3, 08/07 NIV_L13 —
+   "a vela foi a favor e mesmo assim deu loss pequeno", −$5 a −$7 em vez de +$20). O log `<<< SAIDA`
+   mostra o nível gerenciado, o `[MeuTrade] PnL` e o marker do gráfico mostram o fill real, 2-3pt
+   pior. Em replay 500x é pior que ao vivo. Se persistir na velocidade real, o trailing de 1,75pt
+   (calibrado no NQ do NT8) pode estar apertado demais pro atrito.
+
+2. **🆕 Gap de entrada** (08/07 NIV_L14): sinal disparou LONG @ 29211,75, fill real **29221,90 —
+   10,15pt pior**. Nos segundos entre o close da vela de sinal e o `OnMarketData` mandar a ordem,
+   o preço correu 10pt. O favor "sumiu" no fill (só +2,1pt a partir do preço real → não bateu BE
+   → stop cheio −$158). No preço do sinal o trade teria dado +12pt. Aconteceu depois de uma vela
+   de sinal violenta (spike de 17pt abaixo da linha + fechamento longe do fundo). É a 2ª hipótese
+   deste item ("o fill vem tarde"). **Antes era considerado raríssimo** (item #21 #3: "gap adverso
+   >3pt barra-a-barra em 1min = 0-1 trade/ano" no backtest) — mas o backtest preenche no close da
+   vela e não modela o gap do `OnMarketData`. **Watch:** se repetir, checar a lógica de entrada do
+   `OnMarketData` (pode estar perseguindo o preço em vez de entrar a mercado no 1º tick após o
+   sinal).
 
 ---
 
