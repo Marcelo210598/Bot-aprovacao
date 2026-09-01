@@ -18,6 +18,11 @@
 | 08/07 | 5 | 2/3 | **−$270,0** | −$633,5 | NIV_L14 −$158 (gap de entrada +10pt); L15 −$139 |
 | 09/07 | 0 | — | $0,00 | −$633,5 | sem entradas |
 | 10/07 | 4 | 3/1 | **−$62,5** | **−$696,0** | +$94 nos 3 primeiros, aí NIV_S20 −$156,5 (facada) devolveu tudo |
+| 11-12/07 | — | — | — | −$696,0 | **fim de semana — mercado fechado** |
+
+> **Calendário julho/2026:** 03/07 = feriado (Independence Day observado). 04-05, 11-12, 18-19,
+> 25-26 = fins de semana. **Próximo pregão depois de 10/07 (sex) = 13/07 (seg)** — e a segunda
+> usa o range do Globex de domingo à noite, igual foi no 06/07.
 
 **Acumulado (01→10/07, 8 pregões, 4 operados): −$696,0.**
 A trava real: **$1.500 em 30 dias corridos**. Faltam ~20 pregões, precisa de +$2.196 do ponto
