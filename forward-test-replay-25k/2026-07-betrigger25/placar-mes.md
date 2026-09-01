@@ -25,6 +25,21 @@
 | 16/07 | 5 | 2/3 | **+$4,0** | −$781,0 | flat; 5 trailing scratches |
 | 17/07 | 0 | — | $0,00 | −$781,0 | sem entradas |
 | 20/07 | 6 | 2/4 | **+$10,0** | **−$771,0** | flat; S5 +$28 único trailing que correu |
+| 21-22/07 | 0 | — | $0,00 | −$771,0 | 🔴 BLOQUEADO — bug item #18 (pdHigh/pdLow zeraram no restart, bot cego 2 dias) |
+
+## ⏸️ 22/07 — forward test PAUSADO + auditoria completa
+
+O bug do item #18 (níveis zerados no restart) parou o teste. Antes de continuar: **auditoria
+quantitativa completa em `docs/auditoria-julho-2026.md`** (`backtest/auditoria_julho.py`).
+
+**Resumo:** forward test = PF 0,44, WR 45%, E −$17,5/trade. Backtest de 13 meses = PF 1,50, WR
+73%, **0 meses vermelhos em 13**. A divergência é estrutural: o backtest gere a saída
+`OnBarClose` (segura o trade através de repiques intrabar), o bot ao vivo gere `OnMarketData`
+tick a tick (sai no 1º repique). Resultado: avgW $80 → $31, WR 73% → 45%. **O edge histórico de
+"100% de aprovação" pode ser artefato de `OnBarClose`.**
+
+**Próximo passo (Fase 0 da auditoria):** (1) corrigir o item #18; (2) **ligar Tick Replay** no
+gráfico e re-rodar o backtest de 13 meses — se der PF ~0,4-0,8, o edge era artefato.
 
 > **Calendário julho/2026:** 03/07 = feriado (Independence Day observado). 04-05, 11-12, 18-19,
 > 25-26 = fins de semana. Segundas usam o range do Globex de domingo à noite.
