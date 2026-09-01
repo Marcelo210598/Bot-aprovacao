@@ -182,6 +182,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				BufferStopServidorPontos = 5.0;   // stop servidor 5pt mais largo que o gerenciado -> a saida a mercado dispara primeiro (anti-fantasma, 18/06)
 
 				StopDiarioDolar		= 750.0;
+				SoOperarShort		= false;   // teste de robustez: ON = so vende (LONG e' PF 0,85 no MNQ)
 				MaxTradesDia		= 12;   // limite anti-overtrading (otimizado 23/06): sobe aprovacao 57%->70% no backtest (DD real $1000, slippage 2t), validado OOS. Corta dias de reentrada em sequencia.
 
 				// ----- EXPERIMENTO 18/08: saida parcial E(4+1) -----
@@ -697,6 +698,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 				return;
 			}
 
+			// ----- FILTRO: so operar SHORT (teste de robustez — no MNQ o lado LONG e' PF 0,85) -----
+			if (SoOperarShort) return;
+
 			// ----- tocou a zona da MINIMA de referencia? (setup de LONG) -----
 			if (l <= nLo + tol)
 			{
@@ -929,6 +933,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 				pendLado = 0;   // consome o setup (evita spam tick a tick)
 				Print(string.Format("{0}  ⚠️ SETUP PERDIDO — NOITE {1} NAO ENVIADO: conta DESCONECTADA. (Perdido por CONEXAO, nao pela estrategia.)",
 					Time[0], lado == -1 ? "SHORT" : "LONG"));
+				return;
+			}
+			if (lado == 1 && SoOperarShort)
+			{
+				pendLado = 0;
+				Print(string.Format("{0}  NOITE LONG ignorado (SoOperarShort=ON)", Time[0]));
 				return;
 			}
 			tradeSeq++;
@@ -1245,6 +1255,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Range(0, 100000)]
 		[Display(Name="Stop diario ($)", Description="Para de operar no dia ao perder esse valor (0 = desliga)", Order=20, GroupName="3. Risco")]
 		public double StopDiarioDolar { get; set; }
+
+		[NinjaScriptProperty]
+		[Display(Name="So operar SHORT", Description="ON = ignora TODAS as entradas LONG (diurna e noturna). Teste de robustez: no MNQ o LONG rende PF 0,85 e o SHORT PF 1,04. OFF = opera os dois lados.", Order=2, GroupName="1. Geral")]
+		public bool SoOperarShort { get; set; }
 
 		// ----- EXPERIMENTO 18/08: saida parcial E(4+1) -----
 		[NinjaScriptProperty]
