@@ -20,14 +20,29 @@
 | 10/07 | 4 | 3/1 | **−$62,5** | **−$696,0** | +$94 nos 3 primeiros, aí NIV_S20 −$156,5 (facada) devolveu tudo |
 | 11-12/07 | — | — | — | −$696,0 | fim de semana — mercado fechado |
 | 13/07 | 5 | 3/2 | **−$0,5** | −$696,5 | +$225 nos 3 verdes (L5/L7 correram +$100 cada); L6 −$153 (gap +11pt), L8 −$121 (facada) |
-| 14/07 | 6 | 1/5 | **−$140,0** | **−$836,5** | 5 de 6 trades = trailing quebrado (deviam ganhar pequeno, saíram no BE); S16 −$119,5 (facada) |
+| 14/07 | 6 | 1/5 | **−$140,0** | −$836,5 | 5 de 6 = trailing saiu no BE; S16 −$119,5 (facada) |
+| 15/07 | 6 | 5/1 | **+$51,5** | −$785,0 | 🟢 1º dia verde; trailing funcionou (S16/S17/L19 nos +$16-21) |
+| 16/07 | 5 | 2/3 | **+$4,0** | −$781,0 | flat; 5 trailing scratches |
+| 17/07 | 0 | — | $0,00 | −$781,0 | sem entradas |
+| 20/07 | 6 | 2/4 | **+$10,0** | **−$771,0** | flat; S5 +$28 único trailing que correu |
 
 > **Calendário julho/2026:** 03/07 = feriado (Independence Day observado). 04-05, 11-12, 18-19,
 > 25-26 = fins de semana. Segundas usam o range do Globex de domingo à noite.
 
-**Acumulado (01→14/07, 10 pregões, 6 operados): −$836,5.** Faltam ~18 pregões e +$2.336,5.
-Drawdown: **$887,5** (Apex trailing, **89% do limite $1.000 — a 1 trade ruim de estourar**) /
-**$836,5** (DD estático, 84%).
+**Acumulado (01→20/07, 13 pregões, 9 operados): −$771,0.** Faltam ~13 pregões e +$2.271.
+Drawdown: **$822** (Apex trailing, 82% do limite $1.000; pior momento foi $887,5 em 14/07) /
+**$771** (DD estático, 77%).
+
+## Onde julho está agora (20/07)
+
+Nos últimos 3 dias operados (15, 16, 20) o sangramento parou: **+$65,5 no total**, ZERO facadas,
+ZERO gaps de entrada. Só trailing scratch (±$10/dia). **Todo o dano de julho (−$1.166) foram ~6
+trades nas 2 primeiras semanas** (4 facadas, 2 gaps de entrada). Quando o mercado não dá vela de
+sinal violenta, o bot fica de lado.
+
+Mas: mesmo parando de sangrar, o bot **não recupera** — os trailing scratches (favor +3-6pt
+saindo no BE) mantêm o PnL preso. Pra virar +$1.500 o bot precisa que o trailing pegue movimento
+de verdade (como 15/07), e isso só aconteceu 1 dia em 9.
 
 **Acumulado (01→10/07, 8 pregões, 4 operados): −$696,0.**
 A trava real: **$1.500 em 30 dias corridos**. Faltam ~20 pregões, precisa de +$2.196 do ponto
