@@ -220,30 +220,48 @@ movimento de 3-14pt (stop cheio normal). Apertar o SL já foi testado 3x e piora
 
 ## PARTE 5 — PROBLEMAS CLASSIFICADOS
 
-### 🔴 PROBLEMA #1 — Gestão de saída intrabar estrangula os ganhos `[F + C]`
+### 🔴 PROBLEMA #1 — Gestão de saída intrabar CAPA os ganhos em ~$35 `[F + C]`
 
-- **Evidência:** avgW $80→$31, WR 73%→45%; 12 trades com BE+favor≥3pt saíram ≤$0; backtest 13/13
-  meses verdes vs forward PF 0,44.
-- **Impacto:** ~−$1.100/mês (a diferença entre PF 1,5 e PF 0,44). **É o problema.**
-- **Causa provável:** `OnBarClose` no backtest segura o trade através de repiques intrabar; o
-  `OnMarketData` tick-a-tick sai no 1º repique. O trailing de 1,75pt + BE-lock 0,75 é curto
-  demais pro ruído tick-level.
-- **Alteração sugerida (em ordem de preferência):**
-  1. **Ligar Tick Replay no gráfico e re-rodar o backtest de 13 meses** — mede o edge REAL sob a
-     gestão intrabar. Se o backtest com Tick Replay der PF > 1,3, o problema é outro; se der PF
-     ~0,4-0,7, confirmado que o edge histórico era artefato de `OnBarClose`.
-  2. Se confirmado: **testar trailing largo (4-8pt) e BE-lock maior (0,5-0,6 fixo) NO backtest
-     COM Tick Replay.** O "trailing largo piora" do projeto foi medido só no motor `OnBarClose` —
-     onde largar só devolve lucro. No motor de tick, largar pode EVITAR o nick. São motores
-     diferentes, o veredito antigo não se aplica.
-  3. Alternativa: **gerir a saída SÓ no `OnBarClose` mesmo ao vivo** (desligar o trailing do
-     `OnMarketData`, manter só o stop inicial no servidor). Faz o ao vivo bater com o backtest.
-     Risco: perde a proteção contra "stop abaixo do mercado" em rally (bug 5 de 16/06) — mas só
-     pro trailing, não pro stop inicial.
-- **Risco de overfitting:** BAIXO se testado com Tick Replay em 13 meses + OOS. É correção de
-  execução, não filtro.
-- **Como testar:** Tick Replay ON → backtest 13 meses → OOS 1ª/2ª metade → sweep de trailing
-  (1,75 / 3 / 5 / 8) → escolher pela robustez (PF estável nas 2 metades), não pelo PnL máximo.
+- **Evidência:** avgW $80→$31, WR 73%→45%; 12 trades com BE+favor≥3pt saíram ≤$0.
+- **Impacto:** ~−$1.100/mês.
+- **Causa (CONFIRMADA por simulação — `backtest/run_trailing_bridge.py`):** o backtest oficial
+  roda `OnBarClose` (checa o stop 1× por barra, contra o stop do INÍCIO da barra, e só depois
+  trilha → "segura" o trade através de repiques intrabar). Ao vivo, `OnMarketData` trilha e checa
+  a CADA tick → sai no 1º repique.
+  - Simulei o caminho intrabar de cada barra com uma **ponte browniana** (toca o H e o L da barra
+    + ruído) e rodei a gestão tick-a-tick sobre ela:
+
+| motor | avgW | avgL | PF |
+|---|---|---|---|
+| **OnBarClose** (= backtest) | **+$80** | −$141 | 1,50 |
+| **tick a tick** (ponte browniana ≈ ao vivo) | **+$35** | (varia) | — |
+| forward test julho (real) | +$31 | −$143 (só facadas) | 0,44 |
+
+  - **O avgW de +$35 no motor de tick bate com o forward test.** E **afrouxar o trailing (1,75 →
+    4/8/12pt) NÃO recupera** — fica sempre ~$33-37. O que está capando não é a distância do
+    trailing, é o **BE-lock 0,75** (após o BE, o stop trava em `entrada + 0,75×MFE`; pra MFE de
+    4-5pt isso é +3-3,75pt, e o 1º repique tira ali).
+  - Subir o BE trigger (2,5 → 6pt) na simulação sobe o avgW pra ~$56, mas derruba o WR (73→63%) e
+    sobe o avgL — PF cai. **Não há tweak de trailing/BE que recupere o avgW de $80.**
+- **Conclusão:** o edge histórico de "PF 1,50 / 100% de aprovação" É um artefato de `OnBarClose`.
+  Sob gestão de tick real, o avgW da estratégia é ~$35, não $80. **Não é um bug pra consertar com
+  um parâmetro — é o modelo de saída que precisa mudar.**
+- **Alteração sugerida (testar TUDO com Tick Replay ON):**
+  1. **Alvo fixo em vez de trailing:** se o trailing capa em ~$35 de qualquer jeito, trocar por um
+     alvo fixo determinístico de +8 a +15pt (~$40-75) — pelo menos não é nickado. Perde os
+     runners (13/07 L5 +$123), mas ganha consistência.
+  2. **Parcial + runner:** 4 contratos saem em alvo fixo +6-8pt; 1-2 contratos correm com trail
+     LARGO (8-12pt) pra pegar o runner. A saída parcial foi rejeitada (item #15) MAS no motor
+     `OnBarClose` — no motor de tick a lógica é outra.
+  3. **Timeframe 2-3min:** menos barras = menos repique intrabar pra nickar. Backtest antigo
+     (`OnBarClose`) mostrou 2min PF 1,80. Re-testar com Tick Replay.
+  4. **Gerir a saída só no `OnBarClose` mesmo ao vivo** (desligar o trailing do `OnMarketData`).
+     Faz o ao vivo bater com o backtest. Risco: perde a proteção anti "stop abaixo do mercado" em
+     rally — mas só pro trailing, o stop inicial no servidor continua.
+- **Risco de overfitting:** BAIXO — é mudança de modelo de execução, validada com Tick Replay +
+  OOS, escolhida pela estabilidade e não pelo PnL.
+- **Como testar:** Tick Replay ON → backtest 13 meses → OOS 1ª/2ª metade → comparar as 4 opções
+  acima pelo avgW real e PF estável nas 2 metades.
 
 ### 🔴 PROBLEMA #2 — Facada (reversão em V instantânea) `[E]`
 
@@ -312,17 +330,30 @@ movimento de 3-14pt (stop cheio normal). Apertar o SL já foi testado 3x e piora
 
 ## PARTE 6 — PLANO DE MELHORIA (ordem de prioridade)
 
-### Fase 0 — DESTRAVAR e MEDIR A VERDADE (sem mexer na lógica)
+### Fase 0 — DESTRAVAR e MEDIR A VERDADE
 
-1. **Corrigir o `pdHigh`/`pdLow` no restart** (Problema #4). Sem isso o forward test não anda.
-   Mudança pequena e sem risco. **Fazer primeiro.**
-2. **Ligar Tick Replay no gráfico** e re-rodar o backtest de 13 meses do BETrigger25.
-   - Se PF > 1,3 com Tick Replay → o edge é real, o problema é execução pontual (gap de entrada,
-     velocidade) → ir pra Fase 1.
-   - Se PF 0,4-0,8 com Tick Replay → **o edge histórico era artefato de `OnBarClose`.** A
-     estratégia como está não tem edge sob gestão intrabar. Ir pra Fase 2.
-3. **Rodar 1-2 dias do forward test a 1x** (velocidade real) e comparar os trailing exits com os
-   do 500x. Descarta a velocidade como causa.
+1. ✅ **`pdHigh`/`pdLow` no restart corrigido** (01/09) — método `SincronizaNiveisComHistorico()`
+   em `src/BotAprovacao_BETrigger25.cs` (e no `BotAprovacaoDow_MYM.cs`). Reconstrói os níveis
+   varrendo o histórico de barras carregado, 1×, quando a estratégia (re)inicia. Log:
+   `🔧 [item#18] NIVEIS SINCRONIZADOS`. **Testar: reiniciar a estratégia no meio do Replay e ver
+   se os níveis aparecem na hora** (não mais "aguardando 1º dia"). Baixar o `.cs` do GitHub raw,
+   conferir hash, compilar F5, re-adicionar a estratégia (a assinatura não mudou — nenhum param
+   novo — então NÃO precisa re-adicionar, só recompilar).
+
+2. **Ligar Tick Replay no gráfico** e re-rodar o backtest de 13 meses do BETrigger25:
+   - **Como:** botão direito no gráfico → Data Series → **Tick Replay = True** (o gráfico precisa
+     de tick data histórico baixado). OU no backtest (Strategy Analyzer): marcar **"Tick Replay"**
+     antes de rodar. Isso faz o `OnMarketData` rodar também no backtest histórico → a gestão fica
+     igual à do ao vivo.
+   - **O que esperar:** o avgW deve cair de ~$85 pra ~$30-40 (a simulação da ponte browniana já
+     previu isso). A taxa de aprovação de "100%" deve despencar.
+   - **Se der PF > 1,3 com Tick Replay** → o edge sobrevive à gestão de tick → Fase 1.
+   - **Se der PF 0,4-0,9 com Tick Replay** → confirmado: o edge era artefato de `OnBarClose` → o
+     modelo de saída precisa mudar (Problema #1, opções 1-4) → Fase 2.
+
+3. **Rodar 1-2 dias do forward test a 1x** (velocidade real, não 500x) e comparar os trailing
+   exits. Descarta a velocidade do replay como causa (14/07 saiu tudo no BE a 500x, 15/07
+   funcionou a 1000x — inconsistente, precisa checar a 1x).
 
 ### Fase 1 — SE o edge sobreviver ao Tick Replay: corrigir execução
 

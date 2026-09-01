@@ -103,6 +103,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private double onHigh = 0, onLow = 0;   // high/low do overnight (dom 18h -> seg 9h30)
 		private string onKey   = "";            // data da segunda a que esse range pertence
 
+		// ---------- Fix item #18: sincronizacao dos niveis com o historico ao reiniciar ----------
+		private bool niveisSincronizados = false;
+
 		// ---------- Gestao da posicao aberta ----------
 		private double entryPrice = 0;
 		private double stopPrice  = 0;    // stop sintetico: inicial -> trailing apos breakeven
@@ -287,6 +290,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (CurrentBars[0] < BarsRequiredToTrade)
 				return;
+
+			// FIX item #18: reconstroi os niveis do historico se a estrategia reiniciou
+			// no meio do dia (senao o bot fica mudo o dia inteiro). Roda 1x.
+			if (!niveisSincronizados)
+				SincronizaNiveisComHistorico();
 
 			// FUSO-PROOF: converte a hora da barra p/ ET (a diurna opera em horario Eastern),
 			// independente do fuso configurado no grafico.
@@ -550,6 +558,74 @@ namespace NinjaTrader.NinjaScript.Strategies
 				FechaPosicao(beFeito ? "TrailingTick" : "StopTick");
 				return;
 			}
+		}
+
+		// FIX item #18 — reconstroi pdHigh/pdLow/curHigh/curLow/diaNiveis (e onHigh/onLow p/
+		// segunda) varrendo o historico ja carregado. Ver comentario completo no
+		// BotAprovacao_BETrigger25.cs. Roda 1x.
+		private void SincronizaNiveisComHistorico()
+		{
+			try
+			{
+				int nBars = Math.Min(CurrentBar, 8000);
+				string dNiv = ""; double cHi = 0, cLo = 0, pHi = 0, pLo = 0;
+				string oKey = ""; double oHi = 0, oLo = 0;
+
+				for (int ba = nBars; ba >= 1; ba--)
+				{
+					DateTime tb = EmET(Time[ba]);
+					int ag = ToTime(tb) / 100;
+					string d = tb.ToString("yyyy-MM-dd");
+					bool emSes = ag >= SessaoInicio && ag < 1600;
+
+					if (d != dNiv)
+					{
+						if (cHi > 0) { pHi = cHi; pLo = cLo; }
+						dNiv = d;
+						cHi = emSes ? High[ba] : 0;
+						cLo = emSes ? Low[ba]  : 0;
+					}
+					else if (emSes)
+					{
+						cHi = cHi == 0 ? High[ba] : Math.Max(cHi, High[ba]);
+						cLo = cLo == 0 ? Low[ba]  : Math.Min(cLo,  Low[ba]);
+					}
+
+					if (SegUsaDomingo)
+					{
+						DayOfWeek dw = tb.DayOfWeek;
+						string cs = null;
+						if (dw == DayOfWeek.Sunday && ag >= DomNoiteInicio) cs = tb.AddDays(1).ToString("yyyy-MM-dd");
+						else if (dw == DayOfWeek.Monday && ag < SessaoInicio) cs = d;
+						if (cs != null)
+						{
+							if (cs != oKey) { oKey = cs; oHi = High[ba]; oLo = Low[ba]; }
+							else { oHi = Math.Max(oHi, High[ba]); oLo = Math.Min(oLo, Low[ba]); }
+						}
+					}
+				}
+
+				if (pHi > 0 && (pdHigh <= 0 || string.Compare(diaNiveis, dNiv) < 0))
+				{
+					pdHigh = pHi; pdLow = pLo;
+					curHigh = cHi; curLow = cLo; diaNiveis = dNiv;
+					Print(string.Format("{0}  🔧 [item#18] NIVEIS SINCRONIZADOS do historico: pdHigh={1:F2} pdLow={2:F2} (dia {3}).",
+						Time[0], pdHigh, pdLow, dNiv));
+				}
+				if (oHi > 0 && (onHigh <= 0 || onKey != oKey))
+				{
+					string segHoje = EmET(Time[0]).ToString("yyyy-MM-dd");
+					if (oKey == segHoje)
+					{
+						onHigh = oHi; onLow = oLo; onKey = oKey;
+						Print(string.Format("{0}  🔧 [item#18] RANGE GLOBEX (segunda) sincronizado: onHigh={1:F2} onLow={2:F2}.",
+							Time[0], onHigh, onLow));
+					}
+				}
+			}
+			catch (Exception e) { Print("[BotAprovacao] SincronizaNiveisComHistorico falhou: " + e.Message); }
+
+			niveisSincronizados = true;
 		}
 
 		// Nivel de rejeicao ativo: na SEGUNDA usa o range do domingo a noite (Globex);
