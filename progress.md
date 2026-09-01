@@ -21,7 +21,12 @@ de entrada [F+B] — 2 casos, fill +10-11pt após vela de spike, −$300; #4 pdH
 restart [A] — BLOQUEANTE, matou 21-22/07; #5 custos = 63% do prejuízo [D]; #6 overfit do backtest
 original [G].
 
-**PLANO — Fase 0 (destravar e medir a verdade):** (1) corrigir o item #18; (2) **LIGAR TICK
+**FASE 0 EXECUTADA (01/09):** (1) ✅ **item #18 CORRIGIDO** — método `SincronizaNiveisComHistorico()`
+em `BotAprovacao_BETrigger25.cs` + `BotAprovacaoDow_MYM.cs` (reconstrói os níveis varrendo o
+histórico; assinatura não mudou, só recompilar). `backtest/run_trailing_bridge.py` (ponte
+browniana ≈ Tick Replay) CONFIRMA: gestão tick-a-tick capa o avgW em **~$35** (vs $80 OnBarClose;
+forward real $31), e **afrouxar o trailing não recupera** — quem capa é o BE-lock 0,75. **O edge
+de PF 1,50 é artefato de `OnBarClose`.** Próximo (Marcelo no NT8): (2) **LIGAR TICK
 REPLAY** no gráfico e re-rodar o backtest de 13 meses do BETrigger25 — se der PF 0,4-0,8, o edge
 histórico era artefato de `OnBarClose` e a estratégia precisa ser repensada, não ajustada; se der
 PF > 1,3, ir pra Fase 1 (revisar entrada `OnMarketData`, sweep de trailing com Tick Replay,

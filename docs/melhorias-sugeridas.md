@@ -498,7 +498,24 @@ o 06/07 desde que não vá −$1.000 do saldo inicial). Mais um motivo pra firma
 
 ---
 
-## 🐛 Item #18 — pdHigh/pdLow (nível dia anterior) zera ao reiniciar a estratégia (23/08, NÃO CORRIGIDO)
+## 🐛 Item #18 — pdHigh/pdLow (nível dia anterior) zera ao reiniciar a estratégia — ✅ CORRIGIDO (01/09)
+
+**✅ CORRIGIDO em 01/09** (depois do bug matar 21/07 e 22/07 do forward test de julho). Método
+`SincronizaNiveisComHistorico()` em `src/BotAprovacao_BETrigger25.cs` (e `BotAprovacaoDow_MYM.cs`):
+chamado 1× no início do `OnBarUpdate` (guardado por `niveisSincronizados`). Varre o histórico de
+barras já carregado (`High[ba]`/`Low[ba]`/`Time[ba]`, até 8000 barras pra trás), replicando a
+lógica de acúmulo de nível do `OnBarUpdate` (linhas ~307-336), e reconstrói
+`pdHigh/pdLow/curHigh/curLow/diaNiveis` — e `onHigh/onLow/onKey` pra segunda. Só sobrescreve se
+reconstruiu um nível válido E o estado live está zerado/mais antigo. Log:
+`🔧 [item#18] NIVEIS SINCRONIZADOS do historico`. Assinatura não mudou (nenhum param novo) — só
+recompilar (F5), não precisa re-adicionar a estratégia. **Testar: reiniciar a estratégia no meio
+do Replay → os níveis devem aparecer na hora** (não mais "aguardando 1º dia").
+
+_(contexto original abaixo)_
+
+---
+
+### 📜 Contexto original (23/08)
 
 **Apontado pelo Marcelo:** no dia 21/07/2026 (Market Replay), o painel de níveis mostrou
 "Níveis dia anterior: Max (short) (aguardando 1º dia) / Min (long) (aguardando 1º dia)" — mesmo
