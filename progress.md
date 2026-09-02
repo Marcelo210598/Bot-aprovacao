@@ -1,6 +1,60 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-09-02 (tarde) — B e A MORTAS. Candidata C (gap-and-go) = ÚNICO edge OOS-robusto do projeto (PF 1,29 todo ano 2022-26), MAS: precisa stop largo (capar mata), maxDD $6,5k, ~42% aprovação só em firma de DD estático. `.cs` mínimo escrito (`src/NomadeBot_GapAndGo.cs`) — falta Marcelo rodar no NT8 Analyzer (o juiz).
+## Última atualização: 2026-09-02 (fim) — gap-and-go RODADA no NT8: IS PF 1,10 / holdout 2026 PF 0,57 (−$7.408). MORTA, igual todas. ~14 famílias testadas, nenhuma passa OOS. ➡️ PIVOT DE OBJETIVO: bot pra OPERAR conta funded respeitando regras de payout (consistência/dias verdes/lucro X), NÃO pra passar avaliação. Debater próxima sessão.
+
+## 🔴 02/09 (fim) — gap-and-go RODADA NO NT8 ANALYZER: MORTA. Pivot de objetivo.
+
+**O juiz falou.** `NomadeBot_GapAndGo.cs` compilou e rodou. MNQ DEC25, 5 MNQ. **Fuso do dado
+do Marcelo = ET** (930/1600/1300), não Chicago — isso levou o PF de 1,02 → 1,19 (slip 0).
+
+| Período | Slippage | PF | Líquido |
+|---|---|---|---|
+| IS 2022-2025 | 0 | 1,19 | +$14.454 |
+| IS 2022-2025 | 3 ticks | **1,10** | +$7.954 |
+| IS 2022-2025 | 5 ticks | 1,05 | +$4.322 |
+| **Holdout 2026** (jan-ago) | 3 ticks | **0,57** | **−$7.408** |
+
+**Some no holdout. Exatamente o padrão da reversão.** O motor Python (`run_gap_open.py`) dizia
+2026 = PF 1,27-1,30 → **errou o SINAL**, não só a magnitude. Python não presta pra decidir.
+
+**Estado das candidatas da "estratégia nova" (`docs/estrategia-nova-2026-09.md`):**
+| Candidata | Veredito NT8/Python |
+|---|---|
+| B — event 8h30 | sem edge |
+| A — momentum continuation | PF 0,4-0,97, morta |
+| C — gap-fill | catástrofe (PF 0,2) |
+| **C — gap-and-go** | **IS 1,10 / holdout 0,57 — MORTA** |
+
+**Somando com o cemitério anterior: ~14 famílias de estratégia mecânica testadas ao longo do
+projeto. NENHUMA passa fora de amostra.** A tese "bot mecânico no MNQ 1-min COM EDGE" está
+esgotada.
+
+### Erros meus (Claude) nesta sessão — registrados
+- Afirmei "Apex proíbe bot/HFT/copy" → **FALSO, a Apex PERMITE bot.** Confirmar regras antes de afirmar.
+- Propus "comprar 8 avaliações em paralelo, passar 40%" → **não existe.** Ou sequencial (1 por
+  vez), ou replicador (todas fazem o mesmo trade = passam/falham juntas). Ver
+  memória `feedback_apex_sem_avaliacoes_paralelas`.
+
+### ➡️ NOVA DIREÇÃO (Marcelo decidiu 02/09 — DEBATER na próxima sessão)
+**NÃO é mais bot pra passar avaliação. É bot pra OPERAR uma conta funded da Apex respeitando as
+regras de payout:**
+- **Consistência** — nenhum dia verde > ~30% do lucro total no momento do saque
+- **X dias no verde** — dias mínimos operados com lucro
+- **Acumular lucro X** — safety net / threshold de saque
+Ou seja: **ganhos diários pequenos e CONSTANTES**, espalhados por muitos dias, **sem um dia
+grande** (quebra os 30%), sem estourar a conta. PF só > 1,0 com **variância baixa**. É uma
+otimização DIFERENTE de tudo feito até aqui (era "bater +$1.500 rápido"; agora é "grindar
++$100-200/dia por N dias sem escorregar").
+
+**A próxima sessão começa debatendo:** que estratégia-base tem WR alto + alvo pequeno + DD
+controlado o suficiente pra grindar isso? (candidatas: reversão como scalp de alvo curto,
+ORB-scalp, VWAP-fade, range-fade). E medir: quantos dias verdes / mês, distribuição do PnL
+diário, chance de estourar.
+
+Produção (`BotAprovacao.cs`) intacta. `.cs` `NomadeBot_GapAndGo` compila e roda (estratégia morta).
+
+---
+
 
 ## 🔵 02/09 (tarde) — refino da C + candidata A testada (morta) + `.cs` + sim de aprovação
 
