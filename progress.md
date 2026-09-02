@@ -1,6 +1,69 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-09-01 (noite) — OOS MATOU a reversão (short-only 2022-2025 PF 0,91). Marcelo escolheu: ESTRATÉGIA NOVA DO ZERO, começando por B (event-driven 8h30 ET). Início 02/09. Ver `docs/estrategia-nova-2026-09.md`.
+## Última atualização: 2026-09-02 — Candidata B (event 8h30) TESTADA e SEM EDGE. Candidata C (gap-and-go) apareceu com PF ~1,3 IS≈OOS — primeira coisa robusta do projeto. Próximo: refinar C + grill-me + NT8 Analyzer.
+
+## 🔵 02/09 — Itens 1-3 do plano: B testada (morta), C promissora
+
+**Protótipo Python — decisão final é sempre no NT8 Analyzer.** Dado: MNQ 1-min 2022-2026
+(Databento). IS = 2022-2025, holdout = 2026.
+
+### Item 1 — lista de releases 8h30 ET (`backtest/run_event_830.py`)
+Detectada DO PRÓPRIO DADO: um release das 8h30 ET produz spike de volume 10-30× no minuto
+exato (ex.: CPI 12/02/2025 8h30 ET = 16.064 contr vs ~500 antes). **241 dias de release**
+2022-2026 (vol barra 8h30 ≥ 3× mediana móvel 20d). Classificados por posição no calendário
+(Qui=claims, Sex cedo=NFP, meio=CPI/PPI/retail, fim=GDP/PCE). Contagem bate com o esperado
+(~150-190/ano com claims semanal).
+
+### Item 2 — teste tosco: candidata B NÃO tem edge
+Breakout do range 8h25-30 na barra 8h30, bracket fixo, slippage 3-5t, flat 9h00 ET:
+
+| Variante | PF IS 2022-2025 | Leitura |
+|---|---|---|
+| Breakout puro (todas as configs SL/RR) | **0,92 – 0,98** | coin flip; avgW ≈ avgL |
+| FADE (contra o rompimento) | 0,48 – 0,84 | pior ainda |
+| DELAY (entra na 8h32 no range 8h30+31) | 1,4 mas **n=33 (8/ano)**, holdout misto | overfit / amostra ínfima |
+| Só eventos grandes (vol ≥10×) | 2,16 mas **n=25, holdout PF 0,00** | overfit de regime |
+| Ride the trend (segura até 10h-13h) | 0,80 – 0,88, DD até −$35k | **pior quanto mais segura** — mean-reverte |
+| NFP-only ride | 0,42 | morto |
+
+**O movimento das 8h30 é ruído depois do slippage.** O spike não prevê o follow-through de
+30 min; segurar mais tempo reverte contra. Confirma o próprio risco do doc ("head fake dos
+releases"). **Corte = PF > 1,3 IS. Nada legítimo passa. → NÃO escreve o .cs da B. B morta.**
+(B entra no cemitério: reversão, ORB, EMA/VWAP, ICT, Renko, breakout, squeeze, RSI, IB, event.)
+
+### Item 3 — B reprovou o gate → probe da candidata C (`backtest/run_gap_open.py`)
+Gap RTH open (9h30 ET) vs prior RTH close (16h00 ET):
+- **gap-FILL (fade) = catástrofe**: PF 0,22–0,36, −$40k a −$69k. O MNQ **tende**, não volta pro close.
+- **gap-and-GO** (gap médio que segura os 1os 15 min → vai a favor, bracket 2:1, flat 13h ET):
+
+| Banda de gap | PF IS 22-25 | PF holdout 26 | n IS | maxDD IS |
+|---|---|---|---|---|
+| 20-150 pt, 2:1 | **1,29** | **1,30** | 380 | −$6,5k |
+| 30-200 pt, 2:1 | 1,23 | 1,27 | 402 | −$6,5k |
+| 30-200 pt, 3:1 flat13h | 1,15 | 1,37 | 402 | −$11k |
+
+gap 30-200 / 2:1 **ano a ano: 2022 PF 1,48 · 2023 1,25 · 2024 1,26 · 2025 1,08 · 2026 1,27** —
+**positivo TODO ano.** Primeira coisa da exploração toda com IS ≈ OOS. ~100 trades/ano, avg
+~$55/trade, ~$5,5-6,8k/ano líquido em 5 MNQ (5c) após custo+slippage.
+
+**Ressalvas (não empolgar ainda):**
+1. Motor Python é ~40% otimista no PF → PF 1,29 aqui pode ser ~1,0-1,1 no NT8 Analyzer.
+2. Lógica ainda tosca (entrada no minuto 15, risco = distância ao extremo dos 15 min).
+3. **maxDD −$6,5k contra o DD trailing de $1.000 da Apex = estoura.** Precisa firma de DD
+   estático (opção C da análise da reversão) OU risco bem mais apertado / menos contratos.
+4. WR 40-42% (o alvo 2:1 faz o trabalho — exige disciplina).
+
+### Próxima sessão
+1. **Refinar a gap-and-go em Python** (entrada melhor, risco melhor, filtro de dia) — objetivo:
+   PF folgado > 1,3 IS com regra limpa, DD menor.
+2. **grill-me** na regra final.
+3. **Escrever `.cs` mínimo da gap-and-go** e rodar o **NT8 Strategy Analyzer** 2022-2025 (o teste
+   de verdade). Só continua se PF > 1,3 lá também.
+4. Se passar: firma de DD estático (Tradeify/MFFU/TPT) — o DD de $6,5k não cabe no trailing Apex.
+5. Produção (`BotAprovacao.cs`) segue INTACTA. Nada escrito ainda.
+
+---
+
 
 ## 🔴 01/09 (noite, fim) — OOS: a reversão morreu. Pivot pra estratégia nova.
 

@@ -42,7 +42,52 @@ Começar por **B (event-driven)**. Iniciar amanhã (02/09).
 
 ---
 
-### ✅ B — Event-driven: o spike das 8h30 ET (ESCOLHIDA)
+### ❌ B — Event-driven: spike das 8h30 ET (TESTADA 02/09 — SEM EDGE, MORTA)
+
+**Resultado do teste tosco** (`backtest/run_event_830.py` + `_v2.py`, MNQ 1-min 2022-2026,
+IS 2022-2025 / holdout 2026):
+
+- **Item 1 (lista de releases):** detectada do próprio dado — o spike de volume 10-30× no
+  minuto das 8h30 ET marca o release com precisão. 241 dias 2022-2026.
+- **Item 2 (breakout do range 8h25-30 na barra 8h30, bracket fixo, slippage 3-5t):**
+  PF **0,92–0,98 em TODA config** no IS. FADE: 0,48–0,84. DELAY (entra na 8h32): PF 1,4 mas
+  só n=33 (8/ano) e holdout misto — overfit. Só eventos vol≥10×: PF 2,16 mas n=25 e
+  **holdout PF 0,00**. Ride the trend (segura até 12h-13h): PF 0,80–0,88, DD até −$35k —
+  **quanto mais segura, pior** (o movimento das 8h30 mean-reverte na manhã).
+
+**Diagnóstico:** o movimento do 1º minuto pós-release é **ruído depois do slippage**. avgW ≈
+avgL no breakout. O "head fake" (risco que o próprio doc listou) é a regra, não a exceção.
+
+**Corte = PF > 1,3 IS 2022-2025. Nada passa. → não se escreve o .cs. B entra no cemitério.**
+
+---
+
+### ✅ C — Gap de abertura (PROMISSORA — probe 02/09, PF ~1,3 IS≈OOS)
+
+**Achado do probe** (`backtest/run_gap_open.py`):
+
+- **gap-FILL (fade o gap, alvo = prior close) = catástrofe:** PF 0,22–0,36, −$40k a −$69k.
+  Confirma em N=3 anos o que matou a reversão: **o MNQ tende, não volta pro close.**
+- **gap-and-GO** (gap médio que **segura** os 1os 15 min → entra a favor, bracket fixo 2:1,
+  flat 13h ET, slippage 5t):
+
+| Banda | PF IS 22-25 | PF holdout 26 | n IS | maxDD IS | ano a ano (30-200/2:1) |
+|---|---|---|---|---|---|
+| 20-150 pt | **1,29** | **1,30** | 380 | −$6,5k | — |
+| 30-200 pt | 1,23 | 1,27 | 402 | −$6,5k | 2022 **1,48** / 23 **1,25** / 24 **1,26** / 25 **1,08** / 26 **1,27** |
+
+**Positivo todo ano. Primeira coisa do projeto com IS ≈ OOS.** ~100 trades/ano, avg ~$55,
+~$5,5–6,8k/ano líquido (5 MNQ, custo+slippage).
+
+**Ressalvas:** (1) motor Python é ~40% otimista → PF 1,29 pode virar ~1,0-1,1 no NT8;
+(2) lógica ainda tosca; (3) **maxDD −$6,5k não cabe no DD trailing $1.000 da Apex** → precisa
+firma de DD estático; (4) WR 40-42%.
+
+**Próximo:** refinar em Python → grill-me → `.cs` mínimo → **NT8 Strategy Analyzer** (o juiz).
+
+---
+
+### (arquivado) B — texto original da hipótese
 
 **Tese:** releases econômicos das 8h30 ET (CPI, PPI, NFP, retail sales, jobless claims, GDP,
 PCE) produzem volatilidade **agendada e enorme**. Não se negocia estrutura de preço — se
