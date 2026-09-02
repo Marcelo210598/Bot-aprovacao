@@ -1,6 +1,65 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-09-02 — Candidata B (event 8h30) TESTADA e SEM EDGE. Candidata C (gap-and-go) apareceu com PF ~1,3 IS≈OOS — primeira coisa robusta do projeto. Próximo: refinar C + grill-me + NT8 Analyzer.
+## Última atualização: 2026-09-02 (tarde) — B e A MORTAS. Candidata C (gap-and-go) = ÚNICO edge OOS-robusto do projeto (PF 1,29 todo ano 2022-26), MAS: precisa stop largo (capar mata), maxDD $6,5k, ~42% aprovação só em firma de DD estático. `.cs` mínimo escrito (`src/NomadeBot_GapAndGo.cs`) — falta Marcelo rodar no NT8 Analyzer (o juiz).
+
+## 🔵 02/09 (tarde) — refino da C + candidata A testada (morta) + `.cs` + sim de aprovação
+
+### Candidata A (momentum continuation) — MORTA (`backtest/run_momentum_A.py`)
+1ª hora RTH forte (força ≥ X, range/ATR ≥ Y) → pullback (33-50% do range) → retomada.
+**PF 0,41–0,97 em TODA config IS.** WR 19–29% (a retomada é fadeada). Ano a ano (amostra
+n=2-13/ano) confirma: perde. A ideia "cavalga a tendência estabelecida" no formato pullback
+simples NÃO funciona no MNQ. **A no cemitério.**
+
+### Candidata C (gap-and-go) — refinada, é REAL mas MARGINAL pro formato
+
+**Reconciliação v1 vs v2:** o probe v1 (`run_gap_open.py`) dava PF 1,29 IS ≈ 1,30 OOS.
+O refino v2 (`run_gap_open_v2.py`, entrada no rompimento do OR + risco capado 1,5×ATR)
+**quebrou em 2025-2026** (PF 0,8). Investigado:
+
+| Versão | PF IS 22-25 | 2022 | 2023 | 2024 | 2025 | 2026 (holdout) |
+|---|---|---|---|---|---|---|
+| v1: entra no min15, **risco = dist ao extremo do OR (SEM cap)**, 2:1 | **1,29** | 1,27 | 1,27 | 1,32 | **1,30** | **1,30** |
+| v1 + cap 40pt no stop | 1,16 | 1,64 | 1,12 | 1,01 | 1,10 | **0,82** |
+| v1 + cap 25-30pt | ~1,0 | 1,3-1,5 | ~0,95 | ~0,9 | ~1,0 | **0,75-0,85** |
+
+**O edge é INSEPARÁVEL do stop largo.** Risco mediano por trade sem cap = 30-82pt
+($300-825 em 5 MNQ). maxDD $6,5k. Capar o stop (pra caber no DD trailing Apex) mata o edge.
+
+**Simulação de aprovação** (30d / meta $1.500 / 5 MNQ / gap-and-go v1):
+| Modelo de DD | Aprovação |
+|---|---|
+| Apex trailing $1.000 | **31%** |
+| Estático $2.000 | 40% |
+| Estático $2.500 | **42%** |
+| Estático $3.000 | 42% |
+
+Menos contratos PIORA (3 MNQ = 21-30%, 2 MNQ = 10-11% — a meta $1.500 não é atingível
+em 30d com size pequeno). Teto ~42%, em firma de DD estático.
+
+### `.cs` mínimo escrito: `src/NomadeBot_GapAndGo.cs` (NÃO é produção, NÃO validado)
+Só entrada + bracket fixo + flatten, estilo `NomadeBot_*` (Analyzer-only). Defaults em fuso
+**Chicago** (o import `MNQ 12-25` está em Chicago): open 830, close 1500, flatten 1200,
+OR 15min, gap 20-150pt, RR 2. **Falta:** Marcelo compilar + rodar o **Strategy Analyzer**
+2022-2025 com comissão + Deslizamento 3-5t. Corte: PF > 1,3 lá. Se o Python (otimista ~40%)
+não segurar no NT8, a gap-and-go morre também.
+
+### DECISÃO ESTRATÉGICA pendente (Marcelo)
+Das 3 candidatas do doc (A/B/C), **só a gap-and-go tem edge OOS-robusto** — e é ~42% de
+aprovação, só em firma de DD estático. O padrão do projeto inteiro se confirma: **o formato
+(DD trailing de 30 dias) é a trava, não a estratégia.** Opções:
+1. Levar a gap-and-go pro NT8 Analyzer. Se PF > 1,2 lá → firma de DD estático (Tradeify/MFFU/TPT).
+2. Aceitar que ~42% é o teto realista de qualquer estratégia mecânica de MNQ nesse formato.
+3. Repensar o alvo (conta maior? outro produto? menos agressivo?).
+
+### Próxima sessão
+1. **Marcelo roda `NomadeBot_GapAndGo` no NT8 Strategy Analyzer** (2022-2025, comissão,
+   Deslizamento 3-5t). Confere o fuso pelo Print do 1º gap. → PF real.
+2. Se PF > 1,2: grill-me na regra + levantar termos de firma de DD estático.
+3. Se PF < 1,1: gap-and-go morre. Aí a pergunta é sobre o FORMATO, não mais a estratégia.
+4. Produção (`BotAprovacao.cs`) intacta.
+
+---
+
 
 ## 🔵 02/09 — Itens 1-3 do plano: B testada (morta), C promissora
 

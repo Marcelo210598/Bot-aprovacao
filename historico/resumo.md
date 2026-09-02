@@ -13,16 +13,22 @@ no NT8 Strategy Analyzer (2022-2025): PF 0,91, perdedora nos 4 anos. O bom resul
 era sorte de regime. **Projeto pivotou pra estratégia NOVA do zero.** O bot de produção
 `BotAprovacao.cs` continua intacto mas sem edge comprovado fora de amostra.
 
-**🔵 02/09/2026 — candidata B (event 8h30 ET) TESTADA e MORTA; candidata C (gap-and-go) promissora.**
-- **B — event-driven 8h30 ET:** o movimento do 1º minuto pós-release (CPI/PPI/NFP/claims/...)
-  é **ruído depois do slippage**. Breakout PF 0,92-0,98 IS; fade/delay/vol-filter = overfit;
-  ride-the-trend = pior quanto mais segura. Nada passa o corte PF>1,3. **B no cemitério.**
-- **C — gap de abertura:** gap-FILL (fade) = catástrofe (PF 0,2, o MNQ tende). Mas **gap-and-GO**
-  (gap que segura 15 min → vai a favor, 2:1, flat 13h ET): **PF ~1,29 IS 2022-25 ≈ 1,30 holdout
-  2026, positivo TODO ano.** 1º sinal robusto do projeto. Ressalvas: Python ~40% otimista;
-  maxDD −$6,5k não cabe no trailing Apex (precisa DD estático).
-- Próximo: refinar a gap-and-go → grill-me → `.cs` mínimo → **NT8 Strategy Analyzer** (o juiz).
-- Scripts: `backtest/run_event_830.py`, `run_event_830_v2.py`, `run_gap_open.py`.
+**🔵 02/09/2026 — B e A testadas e MORTAS. C (gap-and-go) = único edge OOS-robusto, mas marginal.**
+- **B (event 8h30 ET):** o movimento do 1º minuto pós-release é **ruído após slippage**.
+  Breakout PF 0,92-0,98; fade/delay/vol-filter = overfit; ride = pior quanto mais segura. Morta.
+- **A (momentum continuation):** 1ª hora forte → pullback → retomada. PF 0,41-0,97, WR 20-28%
+  (a retomada é fadeada). Morta.
+- **C gap-FILL (fade):** catástrofe (PF 0,2 — o MNQ tende, não fecha o gap).
+- **C gap-and-GO:** **PF 1,29 IS, POSITIVO TODO ANO 2022-2026** (incl. holdout). Único edge
+  OOS-robusto do projeto. **MAS:** o edge exige stop largo — capar o stop (25-40pt) pra caber
+  no DD trailing da Apex MATA o edge. Risco 30-82pt/trade, maxDD $6,5k. Sim de aprovação: Apex
+  trailing 31%, DD estático $2.500 = **42% (teto)**. Menos contratos piora.
+- **`.cs` escrito:** `src/NomadeBot_GapAndGo.cs` (mínimo, Analyzer-only, NÃO validado).
+  **Falta Marcelo rodar o NT8 Strategy Analyzer** (o juiz) — se o Python (otimista ~40%) não
+  segurar lá, a C morre também.
+- **Padrão confirmado: o FORMATO (DD trailing, 30 dias) é a trava, não a estratégia.**
+- Scripts: `backtest/run_event_830.py`, `run_event_830_v2.py`, `run_gap_open.py`,
+  `run_gap_open_v2.py`, `run_momentum_A.py`.
 - Detalhe: `historico/2026-09-02.md` + `progress.md` (topo) + `docs/estrategia-nova-2026-09.md`.
 
 ## 🧪 01/09 — Direção B destrinchada (Renko + DD + outros instrumentos via Databento)

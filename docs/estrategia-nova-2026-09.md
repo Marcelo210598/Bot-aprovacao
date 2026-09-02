@@ -79,11 +79,41 @@ avgL no breakout. O "head fake" (risco que o próprio doc listou) é a regra, n�
 **Positivo todo ano. Primeira coisa do projeto com IS ≈ OOS.** ~100 trades/ano, avg ~$55,
 ~$5,5–6,8k/ano líquido (5 MNQ, custo+slippage).
 
-**Ressalvas:** (1) motor Python é ~40% otimista → PF 1,29 pode virar ~1,0-1,1 no NT8;
-(2) lógica ainda tosca; (3) **maxDD −$6,5k não cabe no DD trailing $1.000 da Apex** → precisa
-firma de DD estático; (4) WR 40-42%.
+**Refino (02/09 tarde):** capar o stop pra caber no DD da Apex **mata o edge** —
+`run_gap_open_v2.py` (entrada no rompimento do OR + risco 1,5×ATR): PF 0,8 em 2025-2026.
+`run_gap_open.py` + cap fixo: cap 40pt → holdout PF 0,82; cap 25-30pt → PF ~1,0. **O edge é
+inseparável do stop largo** (risco mediano 30-82pt = $300-825/trade; maxDD $6,5k).
 
-**Próximo:** refinar em Python → grill-me → `.cs` mínimo → **NT8 Strategy Analyzer** (o juiz).
+**Sim de aprovação (30d / meta $1.500 / 5 MNQ):** Apex trailing 31% · estático $2.500 **42%**.
+Menos contratos piora (2 MNQ = 11%). Teto ~42%, só em firma de DD estático.
+
+**`.cs` escrito:** `src/NomadeBot_GapAndGo.cs` (mínimo, Analyzer-only, NÃO produção, NÃO
+validado). Falta Marcelo rodar o NT8 Strategy Analyzer. Corte: PF > 1,3 IS. Se o Python
+(otimista ~40%) não segurar no NT8, a gap-and-go morre.
+
+---
+
+### ❌ A — Momentum continuation (TESTADA 02/09 — SEM EDGE, MORTA)
+
+`backtest/run_momentum_A.py`: 1ª hora RTH forte → pullback 33-50% → retomada.
+**PF 0,41–0,97 em TODA config IS 2022-2025. WR 19–29%** (a retomada é fadeada constantemente).
+Ano a ano (n pequeno) confirma: perde. A ideia "cavalgar a tendência" no formato pullback
+simples não funciona no MNQ 1-min. **A no cemitério.**
+
+---
+
+### 📊 Situação das 3 candidatas (02/09)
+
+| Candidata | Resultado |
+|---|---|
+| **B — event 8h30** | morta (todas as variantes PF ≤ 0,98 ou overfit) |
+| **C — gap-fill (fade)** | morta (PF 0,2 — o MNQ tende) |
+| **C — gap-and-go** | **único edge OOS-robusto** (PF 1,29, todo ano 22-26) — mas stop largo obrigatório, maxDD $6,5k, ~42% aprovação só em DD estático |
+| **A — momentum continuation** | morta (PF 0,4-0,97, WR 20-28%) |
+
+**Padrão do projeto confirmado: o FORMATO (DD trailing, 30 dias) é a trava, não a estratégia.**
+A gap-and-go é a melhor coisa já encontrada e mesmo assim é ~42% em firma de DD estático.
+Decisão estratégica no `progress.md` (topo).
 
 ---
 
