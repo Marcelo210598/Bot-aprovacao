@@ -132,18 +132,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 			dentroRthAnt = dentroRth;
 			dentroRth    = agora >= HorarioOpenRTH && agora < HorarioCloseRTH;
 
-			// mantem o ultimo close dentro do RTH de hoje (vira o "fechRthAnter" amanha)
-			if (dentroRth)
-				fechRthHoje = Close[0];
-
 			// -------- Virada pra um novo dia de RTH --------
-			// primeira barra que entra no RTH num dia diferente
+			// primeira barra que entra no RTH num dia diferente.
+			// IMPORTANTE: capturar fechRthAnter ANTES de atualizar fechRthHoje com a barra de hoje.
 			bool novaSessaoRth = dentroRth && !dentroRthAnt && hoje != diaRth;
 			if (novaSessaoRth)
 			{
-				// o fechamento de RTH de ontem e o ultimo close que acumulamos
-				fechRthAnter  = fechRthHoje;
-				fechRthHoje   = Close[0];
+				fechRthAnter  = fechRthHoje;   // ultimo close do RTH de ONTEM (ainda intacto)
 				diaRth        = hoje;
 
 				rthOpen       = Open[0];
@@ -154,8 +149,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 				tradeHoje     = false;
 
 				gapPontos = double.IsNaN(fechRthAnter) ? 0 : (rthOpen - fechRthAnter);
+				fechRthHoje = Close[0];        // comeca a acumular o RTH de hoje
 				return;
 			}
+
+			// mantem o ultimo close dentro do RTH de hoje (vira o "fechRthAnter" amanha)
+			if (dentroRth)
+				fechRthHoje = Close[0];
 
 			// -------- Flatten forcado --------
 			if (agora >= FlattenHora)
@@ -168,17 +168,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (hoje != diaRth || setupAvaliado || double.IsNaN(rthOpen))
 				return;
 
-			// -------- Acumula o opening range --------
+			// -------- Acumula o opening range (as 1as ORMinutos barras: minutos 0..ORMinutos-1) --------
+			// orBarras ja e' 1 na barra de abertura (setado no novaSessaoRth).
 			if (orBarras < ORMinutos)
 			{
 				orHigh = Math.Max(orHigh, High[0]);
 				orLow  = Math.Min(orLow,  Low[0]);
 				orBarras++;
-				if (orBarras < ORMinutos)
-					return;
+				return;
 			}
 
-			// -------- Barra que fecha o OR: decide --------
+			// -------- Barra seguinte ao OR (minuto ORMinutos): decide e entra no close dela --------
 			setupAvaliado = true;
 
 			if (double.IsNaN(fechRthAnter) || double.IsNaN(gapPontos))
