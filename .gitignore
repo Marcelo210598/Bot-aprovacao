@@ -11,3 +11,6 @@ dados_databento/*.csv
 dados_databento/MNQ_1min_2022_2026.txt
 dados_databento/MNQ_NT8_import_2022_2026.txt
 dados_databento/MYM_NT8_import_2022_2026.txt
+
+# import contInuo MNQ - versiona sO o .zip (.txt de 85MB regenerA com gera_import_nt8_mnq.py)
+dados_databento/MNQ_NT8_import_2022_2026_CONT.txt
