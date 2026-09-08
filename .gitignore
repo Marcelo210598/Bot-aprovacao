@@ -10,3 +10,4 @@ dados_databento/*.csv
 # backtest/oos_short_only_4anos.py e backtest/gera_import_nt8.py
 dados_databento/MNQ_1min_2022_2026.txt
 dados_databento/MNQ_NT8_import_2022_2026.txt
+dados_databento/MYM_NT8_import_2022_2026.txt
