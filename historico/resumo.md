@@ -3,6 +3,28 @@
 > Visão rápida pra retomar o projeto depois de dias/semanas sem mexer. Detalhe completo sempre
 > em `progress.md` (topo) e nos snapshots diários desta pasta.
 
+## ✅ 08/09/2026 — MILESTONE: Fase A do ONFADE aprovada (equivalência Python ↔ NinjaScript)
+
+Detalhe: `historico/2026-09-08.md`. Evidências: `backtest/onfade_faseA/`.
+
+- **O que foi provado:** `src/OnFadeHarness.cs` (NT8) reproduz `backtest/onfade_harness.py`
+  (Python) **bit a bit**. 77/77 barras-chave idênticas (OHLCV) + **38/38 trades idênticos**
+  (entrada, stop, alvo, timestamps, motivo de saída, PnL bruto e líquido). Total líquido
+  −US$ 134,72 nos dois lados. 6 wins / 38. Único diff = `MNQ` vs `MNQZ4` (cosmético).
+- **⚠️ NÃO é rentabilidade.** Recorte de 6 semanas (set-out/24). Só valida a mecânica.
+  Comissão 1.44 ainda provisória.
+- **Import:** série contínua MNQ (Databento/Eastern) → slot **`MNQ DEC21`**. Auditado: NÃO é o
+  contrato de dez/2021, é slot-container (nome vencido → sem override de feed) com a série
+  2022-05-31→2026-08-31 (1.505.364 barras). Set/24 a ~19.800, out/24 a ~20.400 (nível real).
+- **Novo:** `src/OnFadeNative.cs` — Fase B, execução nativa (ordens de verdade, comissão e
+  slippage do Analyzer, não do código). **Não compilado.**
+- **Item aberto:** flatten de meio-dia (12:55 = fecho NYSE cash) ≠ early close do MNQ/CME
+  (13:15). Sem impacto na Fase A. Alinhar antes do backtest 2022→2026.
+- **Próximo:** recompilar (`OnFadeHarness` + `OnFadeNative`) → confirmar comissão real →
+  **B0** (sanidade: nativo vs harness, slip 0 / comm 0, mesma janela) → **B1/B2/B3**
+  (econômico: slip 1/2/3t + comissão real, período 2022→2026 + holdout). Veredito
+  go/no-go = **relatório do Strategy Analyzer**, não o PnL do harness.
+
 ## O que é o projeto
 
 Bot de automação (NinjaScript/NT8) pra passar avaliações Apex Trader Funding — conta $25K,

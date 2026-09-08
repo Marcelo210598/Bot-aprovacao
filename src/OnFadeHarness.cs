@@ -393,6 +393,22 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			try
 			{
+				if (totalBars == 0 || dumpLog.Count == 0)
+				{
+					Print("==================================================================");
+					Print("  *** ERRO GRAVE: 0 BARRAS PROCESSADAS. O backtest nao achou dado.");
+					Print("  Causas provaveis:");
+					Print("   1. O instrumento do Analyzer (" + Instrument.FullName + ") nao tem o");
+					Print("      historico importado. Confira em Ferramentas > Historico de dados.");
+					Print("   2. TickSize=" + tickSz.ToString(CultureInfo.InvariantCulture)
+					      + " / PointValue=" + pointVal.ToString(CultureInfo.InvariantCulture)
+					      + " (esperado MNQ 0.25 / 2.0) => NT8 nao reconhece esse contrato,");
+					Print("      criou um instrumento generico. Corrija os specs ou use outro slot.");
+					Print("   3. Fuso global do NT8 != Eastern (atual: " + TimeZoneInfo.Local.Id + ").");
+					Print("  Nenhum arquivo de dump escrito.");
+					Print("==================================================================");
+					return;
+				}
 				// completa o dump com primeira/ultima barra de cada dia-amostra
 				var extra = new List<string>();
 				foreach (var kv in dayFirst)

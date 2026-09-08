@@ -1,6 +1,27 @@
 # Bot Trade NT8 (BotAprovacao) - Progresso
 
-## Última atualização: 2026-09-02 (fim) — gap-and-go RODADA no NT8: IS PF 1,10 / holdout 2026 PF 0,57 (−$7.408). MORTA, igual todas. ~14 famílias testadas, nenhuma passa OOS. ➡️ PIVOT DE OBJETIVO: bot pra OPERAR conta funded respeitando regras de payout (consistência/dias verdes/lucro X), NÃO pra passar avaliação. Debater próxima sessão.
+## Última atualização: 2026-09-08 — ✅ **MILESTONE: Fase A do ONFADE aprovada.** `OnFadeHarness.cs` (NT8) reproduz `onfade_harness.py` (Python) **bit a bit**: 77/77 barras-chave idênticas + **38/38 trades idênticos** (entrada, stop, alvo, timestamps, motivo de saída, PnL bruto e líquido). Total líquido −US$ 134,72 nos dois lados, 6 wins/38. Único diff = `MNQ` vs `MNQZ4` (cosmético). ⚠️ Recorte curto (6 semanas) — **NÃO é resultado de rentabilidade**, só prova de equivalência lógica. Escrito `src/OnFadeNative.cs` (Fase B, execução nativa) — não compilado. Próximo: recompilar → confirmar comissão real → B0 (sanidade) → B1/B2/B3 (econômico, veredito = Strategy Analyzer). Detalhe: `historico/2026-09-08.md`.
+
+## ✅ 08/09 — Fase A ONFADE: equivalência Python ↔ NinjaScript COMPROVADA
+- **Import:** série contínua MNQ (Databento, Eastern) no slot **`MNQ DEC21`** (contrato vencido = container, sem override de feed Rithmic). Cobertura 2022-05-31→2026-08-31, 1.505.364 barras. (Tropeço: 1º import caiu no instrumento-lixo `MNQDEC2021` sem espaço, specs genéricas 0.01/$1 → 0 barras. Resolvido apontando o Analyzer pro `MNQ DEC21`.)
+- **Rodada 1 (`ReconDumpOnly=true`):** `timestamps_dump_nt8.csv` vs Python — **77/77 barras** (OHLCV) idênticas nos 10 dias-amostra. Confirma `BarLabelOffsetMin = -1` e `Time[0]` em ET.
+- **Rodada 2 (`ReconDumpOnly=false`, `SlipTicks=0`):** `trades_ninjascript_slip0.csv` vs `trades_python_slip0.csv` — **38/38 trades idênticos**. Campos conferidos: `data_pregao`, `bar_sinal_ts_et`, `sinal_preco_close`, `sinal_nivel`, `direcao`, `bar_entrada_ts_et`, `entrada_preco_teorico/efetivo`, `stop_teorico`, `alvo_teorico`, `bar_saida_ts_et`, `saida_motivo`, `saida_preco_teorico/efetivo`, `comissao_rt`, `pnl_bruto`, `pnl_liquido`. **0 divergências.**
+- **PnL:** −US$ 134,72 (Python) = −US$ 134,72 (NT8). 6 wins / 38. Alvo 60pt / stop 12,5pt.
+- **Único diff:** `contract` = `MNQ` (NT8, `MasterInstrument.Name`) vs `MNQZ4` (Python, símbolo Databento do dia). Cosmético.
+- **Auditoria do slot `MNQ DEC21`** (dúvida do Marcelo — "não pode conter set/out 2024"): confirmado que **contém sim**. Primeira barra `20220531 200100`, última `20260831 200000`. Set/24 09:30 O 19788.25 / C 19795.25; out/24 (31/10) 09:30 O 20376.00 / C 20365.25 — nível real do MNQ, não ~16.000 de 2021. `20240913 093000` idêntico ao dump Python. Sem risco de dado real de 2021 (import começa em 2022; contrato vencido não puxa feed). É o slot da Fase A → B0 usa o mesmo.
+- **⚠️ Item aberto:** `NyseHalfDays` + flatten 12:55 vêm do fecho NYSE cash (13:00 ET). O MNQ/CME fecha cedo **13:15 ET** nesses dias. Sem meio-dia na janela da Fase A → não afetou. Alinhar `HALFDAY_FLATTEN_M` nos dois lados (`OnFadeNative.cs` + `onfade_harness.py`) e conferir o template ETH ANTES do backtest 2022→2026. Datas: 2022-11-25/07-03, 2023-07-03/11-24, 2024-07-03/11-29/12-24, 2025-07-03/11-28/12-24, 2026-11-27.
+- **⚠️ Limitações:** recorte 17/09→31/10/2024 curto demais pra conclusão econômica. Comissão `1.44` PROVISÓRIA — confirmar valor real (Rithmic/Apex) antes de B1.
+- **Evidências:** `backtest/onfade_faseA/` (4 CSVs). Snapshot: `historico/2026-09-08.md`.
+- **Manutenção:** guard no `FlushFiles()` do `OnFadeHarness.cs` (diagnóstico claro em vez de crash "Index out of range" quando 0 barras). Cosmético. **Falta recompilar no NT8.**
+
+## 🔵 08/09 — `src/OnFadeNative.cs` escrito (Fase B — execução nativa)
+- Mesma lógica de sinal do harness (ON range, toque estrito, sem filtros/BE/trailing), mas **envia ordens de verdade**: `EnterLong/EnterShort` (mercado no fecho → fill no open de B+1) + `SetStopLoss`/`SetProfitTarget` nativos (50t / 240t, OCO por entrada) + `ExitLong/ExitShort` no flatten.
+- **Não calcula comissão nem slippage** — `Slippage=0` no código, comissão via template do Analyzer, slippage via campo "Deslizamento". O CSV nativo (`trades_native_B{N}.csv`) registra só fill BRUTO, pra conferir mecânica no B0.
+- `OnExecutionUpdate` captura fills de entrada/saída, deriva o motivo do nome da ordem (`Stop loss`/`Profit target`/`OnFadeFlat`) e marca o lado stopado.
+- **NÃO otimizado.** Congelados: janela ON, toque estrito, stop 12,5, alvo 60, máx 2 trades, flatten, sem filtros/BE/trailing.
+- **⚠️ `SetStopLoss`+`SetProfitTarget` não é prova** de execução idêntica ao harness. O B0 tem que comparar os fills e eventos reais de `OnExecutionUpdate`.
+- **OrderFillResolution = Standard** (hardcoded), Calculate = OnBarClose (hardcoded).
+- **Status:** não compilado, não testado. Plano B0 (parâmetros explícitos) no snapshot.
 
 ## 🔴 02/09 (fim) — gap-and-go RODADA NO NT8 ANALYZER: MORTA. Pivot de objetivo.
 
