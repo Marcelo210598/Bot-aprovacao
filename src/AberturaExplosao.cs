@@ -118,6 +118,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Display(Name="EsperaSegundos (espera, le o caminho desde o open, e segue)", Order=9, GroupName="1. Abertura")]
 		public int EsperaSegundos { get; set; }
 
+		[NinjaScriptProperty] [Range(0, 100000)]
+		[Display(Name="StopDolar ($ na posicao; 0 = usa StopTicks/BeTicks/TrailTicks)", Order=10, GroupName="1. Abertura")]
+		public double StopDolar { get; set; }
+
+		[NinjaScriptProperty] [Range(0, 100000)]
+		[Display(Name="TrailDolar (apos verde: stop = pico - TrailDolar, ratchet)", Order=11, GroupName="1. Abertura")]
+		public double TrailDolar { get; set; }
+
+		[NinjaScriptProperty] [Range(0, 600)]
+		[Display(Name="RespiroSegundos (so o stop fixo vale nesse tempo apos a entrada)", Order=12, GroupName="1. Abertura")]
+		public int RespiroSegundos { get; set; }
+
 		[NinjaScriptProperty]
 		[Display(Name="TradeWindowStart (yyyy-MM-dd, vazio = tudo)", Order=8, GroupName="2. Controle")]
 		public string TradeWindowStart { get; set; }
@@ -144,11 +156,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private double   curEntry;
 		private DateTime curEntryTime;
 		private DateTime curSigDay;
-		private double   hwmFav;            // maxima a favor, em pontos
+		private double   hwmFav;            // maxima a favor, em pontos (modo ticks)
 		private bool     beArmed;
-		private double   stopPx;            // preco do stop sintetico corrente
-		private double   tpPx;              // preco do alvo ($ -> preco); NaN = sem alvo
+		private double   stopPx;            // preco do stop sintetico corrente (modo ticks)
 		private bool     exitSent;
+		private DateTime curEntryEt;       // ET do fill de entrada
+		private double   hwmDolar;         // pico de P&L $ na posicao
+		private double   stopDolLock;      // nivel do stop em $ (ratchet, modo $)
 
 		// ---------- controle ----------
 		private DateTime twStart, twEnd;
@@ -196,7 +210,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 				BeTicks          = 6;
 				TrailTicks       = 6;
 				InverterDirecao  = false;
-				EsperaSegundos   = 0;
+				EsperaSegundos   = 30;
+				StopDolar        = 250;
+				TrailDolar       = 100;
+				RespiroSegundos  = 20;
 				TradeWindowStart = "";
 				TradeWindowEnd   = "";
 				OutputDir        = "";
@@ -225,15 +242,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 
 				Print("==================================================================");
-				Print("  AberturaExplosao — abertura de NY   [build: v6 10/09 - OnMarketData (tempo real do tick) + le o caminho]");
+				Print("  AberturaExplosao — abertura de NY   [build: v7 10/09 - trailing em $ (Stop/Trail/Respiro Dolar)]");
 				Print("  Instrumento : " + Instrument.FullName
 				      + "   TickSize : " + TickSize.ToString(CultureInfo.InvariantCulture)
 				      + "   PointValue : " + pointVal.ToString(CultureInfo.InvariantCulture));
 				Print("  Trading Hours : " + (Bars != null && Bars.TradingHours != null ? Bars.TradingHours.Name : "(?)"));
 				Print("  TimeZone da maquina : " + TimeZoneInfo.Local.Id + "  (Time[0] TEM que estar em ET)");
 				Print("  Calculate : " + Calculate + "   (Tick Replay TEM que estar ligado no Analyzer)");
-				Print("  Contratos=" + Contratos + "  AlvoDolar=" + AlvoDolar + "  Gatilho=" + GatilhoTicks + "t"
-				      + "  Janela=" + JanelaLeituraSeg + "s  Stop=" + StopTicks + "t  BE=" + BeTicks + "t  Trail=" + TrailTicks + "t");
+				Print("  Contratos=" + Contratos + "  Gatilho=" + GatilhoTicks + "t  Espera=" + EsperaSegundos + "s"
+				      + "  Janela=" + JanelaLeituraSeg + "s  Inverter=" + InverterDirecao);
+				Print("  " + (StopDolar > 0
+					? "MODO $  AlvoDolar=" + AlvoDolar + "  StopDolar=" + StopDolar + "  TrailDolar=" + TrailDolar + "  Respiro=" + RespiroSegundos + "s"
+					: "MODO ticks  AlvoDolar=" + AlvoDolar + "  Stop=" + StopTicks + "t  BE=" + BeTicks + "t  Trail=" + TrailTicks + "t"));
 				Print("  Janela de trade : " + (twAll ? "TUDO" : (TradeWindowStart + " -> " + TradeWindowEnd)));
 				Print("  OutputDir : " + outDir);
 				if (Math.Abs(TickSize - 0.25) > 1e-9 || Math.Abs(pointVal - 2.0) > 1e-9)
@@ -304,11 +324,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// ---------------- 4. gestao da posicao (tick a tick) ----------------
 			if (inTrade && !exitSent)
 			{
-				double favPts = (px - curEntry) * curSide;
-				if (favPts > hwmFav) hwmFav = favPts;
+				double pnl = (px - curEntry) * curSide * pointVal * Contratos;   // $ na posicao AGORA
+				if (pnl > hwmDolar) hwmDolar = pnl;
 
-				if (!double.IsNaN(tpPx) &&
-				    ((curSide > 0 && px >= tpPx) || (curSide < 0 && px <= tpPx)))
+				// alvo em $
+				if (AlvoDolar > 0 && pnl >= AlvoDolar)
 				{
 					if (curSide > 0) ExitLong ("AbAlvo", "AbLong");
 					else             ExitShort("AbAlvo", "AbShort");
@@ -316,24 +336,49 @@ namespace NinjaTrader.NinjaScript.Strategies
 					return;
 				}
 
-				if (!beArmed && hwmFav >= BeTicks * tickSz - 1e-9)
+				if (StopDolar > 0)
 				{
-					beArmed = true;
-					stopPx  = curSide > 0 ? Math.Max(stopPx, curEntry) : Math.Min(stopPx, curEntry);
+					// ---- MODO $ (ideia do Marcelo): stop fixo -StopDolar; apos o respiro,
+					//      quando fica verde, trava/trilha em pico - TrailDolar (ratchet). ----
+					double respiro = (et - curEntryEt).TotalSeconds;
+					if (respiro >= RespiroSegundos && hwmDolar > 0)
+					{
+						double cand = hwmDolar - TrailDolar;
+						if (cand > stopDolLock) stopDolLock = cand;
+					}
+					if (pnl <= stopDolLock)
+					{
+						string tag = stopDolLock < -1e-6 ? "AbStop"
+						           : stopDolLock < TrailDolar ? "AbBe" : "AbTrail";
+						if (curSide > 0) ExitLong (tag, "AbLong");
+						else             ExitShort(tag, "AbShort");
+						exitSent = true;
+						return;
+					}
 				}
-				if (beArmed)
+				else
 				{
-					double trail = curEntry + curSide * (hwmFav - TrailTicks * tickSz);
-					stopPx = curSide > 0 ? Math.Max(stopPx, trail) : Math.Min(stopPx, trail);
-				}
-
-				if ((curSide > 0 && px <= stopPx) || (curSide < 0 && px >= stopPx))
-				{
-					string tag = !beArmed ? "AbStop" : (Math.Abs(stopPx - curEntry) < tickSz / 2 ? "AbBe" : "AbTrail");
-					if (curSide > 0) ExitLong (tag, "AbLong");
-					else             ExitShort(tag, "AbShort");
-					exitSent = true;
-					return;
+					// ---- MODO ticks (legado): BeTicks + TrailTicks ----
+					double favPts = (px - curEntry) * curSide;
+					if (favPts > hwmFav) hwmFav = favPts;
+					if (!beArmed && hwmFav >= BeTicks * tickSz - 1e-9)
+					{
+						beArmed = true;
+						stopPx  = curSide > 0 ? Math.Max(stopPx, curEntry) : Math.Min(stopPx, curEntry);
+					}
+					if (beArmed)
+					{
+						double trail = curEntry + curSide * (hwmFav - TrailTicks * tickSz);
+						stopPx = curSide > 0 ? Math.Max(stopPx, trail) : Math.Min(stopPx, trail);
+					}
+					if ((curSide > 0 && px <= stopPx) || (curSide < 0 && px >= stopPx))
+					{
+						string tag = !beArmed ? "AbStop" : (Math.Abs(stopPx - curEntry) < tickSz / 2 ? "AbBe" : "AbTrail");
+						if (curSide > 0) ExitLong (tag, "AbLong");
+						else             ExitShort(tag, "AbShort");
+						exitSent = true;
+						return;
+					}
 				}
 			}
 
@@ -380,10 +425,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 					inTrade      = true;
 					curEntry     = price;
 					curEntryTime = time;
+					curEntryEt   = EmET(time);
+					hwmFav       = 0.0;
+					hwmDolar     = 0.0;
+					beArmed      = false;
 					stopPx       = price - curSide * StopTicks * tickSz;
-					tpPx         = AlvoDolar > 0
-						? price + curSide * (AlvoDolar / (pointVal * Contratos))
-						: double.NaN;
+					stopDolLock  = StopDolar > 0
+						? -StopDolar
+						: -(StopTicks * tickSz * pointVal * Contratos);
 				}
 				return;
 			}
