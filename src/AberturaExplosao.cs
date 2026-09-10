@@ -69,7 +69,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 {
 	public class AberturaExplosao : Strategy
 	{
-		private const double TICK = 0.25;                 // MNQ
+		private double tickSz = 0.25;                     // = TickSize (setado em DataLoaded; adapta MNQ/MYM/...)
 
 		private const int SIG_FIRST_M        = 9 * 60 + 30;   // 09:30 ET (abertura de NY)
 		private const int FLATTEN_M          = 15 * 60 + 55;  // 15:55 ET
@@ -152,6 +152,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private readonly List<string> tradeLog = new List<string>();
 		private long     totalBars;
 		private double   pointVal;
+		private int      nTrades;
+		private double   sumPts, sumCash;
+
+		// ---------- fuso-proof (converte Time[0] p/ ET, seja qual for o fuso do grafico) ----------
+		private TimeZoneInfo etTz;
+		private TimeZoneInfo graficoTz;
 
 		protected override void OnStateChange()
 		{
@@ -190,6 +196,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			else if (State == State.DataLoaded)
 			{
 				pointVal = Instrument.MasterInstrument.PointValue;
+				tickSz   = TickSize;
+
+				try { etTz = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time"); } catch { etTz = null; }
+				graficoTz = ResolveFusoGrafico();
+				Print("  Fuso do grafico detectado : " + (graficoTz != null ? graficoTz.Id : "(nao detectado -> assume ET)"));
 
 				outDir = string.IsNullOrWhiteSpace(OutputDir)
 					? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "abertura")
@@ -248,7 +259,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (CurrentBar < 1) return;
 			totalBars++;
 
-			DateTime now = Time[0];                       // ET (fuso global NT8 = Eastern)
+			DateTime now = EmET(Time[0]);                 // FUSO-PROOF: sempre horario Eastern
 			int      m   = now.Hour * 60 + now.Minute;
 			DateTime d   = now.Date;
 			double   px  = Close[0];                      // ultimo preco (cada tick)
@@ -291,7 +302,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 
 				// breakeven: trava stop em 0 quando a maxima a favor >= BeTicks
-				if (!beArmed && hwmFav >= BeTicks * TICK - 1e-9)
+				if (!beArmed && hwmFav >= BeTicks * tickSz - 1e-9)
 				{
 					beArmed = true;
 					double be = curEntry;
@@ -300,14 +311,14 @@ namespace NinjaTrader.NinjaScript.Strategies
 				// trailing: apos o BE, stop = maxima - TrailTicks, so aperta
 				if (beArmed)
 				{
-					double trail = curEntry + curSide * (hwmFav - TrailTicks * TICK);
+					double trail = curEntry + curSide * (hwmFav - TrailTicks * tickSz);
 					stopPx = curSide > 0 ? Math.Max(stopPx, trail) : Math.Min(stopPx, trail);
 				}
 
 				// stop sintetico: saida a mercado quando o preco cruza
 				if ((curSide > 0 && Low[0] <= stopPx) || (curSide < 0 && High[0] >= stopPx))
 				{
-					string tag = !beArmed ? "AbStop" : (Math.Abs(stopPx - curEntry) < TICK / 2 ? "AbBe" : "AbTrail");
+					string tag = !beArmed ? "AbStop" : (Math.Abs(stopPx - curEntry) < tickSz / 2 ? "AbBe" : "AbTrail");
 					if (curSide > 0) ExitLong (tag, "AbLong");
 					else             ExitShort(tag, "AbShort");
 					exitSent = true;
@@ -321,8 +332,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 			    && now <= windowEnd
 			    && m >= SIG_FIRST_M)
 			{
-				double up = openPx + GatilhoTicks * TICK;
-				double dn = openPx - GatilhoTicks * TICK;
+				double up = openPx + GatilhoTicks * tickSz;
+				double dn = openPx - GatilhoTicks * tickSz;
 				int side = 0;
 				if      (High[0] >= up) side = +1;
 				else if (Low[0]  <= dn) side = -1;
@@ -355,7 +366,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					inTrade      = true;
 					curEntry     = price;
 					curEntryTime = time;
-					stopPx       = price - curSide * StopTicks * TICK;
+					stopPx       = price - curSide * StopTicks * tickSz;
 					tpPx         = AlvoDolar > 0
 						? price + curSide * (AlvoDolar / (pointVal * Contratos))
 						: double.NaN;
@@ -379,17 +390,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 				if (twAll || (curSigDay >= twStart && curSigDay <= twEnd))
 				{
-					tradeLog.Add(string.Join(",", new[] {
-						tid.ToString(CultureInfo.InvariantCulture),
-						Instrument.MasterInstrument.Name,
-						curSigDay.ToString("yyyy-MM-dd"),
-						Num(openPx), Num(openPx + curSide * GatilhoTicks * TICK),
-						curSide > 0 ? "LONG" : "SHORT",
-						Iso(curEntryTime), Num(curEntry),
-						Iso(time), motivo, Num(price),
-						quantity.ToString(CultureInfo.InvariantCulture),
-						Num(pnlPts), Num(pnlCash)
-					}));
+					nTrades++;
+					sumPts  += pnlPts;
+					sumCash += pnlCash;
+					try
+					{
+						tradeLog.Add(string.Join(",", new string[] {
+							tid.ToString(CultureInfo.InvariantCulture),
+							Instrument.MasterInstrument.Name,
+							curSigDay.ToString("yyyy-MM-dd"),
+							Num(openPx), Num(openPx + curSide * GatilhoTicks * tickSz),
+							curSide > 0 ? "LONG" : "SHORT",
+							Iso(curEntryTime), Num(curEntry),
+							Iso(time), motivo, Num(price),
+							quantity.ToString(CultureInfo.InvariantCulture),
+							Num(pnlPts), Num(pnlCash)
+						}));
+					}
+					catch (Exception e) { Print("ERRO montando linha do trade: " + e.Message); }
 				}
 				tid++;
 				inTrade  = false;
@@ -406,31 +424,83 @@ namespace NinjaTrader.NinjaScript.Strategies
 			return Math.Round(v, 4).ToString(CultureInfo.InvariantCulture);
 		}
 
+		// ===================== FUSO-PROOF (converte Time[0] p/ ET) =====================
+		private DateTime EmET(DateTime t)
+		{
+			if (graficoTz != null && etTz != null)
+			{
+				try
+				{
+					DateTime utc = TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(t, DateTimeKind.Unspecified), graficoTz);
+					return TimeZoneInfo.ConvertTimeFromUtc(utc, etTz);
+				}
+				catch { }
+			}
+			return t;   // fallback: assume grafico ja em ET
+		}
+
+		// Le por reflection o fuso de exibicao do NT8 (Tools > Options > General > Time zone).
+		// Reflection p/ nunca quebrar a compilacao entre versoes: se nao achar, retorna null (fallback ET).
+		private TimeZoneInfo ResolveFusoGrafico()
+		{
+			const System.Reflection.BindingFlags PS =
+				System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static;
+			try
+			{
+				foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+				{
+					if (asm.FullName == null || asm.FullName.IndexOf("NinjaTrader", StringComparison.OrdinalIgnoreCase) < 0)
+						continue;
+					Type[] tipos;
+					try { tipos = asm.GetTypes(); }
+					catch { continue; }
+					foreach (var t in tipos)
+					{
+						if (t.Name != "Globals") continue;
+						object go = t.GetProperty("GeneralOptions", PS)?.GetValue(null)
+						         ?? t.GetField("GeneralOptions", PS)?.GetValue(null);
+						if (go == null) continue;
+						var ty = go.GetType();
+						var tz = (ty.GetProperty("TimeZoneInfo")?.GetValue(go)
+						       ?? ty.GetField("TimeZoneInfo")?.GetValue(go)) as TimeZoneInfo;
+						if (tz != null) return tz;
+					}
+				}
+			}
+			catch { }
+			return null;
+		}
+
 		private void FlushFiles()
 		{
 			try
 			{
+				Print("------------------------------------------------------------------");
+				Print("  [FLUSH] AberturaExplosao");
+				Print("  barras processadas : " + totalBars + "   trades : " + nTrades);
+
 				if (totalBars == 0)
 				{
-					Print("  *** ERRO GRAVE: 0 BARRAS. Instrumento/fuso errado ou sem historico. Nada escrito.");
-					return;
+					Print("  *** 0 BARRAS — a estrategia nao processou nenhuma barra.");
+					Print("      Causas comuns: (a) contrato sem historico no periodo (ex: 'MYM JUN26'");
+					Print("      num replay de jul/ago — use o FRONT-MONTH: MNQ SEP26); (b) Market Replay");
+					Print("      nao foi dado Play; (c) instrumento/fuso errado.");
 				}
-				string path = Path.Combine(outDir, "trades_abertura_native.csv");
-				File.WriteAllLines(path, tradeLog);
 
-				double somaPts = 0, somaCash = 0; int nt = tradeLog.Count - 1;
-				for (int i = 1; i < tradeLog.Count; i++)
+				if (!string.IsNullOrWhiteSpace(outDir) && tradeLog.Count > 1)
 				{
-					var p = tradeLog[i].Split(',');
-					somaPts  += double.Parse(p[p.Length - 2], CultureInfo.InvariantCulture);
-					somaCash += double.Parse(p[p.Length - 1], CultureInfo.InvariantCulture);
+					try
+					{
+						Directory.CreateDirectory(outDir);
+						string path = Path.Combine(outDir, "trades_abertura_native.csv");
+						File.WriteAllLines(path, tradeLog);
+						Print("  csv : " + path + "  (" + (tradeLog.Count - 1) + " trades)");
+					}
+					catch (Exception e) { Print("  ERRO gravando csv: " + e.Message); }
 				}
-				Print("------------------------------------------------------------------");
-				Print("  [FLUSH] " + path);
-				Print("  barras totais : " + totalBars);
-				Print("  trades registrados : " + nt
-				      + "   soma pts(bruto) : " + Math.Round(somaPts, 2)
-				      + "   soma cash(bruto, s/ comissao) : " + Math.Round(somaCash, 2));
+
+				Print("  soma pts(bruto) : " + Math.Round(sumPts, 2)
+				      + "   soma cash(bruto, s/ comissao) : " + Math.Round(sumCash, 2));
 				Print("  [NOTA] P&L economico = relatorio do Strategy Analyzer (comissao + deslizamento).");
 				Print("------------------------------------------------------------------");
 			}
