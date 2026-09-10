@@ -3,6 +3,38 @@
 > Visão rápida pra retomar o projeto depois de dias/semanas sem mexer. Detalhe completo sempre
 > em `progress.md` (topo) e nos snapshots diários desta pasta.
 
+## 🟢 09/09/2026 — DIREÇÃO NOVA: breakout direcional da ABERTURA de NY. Melhor resultado do projeto.
+
+Detalhe: `historico/2026-09-09.md`. Scripts: `backtest/abertura_*.py`.
+
+- **Ideia (Marcelo):** liga o bot antes das 9:30 ET, espera N ticks pra ler pra onde a abertura
+  puxou, entra nessa direção, protege com trailing escalonado. Não é ONFADE nem BotAprovacao.
+- **Dado: OHLCV-1s real do Databento** — 3 downloads (browser), +$90,10 (crédito ~$11, nada no
+  cartão). `dados_databento/MNQ_1s_{2024,2025,2026ago}.txt` (09:00-12:00 ET, front-month
+  contínuo, via `backtest/carrega_1s.py`). ~352 pregões: 2024 fraco (194d) + 2025 Jan-Jul (136d)
+  + Ago-Set 2026 (22d).
+- **1-min NÃO simula scalp de abertura** (range da barra > stop). Precisou de 1-segundo.
+- **Config: gatilho 3t / stop 6t / BE +6t / trail 6t atrás da máxima / sem alvo / 1 trade/dia /
+  MNQ 1 contr:**
+  - 2024 (fraco): wr 59%, **+$4,18/trade líq** (slip 2t), +$811
+  - 2025: wr 54%, **+$5,57/trade**, +$757
+  - Ago-Set 2026: wr 73%, +$14,83/trade (streak), +$326
+  - ~$1.900 líquido em ~352 pregões, 1 contrato (~$5,4/dia)
+- **PASSOU nos testes que matam ideia:**
+  - **Controle "sem sinal"** (sempre long + mesmo trailing): −$1,6 a −$2,9/trade nos 3 blocos →
+    o edge É direcional, não é o trailing colhendo vol. (o teste principal)
+  - Slippage 1→2→3t: positivo em todos. Comissão $1,24→$1,70: segue positivo.
+  - **13/16 meses positivos** (2024+2025); 3 negativos ≈ breakeven; nenhum mês de desastre.
+  - N-sweep **monotônico** (menor gatilho = melhor, não é pico de sorte); params do trail insensíveis.
+- **É o resultado mais forte do projeto até hoje** (histórico: 14 famílias, nenhuma passou OOS).
+- ⚠️ Config escolhida DEPOIS de ver o dado (overfit possível, mitigado). Falta 2022, 2023,
+  H2/2025, H2/2026 — saem no NT8 Analyzer com o dado 1-min já importado (`MNQ DEC21`).
+- ⚠️ Clique errado no Databento custou $6,22 (botão "Customize download" submeteu direto).
+- **➡️ 10/09:** (1) harness Python bit-exact (molde OnFadeHarness); (2) `.cs` nativo; (3) NT8
+  Strategy Analyzer 2022-2026 (valida 2022/2023); (4) Replay forward-test; (5) cravar critério
+  de morte antes do OOS.
+- Produção (`BotAprovacao.cs`) e ONFADE (`OnFadeNative.cs`) INTOCADOS. Nada commitado.
+
 ## ✅ 08/09/2026 — MILESTONE: Fase A do ONFADE aprovada (equivalência Python ↔ NinjaScript)
 
 Detalhe: `historico/2026-09-08.md`. Evidências: `backtest/onfade_faseA/`.

@@ -92,6 +92,37 @@ com `quantity` parcial). O `soma_pts` está certo — multiplicar por (pointVal 
 prevê** o próximo movimento — 4 de 6 dias o trade vai direto contra. Trailing não conserta
 entrada de moeda ao ar. O harness já dizia isso no 1o dia (o "+edge" era look-ahead).
 
-**Recomendação: no-go na abertura de NY.** Antes de cravar, 1 run limpo full-period (01→17/06,
-`TradeWindow` setado, sem parar por dia) com a config menos ruim (v6 tight, Espera 30). Se
-confirmar ~zero/negativo → encerrar e ir pro próximo (firma de DD estático vs. estratégia nova).
+**Recomendação (Claude): no-go na abertura de NY.** Antes de cravar, 1 run limpo full-period
+(01→17/06, `TradeWindow` setado, sem parar por dia) com a config menos ruim (v6 tight, Espera 30).
+
+## ➡️ AMANHÃ (11/09) — Marcelo vai mexer no STOP e no TRAILING
+
+Marcelo parou o dia 10/09 aqui. Não aceitou o no-go ainda — quer testar mais configs de stop/trail.
+Estado: `src/AberturaExplosao.cs` build v7 (commit ec883a6), compilado na VM.
+
+O que testar (grid, grupo "1. Abertura"):
+- `EsperaSegundos`: quer testar **5** (além de 10/30). ⚠️ mais curto = mais ruído.
+- `StopDolar`: **250 é largo demais** (~5 pt) — toda perda da v7 bateu o stop cheio.
+  Testar 100-150. Ou voltar pro modo ticks (`StopDolar`=0) que deu perdas pequenas na v6.
+- `TrailDolar`: pra "travar mais lucro" (pedido do Marcelo no dia 04) → **baixar pra 50 ou 30**
+  (stop = pico - TrailDolar, mais colado).
+- `RespiroSegundos`: 20 (ou testar 10-30).
+
+⚠️ **Antes de mais tuning:** rodar **UM run limpo** — 01→17/06 contínuo, `TradeWindowStart`=
+`2026-06-01` / `TradeWindowEnd`=`2026-06-17`, SEM parar por dia — pra ter ~13 trades por config
+e não 6 olhados no olho. A cada dia solto o `barras processadas` pula (janelas sobrepostas) e o
+`soma_pts` vira ruído.
+
+**Se depois desse tuning ainda for breakeven/negativo → cravar no-go** e ir pro próximo caminho:
+firma de DD estático (memória `project_bot_trade_nt8` #22) OU estratégia nova do zero
+(decisão em aberto desde 23/08).
+
+## Pendências técnicas do `.cs` (não bloqueiam)
+- **CSV pnlCash subestimado** em saídas com preenchimento parcial (só a 1a execução logada).
+  `soma_pts` OK. Corrigir: acumular todas as execuções de saída antes de fechar o trade.
+- **"Index out of range"** ainda aparece no log = instâncias velhas do NT8 (builds pré-c52f936).
+  Fechar+reabrir o NinjaTrader limpa. O código v7 não tem indexação em lugar nenhum.
+- **Stop sintético (ExitLong/Short a mercado)** enche mal em spike violento (fill 5-6 pt além do
+  nível). Realista pra ordem a mercado, mas considerar `SetStopLoss` server-side se for pra live.
+- `[MeuTrade] HTTP 401` = AddOn TraderOSSync tentando sync a conta Playback101. Ignorar ou
+  desabilitar o AddOn no backtest.
