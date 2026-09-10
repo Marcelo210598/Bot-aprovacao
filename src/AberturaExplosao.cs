@@ -116,6 +116,10 @@ namespace NinjaTrader.NinjaScript.Strategies
 		[Display(Name="InverterDirecao (fada a abertura em vez de seguir)", Order=8, GroupName="1. Abertura")]
 		public bool InverterDirecao { get; set; }
 
+		[NinjaScriptProperty] [Range(0, 600)]
+		[Display(Name="EsperaSegundos (deixa o spike passar; ref = preco apos a espera)", Order=9, GroupName="1. Abertura")]
+		public int EsperaSegundos { get; set; }
+
 		[NinjaScriptProperty]
 		[Display(Name="TradeWindowStart (yyyy-MM-dd, vazio = tudo)", Order=8, GroupName="2. Controle")]
 		public string TradeWindowStart { get; set; }
@@ -130,9 +134,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		// ---------- estado diario ----------
 		private DateTime curDay;
-		private bool     openCaptured;
+		private bool     rthSeen;           // ja vimos a 1a barra >= 09:30
+		private DateTime rthStart;          // ET: inicio da barra de abertura (09:30)
+		private bool     openCaptured;      // ja capturou o preco de referencia (apos EsperaSegundos)
 		private double   openPx;
-		private DateTime openBarStart;      // ET: inicio da barra de abertura (09:30)
+		private DateTime refTime;           // ET: quando capturou a referencia
 		private int      tradesToday;
 		private int      flattenMToday;
 
@@ -194,6 +200,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				BeTicks          = 6;
 				TrailTicks       = 6;
 				InverterDirecao  = false;
+				EsperaSegundos   = 0;
 				TradeWindowStart = "";
 				TradeWindowEnd   = "";
 				OutputDir        = "";
@@ -222,7 +229,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 
 				Print("==================================================================");
-				Print("  AberturaExplosao — abertura de NY   [build: v3 10/09 - timing ok + InverterDirecao]");
+				Print("  AberturaExplosao — abertura de NY   [build: v4 10/09 - EsperaSegundos + InverterDirecao]");
 				Print("  Instrumento : " + Instrument.FullName
 				      + "   TickSize : " + TickSize.ToString(CultureInfo.InvariantCulture)
 				      + "   PointValue : " + pointVal.ToString(CultureInfo.InvariantCulture));
@@ -253,6 +260,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private void ResetDayState(DateTime d)
 		{
 			curDay        = d;
+			rthSeen       = false;
 			openCaptured  = false;
 			openPx        = 0.0;
 			tradesToday   = 0;
@@ -276,12 +284,16 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (d != curDay)
 				ResetDayState(d);
 
-			// ---------------- 2. captura do preco de abertura (barra que COMECA >= 09:30:00 ET) ----------------
-			if (!openCaptured && etStart.Hour == 9 && etStart.Minute >= 30 && etStart.Minute < 40)
+			// ---------------- 2. referencia da abertura (preco EsperaSegundos apos as 09:30 ET) ----------------
+			if (!openCaptured && etStart.Hour == 9 && etStart.Minute >= 30 && etStart.Minute < 45)
 			{
-				openPx       = Open[0];                   // open da 1a barra do RTH
-				openCaptured = true;
-				openBarStart = etStart;
+				if (!rthSeen) { rthSeen = true; rthStart = etStart; }
+				if ((etStart - rthStart).TotalSeconds >= EsperaSegundos)
+				{
+					openPx       = px;                    // preco onde o mercado esta APOS a espera
+					openCaptured = true;
+					refTime      = etStart;
+				}
 			}
 
 			// ---------------- 3. flatten por horario ----------------
@@ -337,7 +349,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// ---------------- 5. trigger de entrada (1o tick que rompe, dentro da janela) ----------------
 			if (!inTrade && !exitSent && openCaptured && tradesToday == 0
 			    && Position.MarketPosition == MarketPosition.Flat
-			    && (etStart - openBarStart).TotalSeconds <= JanelaLeituraSeg)
+			    && (etStart - refTime).TotalSeconds <= JanelaLeituraSeg)
 			{
 				double up = openPx + GatilhoTicks * tickSz;
 				double dn = openPx - GatilhoTicks * tickSz;
