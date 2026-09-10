@@ -3,7 +3,29 @@
 > Visão rápida pra retomar o projeto depois de dias/semanas sem mexer. Detalhe completo sempre
 > em `progress.md` (topo) e nos snapshots diários desta pasta.
 
-## 🟢 09/09/2026 — DIREÇÃO NOVA: breakout direcional da ABERTURA de NY. Melhor resultado do projeto.
+## 🔴 10/09/2026 — ABERTURA DE NY levada pro NT8 (`src/AberturaExplosao.cs`, 7 builds, 6 MNQ): SEM EDGE
+
+Detalhe: `docs/abertura-ny-resultados-10-09.md` + `historico/2026-09-10.md`.
+
+- **O "+$4-5/trade" de 09/09 era LOOK-AHEAD** — o harness (`backtest/abertura_harness.py` +
+  `abertura_trigger_causal.py`) provou: 64-84% dos pregões o 1º segundo pós-09:30 toca +3t E −3t,
+  e o sim resolvia pela cor do bar (adivinhava a direção vencedora). Trigger causal honesto:
+  seguir o rompimento = **−$11/trade = igual ao controle "sempre long"**.
+- **NT8 Market Replay (MNQ JUN26, tick):** 7 versões testadas — seguir/fadar, stop apertado/largo,
+  trail em tick/$, espera 0-30s. **Tudo breakeven a negativo.** v6 (stop 12t): −$18/9 dias.
+  v7 (StopDolar $250 / TrailDolar $100 / Espera 10): **−$830/6 dias**, toda perda bate o stop cheio.
+- **Técnico:** `Time[0]` no NT8 = horário da BARRA (não do tick) → lógica de tempo <1min tem que
+  ir pro `OnMarketData`. Fuso-proof por reflection (VM em BRT, NT8 global em ET).
+- **Sizing decidido: 6 MNQ.** Params novos no `.cs`: `EsperaSegundos` (lê o caminho da abertura e
+  segue), `StopDolar`/`TrailDolar`/`RespiroSegundos` (trailing em $, ideia do Marcelo),
+  `InverterDirecao` (fada em vez de seguir).
+- **➡️ 11/09:** Marcelo **não aceitou o no-go** — vai mexer mais no stop/trail (`EsperaSegundos` 5,
+  `StopDolar` 100-150 ou 0, `TrailDolar` 30-50). **ANTES: 1 run LIMPO** full-period 01→17/06 com
+  `TradeWindowStart/End` setado, SEM parar por dia. Se ainda breakeven/negativo → **cravar no-go**
+  e ir pro próximo (firma de DD estático OU estratégia nova do zero — aberto desde 23/08).
+- Produção (`BotAprovacao.cs`) e ONFADE **INTOCADOS**. Databento: crédito ~$11, não usado.
+
+## 🟡 09/09/2026 — DIREÇÃO NOVA: breakout direcional da ABERTURA de NY (era "melhor resultado", virou look-ahead — ver 10/09)
 
 Detalhe: `historico/2026-09-09.md`. Scripts: `backtest/abertura_*.py`.
 
