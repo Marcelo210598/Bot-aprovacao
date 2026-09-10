@@ -20,18 +20,15 @@ using NinjaTrader.NinjaScript.DrawingTools;
 // =============================================================================
 //  AberturaExplosao — breakout direcional da ABERTURA de NY (explosao da 1a vela)
 // -----------------------------------------------------------------------------
-//  Ideia (Marcelo, 09/09/2026): liga o bot antes das 09:30 ET, pega o preco de
-//  ABERTURA (1o print >= 09:30:00 ET), e entra na direcao do PRIMEIRO rompimento
-//  de +-GatilhoTicks desse preco, dentro dos primeiros JanelaLeituraSeg segundos.
+//  Ideia (Marcelo): liga o bot antes das 09:30 ET, pega o preco de ABERTURA
+//  (1o print >= 09:30:00 ET). Espera EsperaSegundos, LE O CAMINHO (preco atual
+//  vs open) e SEGUE: >= GatilhoTicks acima -> LONG; abaixo -> SHORT; entra na
+//  hora. Se ainda nao andou GatilhoTicks, checa a cada tick ate a janela fechar.
 //  Protege com breakeven + trailing escalonado. Alvo = $ na posicao.
+//  EsperaSegundos=0 -> entra no 1o tick que se afasta GatilhoTicks do open (vela 1).
 //
-//  >>> TRIGGER CAUSALMENTE HONESTO <<<
-//  Roda em Calculate.OnEachTick. O rompimento e' decidido pelo PRIMEIRO tick que
-//  negocia atraves do nivel — nao ha ambiguidade (um tick esta em UM preco).
-//  Isso corrige o achado de 10/09: no dado OHLC de 1s, ~70% dos pregoes o 1o
-//  segundo toca +3t E -3t e o harness Python tinha que ADIVINHAR a ordem (pela
-//  cor do bar = look-ahead). Aqui, com tick real (Tick Replay / ao vivo / Market
-//  Replay), a ordem e' observada, nao adivinhada.
+//  Roda em Calculate.OnEachTick + Tick Replay (a direcao e observada, nao
+//  adivinhada — corrige o look-ahead do harness Python, achado de 10/09).
 //
 //  PRE-REQUISITOS:
 //    - Grafico 1-min (ou menor) + **TICK REPLAY LIGADO** no Strategy Analyzer
@@ -117,7 +114,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public bool InverterDirecao { get; set; }
 
 		[NinjaScriptProperty] [Range(0, 600)]
-		[Display(Name="EsperaSegundos (deixa o spike passar; ref = preco apos a espera)", Order=9, GroupName="1. Abertura")]
+		[Display(Name="EsperaSegundos (espera, le o caminho desde o open, e segue)", Order=9, GroupName="1. Abertura")]
 		public int EsperaSegundos { get; set; }
 
 		[NinjaScriptProperty]
@@ -134,11 +131,9 @@ namespace NinjaTrader.NinjaScript.Strategies
 
 		// ---------- estado diario ----------
 		private DateTime curDay;
-		private bool     rthSeen;           // ja vimos a 1a barra >= 09:30
-		private DateTime rthStart;          // ET: inicio da barra de abertura (09:30)
-		private bool     openCaptured;      // ja capturou o preco de referencia (apos EsperaSegundos)
-		private double   openPx;
-		private DateTime refTime;           // ET: quando capturou a referencia
+		private DateTime rthStart;          // ET: quando capturou o open de NY (1o tick >= 09:30)
+		private bool     openCaptured;
+		private double   openPx;            // open de NY
 		private int      tradesToday;
 		private int      flattenMToday;
 
@@ -229,7 +224,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 
 				Print("==================================================================");
-				Print("  AberturaExplosao — abertura de NY   [build: v4 10/09 - EsperaSegundos + InverterDirecao]");
+				Print("  AberturaExplosao — abertura de NY   [build: v5 10/09 - EsperaSegundos = le o caminho e segue]");
 				Print("  Instrumento : " + Instrument.FullName
 				      + "   TickSize : " + TickSize.ToString(CultureInfo.InvariantCulture)
 				      + "   PointValue : " + pointVal.ToString(CultureInfo.InvariantCulture));
@@ -260,7 +255,6 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private void ResetDayState(DateTime d)
 		{
 			curDay        = d;
-			rthSeen       = false;
 			openCaptured  = false;
 			openPx        = 0.0;
 			tradesToday   = 0;
@@ -284,16 +278,12 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (d != curDay)
 				ResetDayState(d);
 
-			// ---------------- 2. referencia da abertura (preco EsperaSegundos apos as 09:30 ET) ----------------
+			// ---------------- 2. captura do OPEN de NY (1o tick >= 09:30:00 ET) ----------------
 			if (!openCaptured && etStart.Hour == 9 && etStart.Minute >= 30 && etStart.Minute < 45)
 			{
-				if (!rthSeen) { rthSeen = true; rthStart = etStart; }
-				if ((etStart - rthStart).TotalSeconds >= EsperaSegundos)
-				{
-					openPx       = px;                    // preco onde o mercado esta APOS a espera
-					openCaptured = true;
-					refTime      = etStart;
-				}
+				openPx       = px;                    // preco de abertura de NY
+				openCaptured = true;
+				rthStart     = etStart;
 			}
 
 			// ---------------- 3. flatten por horario ----------------
@@ -346,16 +336,20 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 			}
 
-			// ---------------- 5. trigger de entrada (1o tick que rompe, dentro da janela) ----------------
+			// ---------------- 5. trigger de entrada ----------------
+			// espera EsperaSegundos apos as 09:30, entao LE O CAMINHO: onde o preco esta
+			// vs o open? >= GatilhoTicks acima -> segue LONG; abaixo -> segue SHORT. Entra na hora.
+			// Se ainda nao andou GatilhoTicks, checa a cada tick ate a janela fechar.
+			double decorrido = (etStart - rthStart).TotalSeconds;
 			if (!inTrade && !exitSent && openCaptured && tradesToday == 0
 			    && Position.MarketPosition == MarketPosition.Flat
-			    && (etStart - refTime).TotalSeconds <= JanelaLeituraSeg)
+			    && decorrido >= EsperaSegundos
+			    && decorrido <= EsperaSegundos + JanelaLeituraSeg)
 			{
-				double up = openPx + GatilhoTicks * tickSz;
-				double dn = openPx - GatilhoTicks * tickSz;
+				double disp = px - openPx;                     // caminho desde a abertura, em pontos
 				int side = 0;
-				if      (High[0] >= up) side = +1;
-				else if (Low[0]  <= dn) side = -1;
+				if      (disp >=  GatilhoTicks * tickSz) side = +1;
+				else if (disp <= -GatilhoTicks * tickSz) side = -1;
 
 				if (side != 0 && InverterDirecao) side = -side;   // fada a abertura
 
