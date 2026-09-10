@@ -128,7 +128,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private DateTime curDay;
 		private bool     openCaptured;
 		private double   openPx;
-		private DateTime windowEnd;         // ET: fim da janela de leitura
+		private DateTime openBarStart;      // ET: inicio da barra de abertura (09:30)
 		private int      tradesToday;
 		private int      flattenMToday;
 
@@ -259,21 +259,24 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (CurrentBar < 1) return;
 			totalBars++;
 
-			DateTime now = EmET(Time[0]);                 // FUSO-PROOF: sempre horario Eastern
-			int      m   = now.Hour * 60 + now.Minute;
-			DateTime d   = now.Date;
+			// NT8 carimba a barra intraday no FECHO. Numa barra em formacao (OnEachTick),
+			// Time[0] ja retorna o horario de fecho -> subtrai 1 min p/ ter o INICIO da barra.
+			// (era esse o bug: as 09:29 o codigo lia "09:30" e entrava antes da 1a vela.)
+			DateTime etStart = EmET(Time[0]).AddMinutes(-1);   // FUSO-PROOF + inicio da barra
+			int      m   = etStart.Hour * 60 + etStart.Minute;
+			DateTime d   = etStart.Date;
 			double   px  = Close[0];                      // ultimo preco (cada tick)
 
 			// ---------------- 1. virada de dia ----------------
 			if (d != curDay)
 				ResetDayState(d);
 
-			// ---------------- 2. captura do preco de abertura (1o print >= 09:30:00 ET) ----------------
-			if (!openCaptured && now.Hour == 9 && now.Minute >= 30 && now.Minute < 45)
+			// ---------------- 2. captura do preco de abertura (barra que COMECA >= 09:30:00 ET) ----------------
+			if (!openCaptured && etStart.Hour == 9 && etStart.Minute >= 30 && etStart.Minute < 40)
 			{
-				openPx       = px;
+				openPx       = Open[0];                   // open da 1a barra do RTH
 				openCaptured = true;
-				windowEnd    = now.AddSeconds(JanelaLeituraSeg);
+				openBarStart = etStart;
 			}
 
 			// ---------------- 3. flatten por horario ----------------
@@ -329,8 +332,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// ---------------- 5. trigger de entrada (1o tick que rompe, dentro da janela) ----------------
 			if (!inTrade && !exitSent && openCaptured && tradesToday == 0
 			    && Position.MarketPosition == MarketPosition.Flat
-			    && now <= windowEnd
-			    && m >= SIG_FIRST_M)
+			    && (etStart - openBarStart).TotalSeconds <= JanelaLeituraSeg)
 			{
 				double up = openPx + GatilhoTicks * tickSz;
 				double dn = openPx - GatilhoTicks * tickSz;
