@@ -49,3 +49,49 @@ Rodar **UMA vez contínua** (sem parar por dia), `TradeWindowStart`=2026-06-01,
 - 1 flush limpo. Depois `InverterDirecao`✓ e repete.
 
 **Critério:** ambos negativos/zero com ~10-14 trades → **no-go cravado** na abertura de NY.
+
+---
+
+## Iteração v5-v7 (10/09 tarde) — entrada "le o caminho" + trailing em $
+
+- **v5-v6:** trocada a lógica do `EsperaSegundos` — depois da espera, compara preço vs open;
+  se afastou >= GatilhoTicks, entra NESSA direção na hora (segue o caminho). Bug de fundo achado:
+  `Time[0]` no NT8 só anda de minuto em minuto -> EsperaSegundos < 60 caía sempre na 2a vela.
+  Corrigido movendo a lógica de tempo pro `OnMarketData` (timestamp real do tick). v6 entra
+  aos 09:30:32 com Espera=30.
+- **v7 (commit ec883a6):** trailing em $ (ideia do Marcelo): `StopDolar` (stop fixo em $),
+  `RespiroSegundos` (só o stop fixo vale nesse tempo), `TrailDolar` (depois de ficar verde,
+  stop = pico - TrailDolar, ratchet).
+
+### v6 — Espera 30 / Stop 12t / BE 24t / Trail 10t (6 MNQ, $ = soma_pts x 12)
+| dia | 01 | 02 | 03 | 04 | 05 | 08 | 09 | 10 | 11 |
+|---|---|---|---|---|---|---|---|---|---|
+| $ | -68 | -8 | **+99** | +6 | -15 | -4 | -1 | -5 | -22 |
+Net ≈ -18 / 9 trades. Losers pequenos, +99 do dia 3 carrega. "Trade nem respira e stopa."
+
+### v7 — Espera 10 / StopDolar 250 / TrailDolar 100 / Respiro 20 (6 MNQ)
+| dia | soma_pts | $ real (x12) | dir |
+|---|---|---|---|
+| 01 | -19.75 | **-237** | LONG |
+| 02 | +9.75 | +117 | SHORT |
+| 03 | -21.5 | **-258** | LONG |
+| 04 | +5.75 | +69 | SHORT |
+| 05 | -22 | **-264** | LONG |
+| 08 | -22 | **-257** | SHORT |
+Net ≈ **-830 / 6 dias**. WR 2/6. **TODA perda bate o StopDolar cheio (-250)** — o trade vai
+direto contra e come o stop inteiro. Espera 10s + stop largo = PIOR que a v6.
+LONG 0/3, SHORT 2/2 (amostra ínfima).
+
+### ⚠️ BUG conhecido no CSV
+`pnlCash` no CSV/flush subestima quando a saída preenche em partes (só a 1a execução é logada
+com `quantity` parcial). O `soma_pts` está certo — multiplicar por (pointVal x Contratos) pro $ real.
+
+### Leitura
+7 versões, ~todas as configs (seguir/fadar, stop apertado/largo, trail em tick/$, espera
+0/10/30s): **tudo entre breakeven e negativo.** Ler o caminho da abertura aos 5-30s **não
+prevê** o próximo movimento — 4 de 6 dias o trade vai direto contra. Trailing não conserta
+entrada de moeda ao ar. O harness já dizia isso no 1o dia (o "+edge" era look-ahead).
+
+**Recomendação: no-go na abertura de NY.** Antes de cravar, 1 run limpo full-period (01→17/06,
+`TradeWindow` setado, sem parar por dia) com a config menos ruim (v6 tight, Espera 30). Se
+confirmar ~zero/negativo → encerrar e ir pro próximo (firma de DD estático vs. estratégia nova).
