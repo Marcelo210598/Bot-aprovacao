@@ -27,13 +27,14 @@ using NinjaTrader.NinjaScript.DrawingTools;
 //  Protege com breakeven + trailing escalonado. Alvo = $ na posicao.
 //  EsperaSegundos=0 -> entra no 1o tick que se afasta GatilhoTicks do open (vela 1).
 //
-//  Roda em Calculate.OnEachTick + Tick Replay (a direcao e observada, nao
-//  adivinhada — corrige o look-ahead do harness Python, achado de 10/09).
+//  Toda a logica sensivel a TEMPO roda em OnMarketData (timestamp REAL do tick).
+//  Time[0] no NT8 so anda de minuto em minuto -> EsperaSegundos < 60 caia sempre
+//  na 2a vela. OnMarketData resolve isso.
 //
 //  PRE-REQUISITOS:
-//    - Grafico 1-min (ou menor) + **TICK REPLAY LIGADO** no Strategy Analyzer
-//      (Analisador -> engrenagem -> "Tick replay" = marcado). Sem isso o trigger
-//      degenera pro fecho da barra de 1min e o teste nao vale.
+//    - Market Replay (tick) OU Strategy Analyzer com **TICK REPLAY LIGADO**
+//      (Analisador -> engrenagem -> "Tick replay" = marcado). Sem tick real o
+//      OnMarketData nao dispara no historico e o teste nao vale.
 //    - Fuso global do NT8 = (UTC-05:00) Eastern  -> Time[0] em ET.
 //    - Trading Hours : CME US Index Futures ETH.
 //    - Instrumento   : MNQ (TickSize 0.25 / PointValue 2.0).
@@ -224,7 +225,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 
 				Print("==================================================================");
-				Print("  AberturaExplosao — abertura de NY   [build: v5 10/09 - EsperaSegundos = le o caminho e segue]");
+				Print("  AberturaExplosao — abertura de NY   [build: v6 10/09 - OnMarketData (tempo real do tick) + le o caminho]");
 				Print("  Instrumento : " + Instrument.FullName
 				      + "   TickSize : " + TickSize.ToString(CultureInfo.InvariantCulture)
 				      + "   PointValue : " + pointVal.ToString(CultureInfo.InvariantCulture));
@@ -261,29 +262,34 @@ namespace NinjaTrader.NinjaScript.Strategies
 			flattenMToday = NyseHalfDays.Contains(d.Date) ? HALFDAY_FLATTEN_M : FLATTEN_M;
 		}
 
+		// OnBarUpdate so conta barras (diagnostico "0 barras"). Toda a logica sensivel a
+		// TEMPO esta em OnMarketData, que traz o timestamp REAL do tick (Time[0] no NT8 so
+		// anda de minuto em minuto -> EsperaSegundos < 60 caia sempre na 2a vela).
 		protected override void OnBarUpdate()
 		{
-			if (CurrentBar < 1) return;
 			totalBars++;
+		}
 
-			// NT8 carimba a barra intraday no FECHO. Numa barra em formacao (OnEachTick),
-			// Time[0] ja retorna o horario de fecho -> subtrai 1 min p/ ter o INICIO da barra.
-			// (era esse o bug: as 09:29 o codigo lia "09:30" e entrava antes da 1a vela.)
-			DateTime etStart = EmET(Time[0]).AddMinutes(-1);   // FUSO-PROOF + inicio da barra
-			int      m   = etStart.Hour * 60 + etStart.Minute;
-			DateTime d   = etStart.Date;
-			double   px  = Close[0];                      // ultimo preco (cada tick)
+		protected override void OnMarketData(MarketDataEventArgs e)
+		{
+			if (e.MarketDataType != MarketDataType.Last) return;
+			if (BarsInProgress != 0 || CurrentBar < 1) return;
+
+			DateTime et = EmET(e.Time);          // FUSO-PROOF, timestamp REAL do tick
+			int      m  = et.Hour * 60 + et.Minute;
+			DateTime d  = et.Date;
+			double   px = e.Price;
 
 			// ---------------- 1. virada de dia ----------------
 			if (d != curDay)
 				ResetDayState(d);
 
 			// ---------------- 2. captura do OPEN de NY (1o tick >= 09:30:00 ET) ----------------
-			if (!openCaptured && etStart.Hour == 9 && etStart.Minute >= 30 && etStart.Minute < 45)
+			if (!openCaptured && et.Hour == 9 && et.Minute >= 30 && et.Minute < 45)
 			{
-				openPx       = px;                    // preco de abertura de NY
+				openPx       = px;
 				openCaptured = true;
-				rthStart     = etStart;
+				rthStart     = et;
 			}
 
 			// ---------------- 3. flatten por horario ----------------
@@ -298,12 +304,11 @@ namespace NinjaTrader.NinjaScript.Strategies
 			// ---------------- 4. gestao da posicao (tick a tick) ----------------
 			if (inTrade && !exitSent)
 			{
-				double favPts = (px - curEntry) * curSide;         // excursao a favor, em pontos
+				double favPts = (px - curEntry) * curSide;
 				if (favPts > hwmFav) hwmFav = favPts;
 
-				// alvo em $ -> preco alvo (setado no fill); checa por preco
 				if (!double.IsNaN(tpPx) &&
-				    ((curSide > 0 && High[0] >= tpPx) || (curSide < 0 && Low[0] <= tpPx)))
+				    ((curSide > 0 && px >= tpPx) || (curSide < 0 && px <= tpPx)))
 				{
 					if (curSide > 0) ExitLong ("AbAlvo", "AbLong");
 					else             ExitShort("AbAlvo", "AbShort");
@@ -311,22 +316,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 					return;
 				}
 
-				// breakeven: trava stop em 0 quando a maxima a favor >= BeTicks
 				if (!beArmed && hwmFav >= BeTicks * tickSz - 1e-9)
 				{
 					beArmed = true;
-					double be = curEntry;
-					stopPx = curSide > 0 ? Math.Max(stopPx, be) : Math.Min(stopPx, be);
+					stopPx  = curSide > 0 ? Math.Max(stopPx, curEntry) : Math.Min(stopPx, curEntry);
 				}
-				// trailing: apos o BE, stop = maxima - TrailTicks, so aperta
 				if (beArmed)
 				{
 					double trail = curEntry + curSide * (hwmFav - TrailTicks * tickSz);
 					stopPx = curSide > 0 ? Math.Max(stopPx, trail) : Math.Min(stopPx, trail);
 				}
 
-				// stop sintetico: saida a mercado quando o preco cruza
-				if ((curSide > 0 && Low[0] <= stopPx) || (curSide < 0 && High[0] >= stopPx))
+				if ((curSide > 0 && px <= stopPx) || (curSide < 0 && px >= stopPx))
 				{
 					string tag = !beArmed ? "AbStop" : (Math.Abs(stopPx - curEntry) < tickSz / 2 ? "AbBe" : "AbTrail");
 					if (curSide > 0) ExitLong (tag, "AbLong");
@@ -336,33 +337,31 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 			}
 
-			// ---------------- 5. trigger de entrada ----------------
-			// espera EsperaSegundos apos as 09:30, entao LE O CAMINHO: onde o preco esta
-			// vs o open? >= GatilhoTicks acima -> segue LONG; abaixo -> segue SHORT. Entra na hora.
-			// Se ainda nao andou GatilhoTicks, checa a cada tick ate a janela fechar.
-			double decorrido = (etStart - rthStart).TotalSeconds;
+			// ---------------- 5. trigger: espera EsperaSegundos, LE O CAMINHO e SEGUE ----------------
 			if (!inTrade && !exitSent && openCaptured && tradesToday == 0
-			    && Position.MarketPosition == MarketPosition.Flat
-			    && decorrido >= EsperaSegundos
-			    && decorrido <= EsperaSegundos + JanelaLeituraSeg)
+			    && Position.MarketPosition == MarketPosition.Flat)
 			{
-				double disp = px - openPx;                     // caminho desde a abertura, em pontos
-				int side = 0;
-				if      (disp >=  GatilhoTicks * tickSz) side = +1;
-				else if (disp <= -GatilhoTicks * tickSz) side = -1;
-
-				if (side != 0 && InverterDirecao) side = -side;   // fada a abertura
-
-				if (side != 0)
+				double decorrido = (et - rthStart).TotalSeconds;
+				if (decorrido >= EsperaSegundos && decorrido <= EsperaSegundos + JanelaLeituraSeg)
 				{
-					curSide      = side;
-					curSigDay    = d;
-					tradesToday++;
-					exitSent     = false;
-					beArmed      = false;
-					hwmFav       = 0.0;
-					if (side > 0) EnterLong (Contratos, "AbLong");
-					else          EnterShort(Contratos, "AbShort");
+					double disp = px - openPx;
+					int side = 0;
+					if      (disp >=  GatilhoTicks * tickSz) side = +1;
+					else if (disp <= -GatilhoTicks * tickSz) side = -1;
+
+					if (side != 0 && InverterDirecao) side = -side;
+
+					if (side != 0)
+					{
+						curSide   = side;
+						curSigDay = d;
+						tradesToday++;
+						exitSent  = false;
+						beArmed   = false;
+						hwmFav    = 0.0;
+						if (side > 0) EnterLong (Contratos, "AbLong");
+						else          EnterShort(Contratos, "AbShort");
+					}
 				}
 			}
 		}
