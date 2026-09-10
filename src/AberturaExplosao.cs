@@ -154,6 +154,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private double   pointVal;
 		private int      nTrades;
 		private double   sumPts, sumCash;
+		private bool     diagFeito;
 
 		// ---------- fuso-proof (converte Time[0] p/ ET, seja qual for o fuso do grafico) ----------
 		private TimeZoneInfo etTz;
@@ -217,7 +218,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 
 				Print("==================================================================");
-				Print("  AberturaExplosao — breakout direcional da abertura de NY");
+				Print("  AberturaExplosao — breakout direcional da abertura de NY   [build: diag-timestamp 10/09]");
 				Print("  Instrumento : " + Instrument.FullName
 				      + "   TickSize : " + TickSize.ToString(CultureInfo.InvariantCulture)
 				      + "   PointValue : " + pointVal.ToString(CultureInfo.InvariantCulture));
@@ -266,6 +267,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 			int      m   = etStart.Hour * 60 + etStart.Minute;
 			DateTime d   = etStart.Date;
 			double   px  = Close[0];                      // ultimo preco (cada tick)
+
+			// ---- DIAGNOSTICO (some depois): mostra a convencao de timestamp perto da abertura ----
+			if (!diagFeito && Time[0].Hour == 9 && Time[0].Minute >= 25 && Time[0].Minute <= 40)
+			{
+				Print(string.Format("  [DIAG] Time[0]={0}  Time[1]={1}  EmET(Time[0])={2}  etStart(calc)={3}  "
+					+ "IsFirstBarOfSession={4}  Open[0]={5} Close[0]={6}",
+					Time[0].ToString("yyyy-MM-dd HH:mm:ss"), Time[1].ToString("HH:mm:ss"),
+					EmET(Time[0]).ToString("HH:mm:ss"), etStart.ToString("HH:mm:ss"),
+					Bars.IsFirstBarOfSession, Open[0], Close[0]));
+				if (Time[0].Minute >= 33) diagFeito = true;
+			}
 
 			// ---------------- 1. virada de dia ----------------
 			if (d != curDay)
