@@ -18,59 +18,37 @@ using NinjaTrader.NinjaScript.DrawingTools;
 #endregion
 
 // =============================================================================
-//  AberturaNYSpecAndersson — igual ao pedido do Andersson de 11/09/2026, motor
-//  reaproveitado do AberturaExplosao.cs (OnMarketData tick-a-tick, fuso-proof,
-//  CSV, flatten) do Marcelo.
+//  AberturaNYSpecAndersson_v2 — MESMO motor/logica do AberturaNYSpecAndersson.cs
+//  (V1, pedido original do Andersson, 11/09/2026), so' com defaults diferentes:
+//  Marcelo pediu (11/09 tarde) reduzir contratos e stop, escalando o BE
+//  progressivo na MESMA proporcao que tinha em V1 (ativa=40% do stop,
+//  incremento=20% do stop).
 // -----------------------------------------------------------------------------
-//  LOGICA (pedido do Andersson, ponto a ponto):
-//   1) Horario: abertura de NY (09:30 ET = ~10:30 Brasilia — o offset BRT/ET
-//      varia com o horario de verao americano; a maquina trabalha em ET fuso-
-//      proof, por isso o parametro abaixo e' em ET, nao em BRT).
-//   2) Referencia = preco de abertura da 1a vela de 1min (1o print >= 09:30:00 ET).
-//   3) Entrada em TEMPO REAL (nao espera a vela fechar): assim que o preco andar
-//      TicksParaEntrada a partir da abertura, dispara a MERCADO na direcao do
-//      movimento. So' monitora dentro de JanelaMonitoramentoSeg (default 60s =
-//      "so' a 1a vela de 1min", como pedido).
-//   4) 1 entrada por abertura (nao reentra no mesmo dia).
-//   5) StopLossDolares / TakeProfitDolares: $ na posicao, configuraveis.
-//   6) Break-even PROGRESSIVO em DEGRAUS (o pedido explicito do Andersson, ponto
-//      6 do texto dele — diferente do TrailDolar continuo do AberturaExplosao):
-//        - BeAtivacaoDolar : lucro ($) pra ativar a 1a protecao.
-//        - BeProtegeDolar  : quanto desse lucro fica travado no stop na 1a vez
-//                            (0 = breakeven exato).
-//        - BeIncrementoDolar : a cada esse valor A MAIS de lucro (hwm), o stop
-//                            sobe o MESMO valor (degrau), sempre so' pra cima
-//                            (ratchet). BeIncrementoDolar=0 = trava 1x e para
-//                            (sem novos degraus).
+//  V1 (original Andersson)         ->  V2 (teste Marcelo 11/09)
+//    Contratos          6          ->    4
+//    StopLossDolares    $250       ->    $150
+//    TakeProfitDolares  $500       ->    $500 (mantido)
+//    BeAtivacaoDolar    $100       ->    $60
+//    BeProtegeDolar     $0         ->    $0   (mantido)
+//    BeIncrementoDolar  $50        ->    $30
 //
-//  Os 3 valores de BE (ativacao/protege/incremento) NAO tinham default numerico
-//  no pedido do Andersson (ele so' deu o "exemplo conceitual") — os defaults
-//  abaixo (ativa em $100, protege $0/breakeven, sobe de $50 em $50) sao um
-//  ponto de partida RAZOAVEL do Marcelo, confirmar/ajustar com ele antes de
-//  bater o martelo.
+//  V1 fica INTOCADO em `AberturaNYSpecAndersson.cs` — este arquivo e' uma
+//  INSTANCIA SEPARADA no NT8 (nome de classe diferente), pra comparar as duas
+//  configs lado a lado sem perder o historico/registro de V1. Ver
+//  `docs/resumo-para-andersson-11-09.md` e `docs/analise-comite-*.md` pro
+//  contexto completo (45 dias de V1: jun+jul/2026, net -$340,50, achado
+//  principal = curva de patrimonio continua estourou o DD de $1.000).
 //
-//  PRE-REQUISITOS (igual ao AberturaExplosao):
-//    - Market Replay (tick) OU Strategy Analyzer com TICK REPLAY LIGADO.
-//    - Fuso global do NT8 = Eastern (ou qualquer fuso — o codigo e' fuso-proof).
-//    - Instrumento MNQ (TickSize 0.25 / PointValue 2.0).
-//
-//  COMISSAO / SLIPPAGE: nao calculados aqui (igual ao AberturaExplosao) — o
-//  veredito economico e' o relatorio do Strategy Analyzer / Market Replay.
-//
-//  ⚠️ Achado do dia 11/09 (grid honesto em Python, mesmo gatilho de 10 ticks,
-//  janela de 60s): 17 de 18 combinacoes de degrau/stop deram NEGATIVO. Isso
-//  NAO significa que esse .cs esta errado — significa que a mecanica "reage
-//  ao 1o movimento da abertura" nao mostrou edge em nenhuma variacao testada
-//  ate agora (nem gatilho 3t nem 10t, nem trailing continuo nem em degraus).
-//  Construido do jeito que o Andersson pediu mesmo assim, pra ele ver com os
-//  proprios olhos no Replay — mesmo processo que o Marcelo fez o dia inteiro.
+//  Mesma logica de entrada/gestao do V1 (ver comentario detalhado la):
+//  gatilho de N ticks na 1a vela de 1min, entrada em tempo real, SL/TP em $,
+//  break-even progressivo em degraus. Rodar em Tick Replay.
 //
 //  NAO e' bot de producao. `BotAprovacao.cs` e o ONFADE seguem intactos.
 // =============================================================================
 
 namespace NinjaTrader.NinjaScript.Strategies
 {
-	public class AberturaNYSpecAndersson : Strategy
+	public class AberturaNYSpecAndersson_v2 : Strategy
 	{
 		private double tickSz = 0.25;
 
@@ -85,7 +63,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			new DateTime(2025,12,24), new DateTime(2026,11,27),
 		};
 
-		// ---------- parametros (secao 7 do pedido do Andersson) ----------
+		// ---------- parametros (mesmos do V1) ----------
 		[NinjaScriptProperty] [Range(1, 40)]
 		[Display(Name="Contratos", Order=1, GroupName="1. Abertura")]
 		public int Contratos { get; set; }
@@ -135,7 +113,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 		public string TradeWindowEnd { get; set; }
 
 		[NinjaScriptProperty]
-		[Display(Name="OutputDir (vazio = Documentos\\abertura_andersson)", Order=3, GroupName="4. Controle")]
+		[Display(Name="OutputDir (vazio = Documentos\\abertura_andersson_v2)", Order=3, GroupName="4. Controle")]
 		public string OutputDir { get; set; }
 
 		// ---------- estado diario ----------
@@ -176,8 +154,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			if (State == State.SetDefaults)
 			{
-				Description                   = @"Abertura de NY — spec do Andersson (11/09/2026): gatilho de N ticks na 1a vela de 1min, entrada em tempo real, SL/TP em $ configuraveis, break-even progressivo em degraus configuraveis. Motor reaproveitado do AberturaExplosao.cs. Rodar em Tick Replay.";
-				Name                          = "AberturaNYSpecAndersson";
+				Description                   = @"Abertura de NY — V2 (11/09/2026 tarde): mesma logica do AberturaNYSpecAndersson V1, defaults reduzidos (4 contratos, stop $150, BE escalado na mesma proporcao). V1 original do Andersson fica intocado em AberturaNYSpecAndersson.cs. Rodar em Tick Replay.";
+				Name                          = "AberturaNYSpecAndersson_v2";
 				Calculate                     = Calculate.OnEachTick;
 				EntriesPerDirection           = 1;
 				EntryHandling                 = EntryHandling.AllEntries;
@@ -195,19 +173,18 @@ namespace NinjaTrader.NinjaScript.Strategies
 				BarsRequiredToTrade           = 1;
 				IsInstantiatedOnEachOptimizationIteration = false;
 
-				// V1 — config ORIGINAL do pedido do Andersson (11/09). NAO ALTERAR estes
-				// defaults — quem quiser testar variacoes usa AberturaNYSpecAndersson_v2.cs
-				// (arquivo separado, instancia separada no NT8).
-				Contratos              = 6;
+				// V2 — pedido do Marcelo (11/09 tarde): 4 contratos, stop $150, BE
+				// escalado na mesma proporcao do V1 (ativa 40%/incremento 20% do stop).
+				Contratos              = 4;
 				HoraAberturaEt         = 9;
 				MinutoAberturaEt       = 30;
 				JanelaMonitoramentoSeg = 60;
 				TicksParaEntrada       = 10;
-				StopLossDolares        = 250;
+				StopLossDolares        = 150;
 				TakeProfitDolares      = 500;
-				BeAtivacaoDolar        = 100;
+				BeAtivacaoDolar        = 60;
 				BeProtegeDolar         = 0;
-				BeIncrementoDolar      = 50;
+				BeIncrementoDolar      = 30;
 				TradeWindowStart       = "";
 				TradeWindowEnd         = "";
 				OutputDir              = "";
@@ -222,7 +199,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				Print("  Fuso do grafico detectado : " + (graficoTz != null ? graficoTz.Id : "(nao detectado -> assume ET)"));
 
 				outDir = string.IsNullOrWhiteSpace(OutputDir)
-					? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "abertura_andersson")
+					? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "abertura_andersson_v2")
 					: OutputDir;
 				try { Directory.CreateDirectory(outDir); } catch (Exception e) { Print("ERRO criando OutputDir: " + e.Message); }
 
@@ -236,7 +213,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 				}
 
 				Print("==================================================================");
-				Print("  AberturaNYSpecAndersson — pedido do Andersson (11/09), motor AberturaExplosao");
+				Print("  AberturaNYSpecAndersson_v2 — teste Marcelo (11/09 tarde), motor AberturaExplosao");
 				Print("  Instrumento : " + Instrument.FullName
 				      + "   TickSize : " + TickSize.ToString(CultureInfo.InvariantCulture)
 				      + "   PointValue : " + pointVal.ToString(CultureInfo.InvariantCulture));
@@ -496,7 +473,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 			try
 			{
 				Print("------------------------------------------------------------------");
-				Print("  [FLUSH] AberturaNYSpecAndersson");
+				Print("  [FLUSH] AberturaNYSpecAndersson_v2");
 				Print("  barras processadas : " + totalBars + "   trades : " + nTrades);
 
 				if (totalBars == 0)
@@ -511,7 +488,7 @@ namespace NinjaTrader.NinjaScript.Strategies
 					try
 					{
 						Directory.CreateDirectory(outDir);
-						string path = Path.Combine(outDir, "trades_abertura_andersson.csv");
+						string path = Path.Combine(outDir, "trades_abertura_andersson_v2.csv");
 						File.WriteAllLines(path, tradeLog);
 						Print("  csv : " + path + "  (" + (tradeLog.Count - 1) + " trades)");
 					}
