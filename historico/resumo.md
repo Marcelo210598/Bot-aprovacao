@@ -3,6 +3,32 @@
 > Visão rápida pra retomar o projeto depois de dias/semanas sem mexer. Detalhe completo sempre
 > em `progress.md` (topo) e nos snapshots diários desta pasta.
 
+## 🟢 11/09/2026 — `AberturaNYSpecAndersson.cs` (V1+V2): 1º resultado do projeto que sobrevive 45 dias reais sem estourar o DD
+
+Detalhe: `historico/2026-09-11.md` (12 seções) + `docs/analise-comite-aberturaNYSpecAndersson-11-09.md`
++ `docs/resumo-para-andersson-11-09.md`.
+
+- **Manhã:** `AberturaExplosao.cs` levou o no-go definitivo — 9 configs testadas, 6 dias reais no
+  Replay (6/6 negativos), 6 ideias novas A-F (ORB, filtro pré-mercado, filtro volume, fada
+  extremo, limite na retração, faixa do dia anterior) sem edge robusto. Grid search Python
+  corrigido (bug que ignorava gap/slippage no stop inflava 73% das configs pra "positivas" —
+  corrigido, caiu pra 9%).
+- **Pivot pro pedido formal do Andersson:** gatilho 10t na 1ª vela, BE PROGRESSIVO EM DEGRAUS
+  (feature nova). Criado `src/AberturaNYSpecAndersson.cs` (V1, motor do AberturaExplosao,
+  defaults do Andersson: 6 contr/$250/$500/BE 100-0-50).
+- **Forward test 45 dias reais (jun+jul/2026, tick replay): V1 fecha −$340,50 (PF 0,87).**
+  Achado crítico: a curva de patrimônio CONTÍNUA (sem resetar por mês) tem DD de **$1.162,50 —
+  ESTOURARIA o limite $1.000 EOD**, escondido no placar mês a mês.
+- **Análise de comitê (8 personas):** motor positivo = `AbTrail` (+$84,81/trade, n=24, BE
+  funcionando); problema = `AbStop` (−$198,08/trade, n=12, slippage do stop sintético em spike).
+  Classificação INVESTIGATE. Recomendação: trocar stop sintético por ordem nativa do NT8.
+- **V2 (Marcelo pediu reduzir risco antes): 4 contr/$150/BE 60-0-30**, arquivo separado
+  (`_v2.cs`), V1 preservado intocado. **Mesmos 45 dias: +$408,00 (PF 1,34), DD contínuo $524 —
+  NÃO ESTOURA.** Mecanismo confirmado (44/45 dias mesmo sinal V1×V2, 1 exceção explicável —
+  dia 06/07, custo real do BE mais agressivo).
+- **➡️ Marcelo cogitando usar como bot PÓS-aprovação** (não pra passar avaliação — nenhum mês
+  bateu a meta $1.500 ainda). Amanhã: testar V3 com 3 contratos.
+
 ## 🔴 10/09/2026 — ABERTURA DE NY levada pro NT8 (`src/AberturaExplosao.cs`, 7 builds, 6 MNQ): SEM EDGE
 
 Detalhe: `docs/abertura-ny-resultados-10-09.md` + `historico/2026-09-10.md`.
