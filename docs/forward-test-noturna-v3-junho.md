@@ -15,20 +15,39 @@ JanelaMonitoramento=60s. `src/AberturaNYSpecAndersson_v3.cs`.
 
 | Dia | Direção | Entrada (média) | Saída (média) | Motivo | Pts | $ (bruto, s/comissão) |
 |---|---|---|---|---|---|---|
-| 01/06 | LONG | 30546,90 | 30528,10 | STOP | −18,80 | **−$150,40** |
+| 01/06 | LONG | 30546,88 | 30528,13 | STOP | −18,75 | **−$149,00** |
+| 02/06 | SHORT | 30741,81 | 30730,38 | TRAIL | +11,44 | **+$91,50** |
 
-**Total até agora: −$150,40 — 1 trade, 0 ganho / 1 perda (0% WR)**
+**Total até agora: −$57,50 — 2 trades, 1 ganho / 1 perda (50% WR)**
+
+---
+
+## 🐞 Bug encontrado e corrigido (14/09, entre o dia 01/06 e 02/06)
+O `.cs` só contava o **último pedaço** quando a entrada/saída enchia em mais de 1 fill
+parcial (comum no Replay) — jogava fora o PnL do(s) fill(s) anterior(es). Foi por isso que
+o `[FLUSH]` do dia 01/06 mostrou −$75 (só a saída de 2 contratos @ 30528,00), quando o real
+(somando os 2 pedaços da saída, 2+2) é **−$149,00**. Corrigido: agora acumula média
+ponderada de entrada E saída até a posição ficar flat. Números da tabela acima já são os
+corretos (recalculados na mão pra 01/06; 02/06 já saiu certo). Dias a partir de agora, se
+você resalvar o `.cs` atualizado na VM, o `[FLUSH]` já vem certo sozinho.
 
 ---
 
 ## Detalhe por dia
 
-### 01/06/2026 — LONG → STOP (−$150,40)
+### 01/06/2026 — LONG → STOP (−$149,00)
 - Abertura (18:00 ET) → gatilho de 10 ticks disparou LONG.
-- Entrada: 2 @ 30546,75 + 2 @ 30547,00 (fill em 2 pedaços, 4 contratos).
-- Saída: `AbStop` — 2 @ 30528,25 + 2 @ 30528,00.
+- Entrada: 2 @ 30546,75 + 2 @ 30547,00 (média 30546,88, 4 contratos).
+- Saída: `AbStop` — 2 @ 30528,25 + 2 @ 30528,00 (média 30528,13).
 - Perda bateu certinho o `StopLossDolares=$150` configurado (mecanismo de stop sintético
   validado, mesmo sem ordem nativa no NT8).
+
+### 02/06/2026 — SHORT → TRAIL (+$91,50)
+- Entrada: 1 @ 30742,00 + 3 @ 30741,75 (média 30741,81, 4 contratos).
+- Saída: `AbTrail` — 2 @ 30730,25 + 2 @ 30730,50 (média 30730,38).
+- O BE progressivo travou lucro no trailing antes de reverter — não foi alvo nem stop, foi
+  o degrau de proteção segurando o ganho. Primeiro sinal de que a gestão em degraus funciona
+  como pensado.
 
 ---
 
