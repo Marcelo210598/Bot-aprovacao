@@ -17,11 +17,24 @@ JanelaMonitoramento=60s. `src/AberturaNYSpecAndersson_v3.cs`.
 |---|---|---|---|---|---|---|
 | 01/06 | LONG | 30546,88 | 30528,13 | STOP | −18,75 | **−$149,00** |
 | 02/06 | SHORT | 30741,81 | 30730,38 | TRAIL | +11,44 | **+$91,50** |
-| 03/06 | SHORT | 30444,56 | 30449,75 | BE | ~−5,19 | **~−$41,50 (PENDENTE — confirmar fills na aba Execuções, log do NT8 mostrou +$46, sinal oposto)** |
+| 03/06 | SHORT | 30444,56 | 30449,75 | BE | −5,19 | **−$41,50** (confirmado na aba Execuções) |
 | 04/06 | LONG | 30406,50 | 30405,69 | TRAIL | −0,81 | **−$6,50** |
-| — | — | — | — | Sexta (05/06) | — | sem pregão noturno — Globex fecha 17h ET sexta, reabre 18h ET domingo |
+| — | — | — | Sexta (05/06) | — | — | sem pregão noturno — Globex fecha 17h ET sexta, reabre 18h ET domingo |
+| 08/06 | SHORT | 29438,06 | 29438,63 | BE | −0,56 | **−$4,50** |
+| 09/06 | SHORT | 29042,25 | 29047,63 | STOP | −5,38 | **−$43,00** |
+| 10/06 | SHORT | 28464,25 | 28467,50 | BE | −3,25 | **−$26,00** |
+| 11/06 | LONG | 29456,44 | 29470,56 | TRAIL | +14,13 | **+$113,00** |
 
-**Total até agora (sem contar 03/06 pendente): −$63,50 — 3 trades, 1 ganho / 2 perdas (33% WR)**
+**Total até agora: −$66,00 — 8 trades, 2 ganhos / 6 perdas (25% WR)**
+
+### Observação por motivo de saída (ainda amostra pequena, mas de olho)
+- **STOP** (2×): sempre perda cheia, como esperado (−149, −43).
+- **BE** (3×): as 3 vezes deu **perda pequena**, nunca lucro — o stop sintético trava em ~$0
+  mas o preencimento costuma escorregar um pouco pro lado errado antes de sair (−41,50, −4,50,
+  −26,00). Não é catastrófico, mas até agora BE nunca protegeu de verdade, só reduziu o dano.
+- **TRAIL** (3×): é de onde saem os ganhos — 2 de 3 foram positivos e grandes (+91,50, +113,00),
+  só 1 pequeno negativo (−6,50). Bom sinal do degrau de proteção funcionando quando o preço
+  anda bastante a favor.
 
 ---
 
