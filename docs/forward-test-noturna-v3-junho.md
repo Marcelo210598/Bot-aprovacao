@@ -25,16 +25,36 @@ JanelaMonitoramento=60s. `src/AberturaNYSpecAndersson_v3.cs`.
 | 10/06 | SHORT | 28464,25 | 28467,50 | BE | −3,25 | **−$26,00** |
 | 11/06 | LONG | 29456,44 | 29470,56 | TRAIL | +14,13 | **+$113,00** |
 
-**Total até agora: −$66,00 — 8 trades, 2 ganhos / 6 perdas (25% WR)**
+| 15/06 | LONG | 30545,13 | 30552,31 | TRAIL | +7,19 | **+$57,50** |
+| 16/06 | LONG | 30022,19 | 30011,25 | STOP | −10,94 | **−$87,50** |
+| 17/06 | SHORT | 29835,13 | 29856,13 | STOP | −21,00 | **−$168,00** |
+| 18/06 | LONG | 30763,88 | 30759,13 | STOP | −4,75 | **−$38,00** (rolou pro contrato SEP26 aqui) |
+| 22/06 | LONG | — | — | TRAIL | — | **+$21,50** |
+| 23/06 | LONG | — | — | TRAIL | — | **−$14,00** |
+| 24/06 | SHORT | — | — | STOP | — | **−$142,50** |
+| 25/06 | SHORT | — | — | STOP | — | **−$137,00** |
+| 29/06 | LONG | — | — | STOP | — | **−$144,50** |
+| 30/06 | LONG | — | — | TRAIL | — | **+$68,50** |
 
-### Observação por motivo de saída (ainda amostra pequena, mas de olho)
-- **STOP** (2×): sempre perda cheia, como esperado (−149, −43).
-- **BE** (3×): as 3 vezes deu **perda pequena**, nunca lucro — o stop sintético trava em ~$0
-  mas o preencimento costuma escorregar um pouco pro lado errado antes de sair (−41,50, −4,50,
-  −26,00). Não é catastrófico, mas até agora BE nunca protegeu de verdade, só reduziu o dano.
-- **TRAIL** (3×): é de onde saem os ganhos — 2 de 3 foram positivos e grandes (+91,50, +113,00),
-  só 1 pequeno negativo (−6,50). Bom sinal do degrau de proteção funcionando quando o preço
-  anda bastante a favor.
+**MÊS FECHADO (junho, só noite): −$650,00 — 18 trades, 5 ganhos / 13 perdas (28% WR)**
+
+### Quebra por motivo de saída (mês inteiro)
+| Motivo | Trades | Ganhos | Resultado |
+|---|---|---|---|
+| STOP | 8 | 0 | **−$909,50** |
+| BE | 3 | 0 | **−$72,00** |
+| TRAIL | 7 | 5 | **+$331,50** |
+
+**Leitura:** o TRAIL é a única fonte de lucro (71% WR, +$331,50) — o BE nunca protegeu de
+verdade (3/3 negativas, pequenas) e o STOP cheio (8×, sempre perda máxima) consome tudo:
+quase −$910 sozinho. Sozinha, a janela da noite **fechou o mês no negativo**. Pelo critério
+combinado com o Marcelo ("se satisfatório, testa manhã + noite juntas"), esse resultado
+**não bate o critério** como está — decisão em aberto: testar manhã sozinha primeiro, ou ir
+direto pro combo mesmo com a noite fraca.
+
+### ⏳ Pendente
+- **Manhã sozinha** (`AtivarAberturaManha=true`, `AtivarAberturaNoite=false`) — ainda não rodado.
+- **Manhã + noite juntas** — ainda não rodado.
 
 ---
 
