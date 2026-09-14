@@ -17,8 +17,11 @@ JanelaMonitoramento=60s. `src/AberturaNYSpecAndersson_v3.cs`.
 |---|---|---|---|---|---|---|
 | 01/06 | LONG | 30546,88 | 30528,13 | STOP | −18,75 | **−$149,00** |
 | 02/06 | SHORT | 30741,81 | 30730,38 | TRAIL | +11,44 | **+$91,50** |
+| 03/06 | SHORT | 30444,56 | 30449,75 | BE | ~−5,19 | **~−$41,50 (PENDENTE — confirmar fills na aba Execuções, log do NT8 mostrou +$46, sinal oposto)** |
+| 04/06 | LONG | 30406,50 | 30405,69 | TRAIL | −0,81 | **−$6,50** |
+| — | — | — | — | Sexta (05/06) | — | sem pregão noturno — Globex fecha 17h ET sexta, reabre 18h ET domingo |
 
-**Total até agora: −$57,50 — 2 trades, 1 ganho / 1 perda (50% WR)**
+**Total até agora (sem contar 03/06 pendente): −$63,50 — 3 trades, 1 ganho / 2 perdas (33% WR)**
 
 ---
 
