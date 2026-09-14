@@ -3,6 +3,22 @@
 > Visão rápida pra retomar o projeto depois de dias/semanas sem mexer. Detalhe completo sempre
 > em `progress.md` (topo) e nos snapshots diários desta pasta.
 
+## 🌙 14/09/2026 — `AberturaNYSpecAndersson_v3.cs`: janela da NOITE sozinha, junho inteiro — FECHOU NEGATIVA
+
+Detalhe: `historico/2026-09-14.md` + `docs/forward-test-noturna-v3-junho.md`.
+
+- Motor idêntico ao V2, mas com **2 janelas de entrada independentes** (manhã 09:30 ET / noite
+  18:00 ET = 19h Brasília), cada uma com flatten próprio. Pedido do Marcelo: testar só a noite
+  primeiro; se satisfatório, ligar manhã+noite juntas.
+- **Forward test manual (Market Replay, junho/2026, 18 pregões): −$650,00, 18 trades, 28% WR.**
+  STOP (8×) = −$909,50; BE (3×, nunca protegeu) = −$72,00; TRAIL (7×, 71% WR) = **+$331,50 —
+  única fonte de lucro, não cobre o resto.** Não bateu o critério pra avançar pro combo.
+- 2 bugs achados e corrigidos no caminho: `FlushFiles` sem guard de 0-barras (crash "Index out
+  of range") e PnL perdendo o fill parcial mais antigo em entradas/saídas de >1 pedaço (só
+  contava o último — dropava metade do resultado em alguns dias). Corrigido e validado trade a
+  trade contra a aba Execuções e a linha `[MeuTrade]` do log.
+- **Pendente:** rodar manhã sozinha e manhã+noite juntas (mesmo junho) — decisão em aberto.
+
 ## 🟢 11/09/2026 — `AberturaNYSpecAndersson.cs` (V1+V2): 1º resultado do projeto que sobrevive 45 dias reais sem estourar o DD
 
 Detalhe: `historico/2026-09-11.md` (12 seções) + `docs/analise-comite-aberturaNYSpecAndersson-11-09.md`
