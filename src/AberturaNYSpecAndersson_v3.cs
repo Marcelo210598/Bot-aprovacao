@@ -183,6 +183,13 @@ namespace NinjaTrader.NinjaScript.Strategies
 		private double   curOpenPxRef;  // openPx da janela que gerou a entrada corrente
 		private int      curFlattenM;   // horario de flatten (minutos do dia ET) da entrada corrente
 
+		// ---------- acumuladores de fill parcial (entrada/saida podem encher em >1 pedaco) ----------
+		private int      entryQtyFilled;
+		private double   entryPxQtySum;
+		private int      exitQtyFilled;
+		private double   exitPxQtySum;
+		private double   exitCashAccum;
+
 		// ---------- controle ----------
 		private DateTime twStart, twEnd;
 		private bool     twAll;
@@ -462,25 +469,32 @@ namespace NinjaTrader.NinjaScript.Strategies
 			if (execution.Order == null) return;
 			string on = execution.Order.Name;
 
-			// ----- ENTRADA -----
+			// ----- ENTRADA (pode encher em >1 fill parcial — acumula media ponderada) -----
 			if (on == "AbLong" || on == "AbShort")
 			{
 				if (!inTrade)
 				{
-					inTrade      = true;
-					curEntry     = price;
-					curEntryTime = time;
-					curEntryEt   = EmET(time);
-					hwmDolar     = 0.0;
-					stopDolLock  = -StopLossDolares;
+					inTrade        = true;
+					curEntryTime   = time;
+					curEntryEt     = EmET(time);
+					hwmDolar       = 0.0;
+					stopDolLock    = -StopLossDolares;
+					entryQtyFilled = 0;
+					entryPxQtySum  = 0.0;
+					exitQtyFilled  = 0;
+					exitPxQtySum   = 0.0;
+					exitCashAccum  = 0.0;
 				}
+				entryQtyFilled += quantity;
+				entryPxQtySum  += price * quantity;
+				curEntry        = entryPxQtySum / entryQtyFilled;  // media ponderada, atualiza a cada fill
 				return;
 			}
 
-			// ----- SAIDA -----
+			// ----- SAIDA (idem — acumula TODOS os fills ate a posicao ficar flat) -----
 			bool isExit = on == "AbStop" || on == "AbBe" || on == "AbTrail" || on == "AbAlvo"
 			              || on == "AbFlat" || on == "Exit on session close";
-			if (isExit && inTrade && Position.MarketPosition == MarketPosition.Flat)
+			if (isExit && inTrade)
 			{
 				string motivo = on == "AbStop"  ? "STOP"
 				              : on == "AbBe"     ? "BE"
@@ -488,8 +502,17 @@ namespace NinjaTrader.NinjaScript.Strategies
 				              : on == "AbAlvo"   ? "ALVO"
 				              : "FLATTEN";
 
-				double pnlPts  = (price - curEntry) * curSide;
-				double pnlCash = pnlPts * pointVal * quantity;
+				exitQtyFilled += quantity;
+				exitPxQtySum  += price * quantity;
+				exitCashAccum += (price - curEntry) * curSide * pointVal * quantity;
+
+				// so' fecha/loga o trade quando TODA a posicao saiu (fills parciais nao contam ainda)
+				if (Position.MarketPosition != MarketPosition.Flat)
+					return;
+
+				double avgExitPx = exitPxQtySum / exitQtyFilled;
+				double pnlCash   = exitCashAccum;
+				double pnlPts    = pnlCash / (pointVal * exitQtyFilled);  // media de pontos por contrato
 
 				if (twAll || (curSigDay >= twStart && curSigDay <= twEnd))
 				{
@@ -508,8 +531,8 @@ namespace NinjaTrader.NinjaScript.Strategies
 							Num(curOpenPxRef), Num(curOpenPxRef + curSide * TicksParaEntrada * tickSz),
 							curSide > 0 ? "LONG" : "SHORT",
 							Iso(curEntryTime), Num(curEntry),
-							Iso(time), motivo, Num(price),
-							quantity.ToString(CultureInfo.InvariantCulture),
+							Iso(time), motivo, Num(avgExitPx),
+							exitQtyFilled.ToString(CultureInfo.InvariantCulture),
 							Num(pnlPts), Num(pnlCash)
 						}));
 					}
