@@ -579,17 +579,26 @@ namespace NinjaTrader.NinjaScript.Strategies
 		{
 			try
 			{
+				// Guard cedo: com 0 barras a estrategia nunca chegou a tocar em OnMarketData,
+				// entao nao ha nada consistente pra flushar. Sai ANTES de qualquer outra
+				// operacao (mesmo Print composto) - mesmo padrao usado no OnFadeHarness.cs
+				// pra evitar o "Index was out of range" quando o Analyzer/Replay nao rodou
+				// dado nenhum (estrategia so' foi adicionada/configurada, sem dar Play).
+				if (totalBars == 0)
+				{
+					Print("==================================================================");
+					Print("  *** 0 BARRAS — a estrategia nao processou nenhuma barra.");
+					Print("      Causas comuns: (a) contrato sem historico no periodo; (b) Market Replay/");
+					Print("      Analyzer nao foi dado Play; (c) instrumento/fuso errado.");
+					Print("  Nenhum arquivo escrito.");
+					Print("==================================================================");
+					return;
+				}
+
 				Print("------------------------------------------------------------------");
 				Print("  [FLUSH] AberturaNYSpecAndersson_v3");
 				Print("  barras processadas : " + totalBars + "   trades : " + nTrades
 				      + "  (manha=" + nTradesManha + " / noite=" + nTradesNoite + ")");
-
-				if (totalBars == 0)
-				{
-					Print("  *** 0 BARRAS — a estrategia nao processou nenhuma barra.");
-					Print("      Causas comuns: (a) contrato sem historico no periodo; (b) Market Replay");
-					Print("      nao foi dado Play; (c) instrumento/fuso errado.");
-				}
 
 				if (!string.IsNullOrWhiteSpace(outDir) && tradeLog.Count > 1)
 				{
